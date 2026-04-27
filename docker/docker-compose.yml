@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16
+    container_name: overwatch-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: overwatch
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: secret
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d overwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
