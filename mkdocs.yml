@@ -1,0 +1,22 @@
+site_name: Overwatch Team Comp Tool
+site_description: Projekt documentation for the SQS project
+repo_url: https://github.com/FabianReinelt-stud/OverwatchTeamUp
+
+theme:
+  name: readthedocs
+  language: en
+
+nav:
+  - Home: index.md
+  - Setup: setup.md
+  - Architecture:
+      - arc42: architecture/arc42.md
+      - C4-Modell: architecture/c4-model.md
+  - ADRs:
+      - React frontend: adr/001-frontend-react.md
+      - Spring Boot backend: adr/002-backend-spring-boot.md
+      - PostgreSQL database: adr/003-database-postgres.md
+  - Tests:
+      - Testkonzept: testing/testkonzept.md
+  - Quality:
+      - Static code analysis: quality/static-analysis.md
