@@ -6,20 +6,25 @@
   <component name="ChangeListManager">
     <list default="true" id="1eb47d96-a697-4e57-a22f-b74a8517fa97" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/app/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/app/asgi.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/app/settings.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/app/urls.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/app/wsgi.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/app/db.sqlite3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/venv/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/database/001_init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/database/001_init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config/asgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config/asgi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/config/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/config/wsgi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/heroes/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/heroes/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/heroes/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/heroes/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/manage.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/app/manage.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -29,6 +34,9 @@
   "associatedIndex": 0
 }]]></component>
   <component name="ProjectId" id="3Dhw780fN6PjhZf1InVla1kdj0y" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

@@ -31,4 +31,4 @@ class Hero(models.Model):
     description = models.TextField()
 
     class Meta:
-        db_table = "hero"
+        db_table = "heroes"
