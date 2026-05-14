@@ -23,3 +23,9 @@ Reset the DB if needed:
 ```bash
 docker compose down -v #-v resets the docker volume
 ```
+
+## Backend 
+### Install required Packages
+```bash
+python -m pip install -r requirements.txt
+```
