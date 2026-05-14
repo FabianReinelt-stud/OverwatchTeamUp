@@ -29,3 +29,10 @@ docker compose down -v #-v resets the docker volume
 ```bash
 python -m pip install -r requirements.txt
 ```
+
+### Create  Virtual Environment
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate
+```
