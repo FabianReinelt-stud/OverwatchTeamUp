@@ -5,7 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1eb47d96-a697-4e57-a22f-b74a8517fa97" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/app/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/app/asgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/app/settings.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/app/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/app/wsgi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/app/db.sqlite3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/venv/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/database/001_init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/docker/database/001_init.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

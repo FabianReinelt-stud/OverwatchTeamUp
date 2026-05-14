@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS team_comps (
     hero_4 VARCHAR(30) REFERENCES heroes(hero_key) ON DELETE RESTRICT,
     hero_5 VARCHAR(30) REFERENCES heroes(hero_key) ON DELETE RESTRICT,
 
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP 
 );
 
 CREATE INDEX IF NOT EXISTS idx_team_comps_user_id ON team_comps(user_id);
