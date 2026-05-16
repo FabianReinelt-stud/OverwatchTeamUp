@@ -1,6 +1,10 @@
-from decimal import Decimal
-
 from rest_framework import serializers
+
+
+class HeroSummarySerializer(serializers.Serializer):
+    display_name = serializers.CharField()
+    portrait_url = serializers.CharField()
+    role = serializers.CharField()
 
 
 class HeroSerializer(serializers.Serializer):

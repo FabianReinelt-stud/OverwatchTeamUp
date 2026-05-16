@@ -7,6 +7,9 @@ class HeroDataBaseAdapter(HeroPort):
     def get_all(self) -> list[HeroEntity]:
         return [self._to_entity(h) for h in Hero.objects.all()]
 
+    def get_by_key(self, hero_key: str) -> HeroEntity:
+        return self._to_entity(Hero.objects.get(pk=hero_key))
+
     def _to_entity(self, h: Hero) -> HeroEntity:
         return HeroEntity(
             hero_key=h.hero_key,

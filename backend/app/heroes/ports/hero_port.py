@@ -6,3 +6,7 @@ from heroes.domain.entities import HeroEntity
 class HeroPort(ABC):
     @abstractmethod
     def get_all(self) -> list[HeroEntity]: ...
+
+    @abstractmethod
+    def get_by_key(self, hero_key: str) -> HeroEntity: ...
+
