@@ -36,3 +36,7 @@ cd backend
 python -m venv venv
 venv\Scripts\activate
 ```
+
+### SonarQube Account
+User: admin
+Password: Overwatchteamup1#
