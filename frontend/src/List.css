@@ -1,0 +1,31 @@
+    .scrollable-container {
+        width: 75%;
+        height: 70%;
+        border-radius: 10px;
+        overflow: auto;
+
+        border: 5px solid #ffffff;
+    }
+
+    .scrollable-items {
+        padding: 0;
+    }
+
+    .scrollable-items li {
+        display: grid;
+        grid-template-columns: 25% 60% 15%;
+        align-items: center;
+        background-color: #EEE;
+        margin: 10px;
+        border-radius: 10px;
+        padding: 5px;
+    }
+
+    .hero-preview{
+        width: 45px;
+        padding-right: 10px;
+    }
+
+    .hero-role{
+        width: 45px;
+    }

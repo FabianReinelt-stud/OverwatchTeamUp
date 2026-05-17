@@ -1,0 +1,81 @@
+.hero-stat-row {
+  --stat-row-gap: 20px;
+  display: grid;
+  grid-gap: var(--stat-row-gap);
+  justify-content: left;
+  text-align: left;
+  grid-template-columns: 25% calc(75% - var(--stat-row-gap));
+}
+
+.hero-view {
+  display: grid;
+  justify-content: left;
+  text-align: left;
+  grid-template-columns: 33% 66%;
+  background-color: rgb(5, 5, 5);
+  border-radius: 10px;
+  margin-left: 10px;
+}
+
+.hero-portrait {
+  margin: 10px;
+  height: 150px;
+  width: 150px;
+  border-radius: 10px;
+}
+
+.hero-name {
+  text-align: center;
+}
+
+.hero-row-name {
+  text-align: left;
+}
+
+.hero-role {
+  justify-content: right;
+}
+
+.main-view {
+  --main-view-gap: 20px;
+  display: grid;
+  grid-row-gap: var(--main-view-gap);
+  grid-template-rows: 15% calc(65% - var(--main-view-gap)) calc(20% - var(--main-view-gap));
+}
+
+.team-comp-select {
+  --comp-grid-gap: 30px;
+  display: grid;
+  grid-gap: var(--comp-grid-gap);
+  grid-template-columns: repeat(6, calc(16% - var(--comp-grid-gap)));
+  grid-template-rows: repeat(2, calc(50% - var(--comp-grid-gap)));
+  background-color: rgb(13, 30, 46);
+  border-radius: 10px;
+}
+
+.team-role-select {
+  position: relative;
+  margin: 10px;
+  grid-row: 1 / span 2;
+}
+
+.role {
+  position: absolute;
+  left: 5px;
+  grid-row: 1/ span 2;
+}
+
+.save {
+  margin: 10px;
+}
+
+.load {
+  margin: 10px;
+}
+
+.overwatch-team-comp {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 60% 40%;
+  background-color: rgb(26, 26, 43);
+}
