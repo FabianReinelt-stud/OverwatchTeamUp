@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16
+    container_name: overwatch-db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: overwatch
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: secret
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d overwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+    volumes:
+      - ./backend/app:/app
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_DB: overwatch
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    command: python manage.py runserver 0.0.0.0:8000
+
+#  frontend:
+#    build:
+#      context: ./frontend
+#    ports:
+#      - "5173:5173"
+#    volumes:
+#      - ./frontend:/app
+#      - /app/node_modules
+#    stdin_open: true
+#    command: ["npm", "run", "dev", "--", "--host"]
+
+volumes:
+  postgres_data:
