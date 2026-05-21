@@ -1,10 +1,10 @@
     .scrollable-container {
-        width: 75%;
-        height: 70%;
+        width: 85%;
+        height: 100%;
         border-radius: 10px;
         overflow: auto;
-
         border: 5px solid #ffffff;
+        margin-bottom: 10px;
     }
 
     .scrollable-items {

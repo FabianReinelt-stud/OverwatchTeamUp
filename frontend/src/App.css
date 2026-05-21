@@ -1,20 +1,27 @@
+.hero-view {
+  display: grid;
+  justify-content: left;
+  text-align: left;
+  grid-template-columns: 1fr 3fr;
+  background-color: rgb(5, 5, 5);
+  border-radius: 10px;
+  margin-left: 10px;
+  height: 425px;
+}
+
 .hero-stat-row {
   --stat-row-gap: 20px;
   display: grid;
   grid-gap: var(--stat-row-gap);
   justify-content: left;
   text-align: left;
-  grid-template-columns: 25% calc(75% - var(--stat-row-gap));
+  grid-template-columns: 1fr 3fr;
+  margin-left: 10px;
 }
 
-.hero-view {
-  display: grid;
-  justify-content: left;
-  text-align: left;
-  grid-template-columns: 33% 66%;
-  background-color: rgb(5, 5, 5);
-  border-radius: 10px;
-  margin-left: 10px;
+.stat-view{
+  display: block;
+  overflow: auto;
 }
 
 .hero-portrait {
@@ -36,19 +43,32 @@
   justify-content: right;
 }
 
+.logo{
+  display: flex;
+  align-items: center;
+}
+
+.logo-img{
+  max-height: 100%;
+  max-width: 100%;
+  margin: 10px;
+}
+
 .main-view {
-  --main-view-gap: 20px;
+  --main-view-gap: 15px;
   display: grid;
   grid-row-gap: var(--main-view-gap);
-  grid-template-rows: 15% calc(65% - var(--main-view-gap)) calc(20% - var(--main-view-gap));
+  grid-template-rows: 10% calc(70% - var(--main-view-gap)) 15%;
+  align-content: start;
 }
 
 .team-comp-select {
-  --comp-grid-gap: 30px;
+  --comp-grid-gap: 10px;
   display: grid;
+  height: 100px;
   grid-gap: var(--comp-grid-gap);
-  grid-template-columns: repeat(6, calc(16% - var(--comp-grid-gap)));
-  grid-template-rows: repeat(2, calc(50% - var(--comp-grid-gap)));
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 1fr 1fr;
   background-color: rgb(13, 30, 46);
   border-radius: 10px;
 }
@@ -56,12 +76,14 @@
 .team-role-select {
   position: relative;
   margin: 10px;
+  z-index: 1;
   grid-row: 1 / span 2;
 }
 
 .role {
   position: absolute;
   left: 5px;
+  z-index: 2;
   grid-row: 1/ span 2;
 }
 
@@ -75,7 +97,6 @@
 
 .overwatch-team-comp {
   display: grid;
-  grid-gap: 20px;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: 2fr 1fr;
   background-color: rgb(26, 26, 43);
 }

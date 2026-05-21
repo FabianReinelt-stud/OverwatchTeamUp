@@ -5,6 +5,7 @@ import damage from './assets/dmg.png'
 import tank from './assets/tank.png'
 import save from './assets/save.png'
 import load from './assets/openfile.png'
+import logo from './assets/logo.png'
 import SearchBar from './SearchBar'
 import './App.css'
 
@@ -37,7 +38,20 @@ function HeroView() {
           <HeroStatRow statName='Abilities' statValue='Ability 01, Ability 02'></HeroStatRow>
           <HeroStatRow statName='Description' statValue='Some Text Some Text 
     Some Text Some Text Some Text Some Text Some Text Some Text Some 
-    Text Some Text Some Text Some Text Some Text Some Text Some Text'>
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some 
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some 
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some 
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some 
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text  Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some 
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some Text Some 
+    Text Some Text Some Text Some Text Some Text Some Text Some Text
+    Some Text Some Text'>
           </HeroStatRow>
         </div>
       </div>
@@ -90,7 +104,9 @@ function App() {
     <>
       <div className='overwatch-team-comp'>
         <div className='main-view'>
-          <h1>Overwatch Team Comp</h1>
+          <div className='logo'>
+          <img className='logo-img' src={logo} alt='logo'></img>
+          </div>
           <HeroView></HeroView>
           <div className='team-comp-select'>
             <TeamSlot role={TeamRole.TANK}></TeamSlot>
