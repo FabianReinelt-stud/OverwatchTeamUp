@@ -9,11 +9,16 @@ Frontend: React mit Typescript<br>
 Datenbank: Postgres
 ## Docker
 ### Postgres DB Container Notes
+Create a local `.env` from `.env.example` and set your development secrets
+before starting Docker Compose.
+
 Start container with:
 ```bash
 docker compose up -d #-d optional for detached terminal
 ```
-The container starts listening at `localhost:5432` for a backend connection. Authenticate with `user=dbuser` and `password=secret`.
+The container starts listening at `localhost:5432` for a backend connection.
+Use the `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` values from
+your local `.env` when connecting.
 
 Apply the Django schema migrations after starting the database:
 ```bash
@@ -38,6 +43,13 @@ docker compose down -v #-v resets the docker volume
 ### Install required Packages
 ```bash
 python -m pip install -r requirements.txt
+```
+
+The backend Docker image installs the hash-locked runtime dependencies from
+`backend/requirements.lock`. Regenerate the lock file after changing
+`backend/requirements.txt`:
+```bash
+pip-compile --generate-hashes --output-file=backend/requirements.lock backend/requirements.txt
 ```
 
 ### Create  Virtual Environment
