@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 
 from heroes.adapters.hero_database_adapter import HeroDataBaseAdapter
 from heroes.domain.entities import HeroEntity
-from heroes.models import Hero
+from heroes.models import Hero, TeamComposition
 
 
 def make_hero(**overrides):
@@ -14,6 +14,31 @@ def make_hero(**overrides):
                 'portrait_url': "http://example.com/tracer.png", 'description': "Cockney time traveler"}
     defaults.update(overrides)
     return Hero.objects.create(**defaults)
+
+
+def make_team_composition(**overrides):
+    tracer = overrides.pop("tracer", None) or make_hero()
+    winston = overrides.pop("winston", None) or make_hero(
+        hero_key="winston",
+        display_name="Winston",
+        role="Tank",
+        subrole="Initiator",
+        winrate=Decimal("50.0"),
+        health=425,
+        armor=200,
+        portrait_url="http://example.com/winston.png",
+        description="Scientist",
+    )
+    defaults = {
+        "name": "Dive Comp",
+        "hero_1": winston,
+        "hero_2": tracer,
+        "hero_3": tracer,
+        "hero_4": winston,
+        "hero_5": tracer,
+    }
+    defaults.update(overrides)
+    return TeamComposition.objects.create(**defaults)
 
 
 class TestHeroDataBaseAdapter(TestCase):
@@ -96,3 +121,116 @@ class TestHeroDetailEndpoint(TestCase):
         assert hero["shields"] == 0
         assert hero["portrait_url"] == "http://example.com/tracer.png"
         assert hero["description"] == "Cockney time traveler"
+
+
+class TestTeamCompositionEndpoints(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.tracer = make_hero()
+        self.winston = make_hero(
+            hero_key="winston",
+            display_name="Winston",
+            role="Tank",
+            subrole="Initiator",
+            winrate=Decimal("50.0"),
+            health=425,
+            armor=200,
+            portrait_url="http://example.com/winston.png",
+            description="Scientist",
+        )
+        self.payload = {
+            "name": "Dive Comp",
+            "hero_1_key": "winston",
+            "hero_2_key": "tracer",
+            "hero_3_key": "tracer",
+            "hero_4_key": "winston",
+            "hero_5_key": "tracer",
+        }
+
+    def test_list_returns_team_compositions(self):
+        make_team_composition(tracer=self.tracer, winston=self.winston)
+
+        response = self.client.get("/api/team-compositions/")
+
+        assert response.status_code == 200
+        assert len(response.data) == 1
+        assert response.data[0]["name"] == "Dive Comp"
+        assert response.data[0]["hero_1"]["hero_key"] == "winston"
+        assert response.data[0]["average_winrate"] == "50.6"
+
+    def test_detail_returns_team_composition(self):
+        team = make_team_composition(tracer=self.tracer, winston=self.winston)
+
+        response = self.client.get(f"/api/team-compositions/{team.id}/")
+
+        assert response.status_code == 200
+        assert response.data["id"] == team.id
+        assert response.data["hero_2"]["hero_key"] == "tracer"
+
+    def test_detail_returns_404_for_unknown_team(self):
+        response = self.client.get("/api/team-compositions/999/")
+
+        assert response.status_code == 404
+
+    def test_create_persists_team_composition(self):
+        response = self.client.post(
+            "/api/team-compositions/create/",
+            self.payload,
+            format="json",
+        )
+
+        assert response.status_code == 201
+        assert TeamComposition.objects.count() == 1
+        team = TeamComposition.objects.get(pk=response.data["id"])
+        assert team.name == "Dive Comp"
+        assert team.hero_1_id == "winston"
+        assert response.data["hero_5"]["hero_key"] == "tracer"
+
+    def test_create_returns_404_when_a_hero_is_unknown(self):
+        payload = {**self.payload, "hero_5_key": "unknown"}
+
+        response = self.client.post(
+            "/api/team-compositions/create/",
+            payload,
+            format="json",
+        )
+
+        assert response.status_code == 404
+        assert TeamComposition.objects.count() == 0
+
+    def test_update_changes_team_composition(self):
+        team = make_team_composition(tracer=self.tracer, winston=self.winston)
+        payload = {
+            **self.payload,
+            "name": "Updated Dive Comp",
+            "hero_1_key": "tracer",
+        }
+
+        response = self.client.put(
+            f"/api/team-compositions/{team.id}/update/",
+            payload,
+            format="json",
+        )
+
+        assert response.status_code == 200
+        team.refresh_from_db()
+        assert team.name == "Updated Dive Comp"
+        assert team.hero_1_id == "tracer"
+        assert response.data["hero_1"]["hero_key"] == "tracer"
+
+    def test_update_returns_404_for_unknown_team(self):
+        response = self.client.put(
+            "/api/team-compositions/999/update/",
+            self.payload,
+            format="json",
+        )
+
+        assert response.status_code == 404
+
+    def test_delete_removes_team_composition(self):
+        team = make_team_composition(tracer=self.tracer, winston=self.winston)
+
+        response = self.client.delete(f"/api/team-compositions/{team.id}/delete/")
+
+        assert response.status_code == 204
+        assert TeamComposition.objects.count() == 0
