@@ -1,7 +1,7 @@
 [run]
 relative_files = True
-source = .
+source = backend/app
 omit =
-    */tests.py
-    */migrations/*
-    manage.py
+    backend/app/*/tests.py
+    backend/app/*/migrations/*
+    backend/app/manage.py

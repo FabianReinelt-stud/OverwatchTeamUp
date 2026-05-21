@@ -62,11 +62,10 @@ jobs:
         run: python manage.py migrate --noinput
 
       - name: Run Django tests with coverage
-        working-directory: backend/app
         run: |
-          coverage run manage.py test
-          coverage xml
-          coverage report
+          coverage run --rcfile=backend/app/.coveragerc backend/app/manage.py test heroes
+          coverage xml --rcfile=backend/app/.coveragerc -o backend/app/coverage.xml
+          coverage report --rcfile=backend/app/.coveragerc
 
       - name: Run SonarQube scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
