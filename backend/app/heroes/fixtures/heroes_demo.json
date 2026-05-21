@@ -1,0 +1,47 @@
+[
+  {
+    "model": "heroes.hero",
+    "pk": "winston",
+    "fields": {
+      "display_name": "Winston",
+      "role": "tank",
+      "subrole": "initiator",
+      "winrate": "50.7",
+      "pickrate": "6.1",
+      "health": 425,
+      "armor": 200,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/46a10db3aa908c590ddc4e7606376a88143d1f1306ecfbea043263040f9529a5.png",
+      "description": "A super-intelligent, genetically engineered scientist and champion for humanity's potential."
+    }
+  },
+  {
+    "model": "heroes.hero",
+    "pk": "tracer",
+    "fields": {
+      "display_name": "Tracer",
+      "role": "damage",
+      "subrole": "flanker",
+      "winrate": "51.1",
+      "pickrate": "6.1",
+      "health": 175,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/4504f6f15cb3feaa92ecd38e01dcf751cb5abdac2e0bb52d0555727e53277502.png",
+      "description": "The former Overwatch agent known as Tracer is a time-jumping adventurer and force for good."
+    }
+  },
+  {
+    "model": "heroes.teamcomposition",
+    "pk": 1,
+    "fields": {
+      "name": "Test Dive Comp",
+      "hero_1": "winston",
+      "hero_2": "tracer",
+      "hero_3": "tracer",
+      "hero_4": "winston",
+      "hero_5": "tracer",
+      "created_at": "2026-05-21T00:00:00Z"
+    }
+  }
+]

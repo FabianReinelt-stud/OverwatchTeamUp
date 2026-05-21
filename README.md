@@ -15,6 +15,16 @@ docker compose up -d #-d optional for detached terminal
 ```
 The container starts listening at `localhost:5432` for a backend connection. Authenticate with `user=dbuser` and `password=secret`.
 
+Apply the Django schema migrations after starting the database:
+```bash
+docker compose run --rm backend python manage.py migrate
+```
+
+Load the local demo records when you want sample heroes and a team composition:
+```bash
+docker compose run --rm backend python manage.py loaddata heroes_demo
+```
+
 Manually inspect DB and execute SQL-queries by opening a psql shell inside the container (or use with PGAdmin or DBeaver): 
 ```bash
 docker exec -it overwatch-db psql -U dbuser -d overwatch
