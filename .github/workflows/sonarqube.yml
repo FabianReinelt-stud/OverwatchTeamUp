@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  backend-tests:
-    name: Backend Tests
+  sonarqube:
+    name: SonarQube Scan
     runs-on: ubuntu-latest
 
     services:
@@ -38,16 +38,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: backend/requirements.txt
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
 
       - name: Install backend dependencies
-        run: python -m pip install -r backend/requirements.txt
+        run: python -m pip install -r backend/requirements-dev.txt
 
       - name: Check Django migrations
         working-directory: backend/app
@@ -57,19 +61,12 @@ jobs:
         working-directory: backend/app
         run: python manage.py migrate --noinput
 
-      - name: Run Django tests
+      - name: Run Django tests with coverage
         working-directory: backend/app
-        run: python manage.py test
-
-  sonarqube:
-    name: SonarQube Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-        with:
-          fetch-depth: 0
+        run: |
+          coverage run manage.py test
+          coverage xml
+          coverage report
 
       - name: Run SonarQube scan
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0

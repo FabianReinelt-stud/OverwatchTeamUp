@@ -14,6 +14,21 @@ from heroes.serializers import (
 from heroes.domain.entities import TeamCompositionEntity
 
 
+def _build_team_composition_entity(heroes_data, team_id=None):
+    hero_adapter = HeroDataBaseAdapter()
+    heroes = {
+        field_name: hero_adapter.get_by_key(hero_data["hero_key"])
+        for field_name, hero_data in heroes_data.items()
+        if field_name.startswith("hero_")
+    }
+    return TeamCompositionEntity(
+        id=team_id,
+        name=heroes_data["name"],
+        created_at=None,
+        **heroes,
+    )
+
+
 @api_view(["GET"])
 def hero_list(request):
     repo = HeroDataBaseAdapter()
@@ -58,31 +73,10 @@ def team_composition_create(request):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    hero_adapter = HeroDataBaseAdapter()
     repo = TeamCompositionDatabaseAdapter()
     
     try:
-        # Get all heroes
-        heroes_data = serializer.validated_data
-        hero_1 = hero_adapter.get_by_key(heroes_data["hero_1"]["hero_key"])
-        hero_2 = hero_adapter.get_by_key(heroes_data["hero_2"]["hero_key"])
-        hero_3 = hero_adapter.get_by_key(heroes_data["hero_3"]["hero_key"])
-        hero_4 = hero_adapter.get_by_key(heroes_data["hero_4"]["hero_key"])
-        hero_5 = hero_adapter.get_by_key(heroes_data["hero_5"]["hero_key"])
-        
-        # Create entity
-        team_entity = TeamCompositionEntity(
-            id=None,
-            name=heroes_data["name"],
-            hero_1=hero_1,
-            hero_2=hero_2,
-            hero_3=hero_3,
-            hero_4=hero_4,
-            hero_5=hero_5,
-            created_at=None,
-        )
-        
-        # Save
+        team_entity = _build_team_composition_entity(serializer.validated_data)
         saved_team = repo.create(team_entity)
         result_serializer = TeamCompositionSerializer(saved_team)
         return Response(result_serializer.data, status=status.HTTP_201_CREATED)
@@ -100,31 +94,13 @@ def team_composition_update(request, team_id):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    hero_adapter = HeroDataBaseAdapter()
     repo = TeamCompositionDatabaseAdapter()
     
     try:
-        # Get all heroes
-        heroes_data = serializer.validated_data
-        hero_1 = hero_adapter.get_by_key(heroes_data["hero_1"]["hero_key"])
-        hero_2 = hero_adapter.get_by_key(heroes_data["hero_2"]["hero_key"])
-        hero_3 = hero_adapter.get_by_key(heroes_data["hero_3"]["hero_key"])
-        hero_4 = hero_adapter.get_by_key(heroes_data["hero_4"]["hero_key"])
-        hero_5 = hero_adapter.get_by_key(heroes_data["hero_5"]["hero_key"])
-        
-        # Create entity
-        team_entity = TeamCompositionEntity(
-            id=team_id,
-            name=heroes_data["name"],
-            hero_1=hero_1,
-            hero_2=hero_2,
-            hero_3=hero_3,
-            hero_4=hero_4,
-            hero_5=hero_5,
-            created_at=None,
+        team_entity = _build_team_composition_entity(
+            serializer.validated_data,
+            team_id=team_id,
         )
-        
-        # Update
         updated_team = repo.update(team_id, team_entity)
         result_serializer = TeamCompositionSerializer(updated_team)
         return Response(result_serializer.data)
