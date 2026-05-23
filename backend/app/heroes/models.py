@@ -34,6 +34,16 @@ class Hero(models.Model):
         db_table = "heroes"
 
 
+class Ability(models.Model):
+    hero = models.ForeignKey(Hero, on_delete=models.CASCADE, related_name="abilities")
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    icon = models.TextField()
+
+    class Meta:
+        db_table = "abilities"
+
+
 class TeamComposition(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)

@@ -7,6 +7,12 @@ class HeroSummarySerializer(serializers.Serializer):
     role = serializers.CharField()
 
 
+class AbilitySerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
+    icon = serializers.CharField()
+
+
 class HeroSerializer(serializers.Serializer):
     hero_key = serializers.CharField()
     display_name = serializers.CharField()
@@ -19,6 +25,7 @@ class HeroSerializer(serializers.Serializer):
     shields = serializers.IntegerField()
     portrait_url = serializers.CharField()
     description = serializers.CharField()
+    abilities = AbilitySerializer(many=True)
 
 
 class TeamCompositionSerializer(serializers.Serializer):

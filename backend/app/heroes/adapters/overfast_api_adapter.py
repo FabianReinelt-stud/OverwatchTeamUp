@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import requests
 
-from heroes.domain.entities import HeroEntity
+from heroes.domain.entities import AbilityEntity, HeroEntity
 from heroes.ports.external_hero_source_port import ExternalHeroSourcePort
 
 _BASE_URL = "https://overfast-api.tekrop.fr"
@@ -26,6 +26,14 @@ class OverfastAPIAdapter(ExternalHeroSourcePort):
             shields=hitpoints.get("shields", 0),
             portrait_url=detail.get("portrait") or "",
             description=detail.get("description") or "",
+            abilities=[
+                AbilityEntity(
+                    name=a["name"],
+                    description=a["description"],
+                    icon=a["icon"],
+                )
+                for a in detail.get("abilities", [])
+            ],
         )
 
     def _get(self, url: str) -> dict | list:

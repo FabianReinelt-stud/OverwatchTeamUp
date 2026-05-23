@@ -1,6 +1,13 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from datetime import datetime
+
+
+@dataclass
+class AbilityEntity:
+    name: str
+    description: str
+    icon: str
 
 
 @dataclass
@@ -16,6 +23,7 @@ class HeroEntity:
     shields: int
     portrait_url: str
     description: str
+    abilities: list[AbilityEntity] = field(default_factory=list)
 
 
 @dataclass
