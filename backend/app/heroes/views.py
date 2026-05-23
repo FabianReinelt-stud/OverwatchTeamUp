@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.http import require_http_methods, require_POST, require_safe
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -29,6 +30,7 @@ def _build_team_composition_entity(heroes_data, team_id=None):
     )
 
 
+@require_safe
 @api_view(["GET"])
 def hero_list(request):
     repo = HeroDataBaseAdapter()
@@ -37,6 +39,7 @@ def hero_list(request):
     return Response(serializer.data)
 
 
+@require_safe
 @api_view(["GET"])
 def hero_detail(request, hero_key):
     repo = HeroDataBaseAdapter()
@@ -48,6 +51,7 @@ def hero_detail(request, hero_key):
     return Response(serializer.data)
 
 
+@require_safe
 @api_view(["GET"])
 def team_composition_list(request):
     repo = TeamCompositionDatabaseAdapter()
@@ -56,6 +60,7 @@ def team_composition_list(request):
     return Response(serializer.data)
 
 
+@require_safe
 @api_view(["GET"])
 def team_composition_detail(request, team_id):
     repo = TeamCompositionDatabaseAdapter()
@@ -67,6 +72,7 @@ def team_composition_detail(request, team_id):
     return Response(serializer.data)
 
 
+@require_POST
 @api_view(["POST"])
 def team_composition_create(request):
     serializer = TeamCompositionCreateUpdateSerializer(data=request.data)
@@ -88,6 +94,7 @@ def team_composition_create(request):
         )
 
 
+@require_http_methods(["PUT"])
 @api_view(["PUT"])
 def team_composition_update(request, team_id):
     serializer = TeamCompositionCreateUpdateSerializer(data=request.data)
@@ -109,6 +116,7 @@ def team_composition_update(request, team_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+@require_http_methods(["DELETE"])
 @api_view(["DELETE"])
 def team_composition_delete(request, team_id):
     repo = TeamCompositionDatabaseAdapter()
