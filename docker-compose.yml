@@ -25,6 +25,9 @@ services:
   backend:
     build:
       context: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - ./backend/app:/app
     ports:
