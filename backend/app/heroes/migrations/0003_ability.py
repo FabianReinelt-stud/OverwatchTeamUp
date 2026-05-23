@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Ability',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('id', models.BigAutoField(primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=100)),
                 ('description', models.TextField()),
                 ('icon', models.TextField()),
