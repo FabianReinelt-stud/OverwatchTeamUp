@@ -62,3 +62,14 @@ venv\Scripts\activate
 ### SonarQube Account
 User: admin
 Password: Overwatchteamup1#
+
+
+| Method | Path | View |
+|--------|------|------|
+| GET | `/api/heroes/` | `hero_list` |
+| GET | `/api/heroes/<hero_key>/` | `hero_detail` |
+| GET | `/api/team-compositions/` | `team_composition_list` |
+| GET | `/api/team-compositions/<id>/` | `team_composition_detail` |
+| POST | `/api/team-compositions/create/` | `team_composition_create` |
+| PUT | `/api/team-compositions/<id>/update/` | `team_composition_update` |
+| DELETE | `/api/team-compositions/<id>/delete/` | `team_composition_delete` |

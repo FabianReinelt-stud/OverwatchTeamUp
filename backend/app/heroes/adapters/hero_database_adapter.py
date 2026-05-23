@@ -10,6 +10,23 @@ class HeroDataBaseAdapter(HeroPort):
     def get_by_key(self, hero_key: str) -> HeroEntity:
         return self._to_entity(Hero.objects.get(pk=hero_key))
 
+    def upsert(self, hero: HeroEntity) -> None:
+        Hero.objects.update_or_create(
+            hero_key=hero.hero_key,
+            defaults={
+                "display_name": hero.display_name,
+                "role": hero.role,
+                "subrole": hero.subrole,
+                "winrate": hero.winrate,
+                "pickrate": hero.pickrate,
+                "health": hero.health,
+                "armor": hero.armor,
+                "shields": hero.shields,
+                "portrait_url": hero.portrait_url,
+                "description": hero.description,
+            },
+        )
+
     def _to_entity(self, h: Hero) -> HeroEntity:
         return HeroEntity(
             hero_key=h.hero_key,

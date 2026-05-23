@@ -10,3 +10,6 @@ class HeroPort(ABC):
     @abstractmethod
     def get_by_key(self, hero_key: str) -> HeroEntity: ...
 
+    @abstractmethod
+    def upsert(self, hero: HeroEntity) -> None: ...
+

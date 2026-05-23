@@ -11,7 +11,9 @@ from .views import (
 
 
 urlpatterns = [
-    path("heroes/", hero_list, name="hero-list"),
+    path("heroes/",
+         hero_list,
+         name="hero-list"),
     path("heroes/<str:hero_key>/", hero_detail, name="hero-detail"),
     path("team-compositions/", team_composition_list, name="team-composition-list"),
     path(
