@@ -1,5 +1,6 @@
     .scrollable-container {
         width: 85%;
+        min-width: 200px;
         height: 100%;
         border-radius: 10px;
         overflow: auto;
@@ -7,25 +8,27 @@
         margin-bottom: 10px;
     }
 
-    .scrollable-items {
+    .scrollable-list {
         padding: 0;
     }
 
-    .scrollable-items li {
+    .scrollable-item {
         display: grid;
-        grid-template-columns: 25% 60% 15%;
+        grid-template-columns: 2.5fr 6fr 1.5fr;
         align-items: center;
         background-color: #EEE;
         margin: 10px;
         border-radius: 10px;
         padding: 5px;
+        font-size: 1.5vw;
     }
 
     .hero-preview{
-        width: 45px;
+        width: 75%;
         padding-right: 10px;
     }
 
     .hero-role{
-        width: 45px;
+        display: block;
+        width: 80%;
     }

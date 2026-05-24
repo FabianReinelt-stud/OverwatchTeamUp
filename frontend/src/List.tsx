@@ -19,9 +19,9 @@ function List({input}: ListProp) {
     /*TODO: */
     return (
         <div className="scrollable-container">
-        <ul className="scrollable-items">
+        <ul className="scrollable-list">
             {filteredData.map((item) => (
-                <li key={item.id}><img className="hero-preview" src={heroPortrait} alt="ana"></img> {item.text} <img className="hero-role" src={heroRole} alt='hero role'></img></li>
+                <li className="scrollable-item" key={item.id}><img className="hero-preview" src={heroPortrait} alt="ana"></img> {item.text} <img className="hero-role" src={heroRole} alt='hero role'></img></li>
             ))}
         </ul>
         </div>

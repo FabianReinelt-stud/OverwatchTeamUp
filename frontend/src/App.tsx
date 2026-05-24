@@ -71,17 +71,17 @@ function HeroStatRow({ statName, statValue }: HeroStatProp) {
 function TeamSlot({ role }: TeamRoleProp) {
   let roleImage;
   if (role == TeamRole.TANK) {
-    roleImage = <img className='role' src={tank} width='75' height='75' alt='tank role'></img>
+    roleImage = <img className='role' src={tank} alt='tank role'></img>
   }
   if (role == TeamRole.DAMAGE) {
-    roleImage = <img className='role' src={damage} width='75' height='75' alt='damage role'></img>
+    roleImage = <img className='role' src={damage} alt='damage role'></img>
   }
   if (role == TeamRole.SUPPORT) {
-    roleImage = <img className='role' src={support} width='75' height='75' alt='support role'></img>
+    roleImage = <img className='role' src={support} alt='support role'></img>
   }
   return (
     <div className='team-role-select'>
-      <img className='select-frame' src={heroSelect} width='75' height='75' alt='select frame'></img>
+      <img className='select-frame' src={heroSelect} alt='select frame'></img>
       {roleImage}
     </div>
   )
@@ -89,13 +89,13 @@ function TeamSlot({ role }: TeamRoleProp) {
 
 function Load() {
   return (
-    <img className='load' src={load} width='25' height='25' alt='load'></img>
+    <img className='team-menu-item' src={load} alt='load'></img>
   )
 }
 
 function Save() {
   return (
-    <img className='save' src={save} width='25' height='25' alt='save'></img>
+    <img className='team-menu-item' src={save} alt='save'></img>
   )
 }
 
@@ -108,7 +108,7 @@ function App() {
           <img className='logo-img' src={logo} alt='logo'></img>
           </div>
           <HeroView></HeroView>
-          <div className='team-comp-select'>
+          <div className='team-comp'>
             <TeamSlot role={TeamRole.TANK}></TeamSlot>
             <TeamSlot role={TeamRole.DAMAGE}></TeamSlot>
             <TeamSlot role={TeamRole.DAMAGE}></TeamSlot>

@@ -6,28 +6,31 @@
   background-color: rgb(5, 5, 5);
   border-radius: 10px;
   margin-left: 10px;
-  height: 420px;
+  height: 620px;
 }
 
 .hero-stat-row {
-  --stat-row-gap: 20px;
+  --stat-row-gap: 10px;
   display: grid;
   grid-gap: var(--stat-row-gap);
   justify-content: left;
   text-align: left;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 4.5fr;
   margin-left: 10px;
 }
 
-.stat-view{
+.stat-view {
   display: block;
   overflow: auto;
+  height: 95%;
+  margin-top: 5%;
+  /*font-size: 1.2vw;*/
+  line-height: normal;
 }
 
 .hero-portrait {
-  margin: 10px;
-  height: 150px;
-  width: 150px;
+  margin: 15px;
+  width: 80%;
   border-radius: 10px;
 }
 
@@ -43,30 +46,27 @@
   justify-content: right;
 }
 
-.logo{
+.logo {
   display: flex;
   align-items: center;
 }
 
-.logo-img{
-  max-height: 100%;
-  max-width: 100%;
-  margin: 10px;
+.logo-img {
+  max-width: 95%;
+  margin: auto;
 }
 
 .main-view {
   --main-view-gap: 15px;
   display: grid;
   grid-row-gap: var(--main-view-gap);
-  grid-template-rows: 10% calc(70% - var(--main-view-gap)) 15%;
+  grid-template-rows: calc(10% - var(--main-view-gap)) calc(70% var(--main-view-gap)) calc(20% var(--main-view-gap));
   align-content: start;
 }
 
-.team-comp-select {
-  --comp-grid-gap: 10px;
+.team-comp {
   display: grid;
-  height: 100px;
-  grid-gap: var(--comp-grid-gap);
+  height: 100%;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: 1fr 1fr;
   background-color: rgb(13, 30, 46);
@@ -75,24 +75,36 @@
 
 .team-role-select {
   position: relative;
+  object-fit: contain;
   margin: 10px;
-  z-index: 1;
+  grid-row: 1 / span 2;
+}
+
+.select-frame {
+  position: absolute;
   grid-row: 1 / span 2;
 }
 
 .role {
   position: absolute;
-  left: 5px;
   z-index: 2;
-  grid-row: 1/ span 2;
+  grid-row: 1 / span 2;
 }
 
-.save {
-  margin: 10px;
+.team-role-select img {
+  display: block;
+  object-fit: contain;
+  height: 100%;
+  width: 100%;
+  grid-row: 1 / span 2;
 }
 
-.load {
-  margin: 10px;
+.team-menu-item {
+  display: block;
+  margin: auto auto auto -5px;
+  width: 50%;
+  height: 50%;
+  object-fit: contain;
 }
 
 .overwatch-team-comp {
