@@ -1,15 +1,11 @@
-import { useState } from "react";
 import TextField from "@mui/material/TextField";
-import List from "./List"
 import "./SearchBar.css";
 
-function SearchBar() {
-    const [inputText, setInputText] = useState("");
-      let inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    var lowerCase = e.target.value.toLowerCase();
-    setInputText(lowerCase);
-  };
+interface InputHandlingProp{
+  inputHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
+function SearchBar({inputHandler}: InputHandlingProp) {
   return (
     <div className="search-bar-area">
       <div className="search">
@@ -27,7 +23,6 @@ function SearchBar() {
           }}
         />
       </div>
-      <List input={inputText}/>
     </div>
   );
 }

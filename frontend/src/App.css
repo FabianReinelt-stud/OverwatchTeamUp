@@ -112,3 +112,10 @@
   grid-template-columns: 2fr 1fr;
   background-color: rgb(26, 26, 43);
 }
+
+.side-bar{
+  display: grid;
+  height: 90vh;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 1fr auto;
+}

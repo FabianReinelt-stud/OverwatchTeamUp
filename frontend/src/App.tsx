@@ -8,6 +8,9 @@ import load from './assets/openfile.png'
 import logo from './assets/logo.png'
 import SearchBar from './SearchBar'
 import './App.css'
+import LoginButton from './Login'
+import { useState } from 'react'
+import List from './List'
 
 interface HeroStatProp {
   statName: string;
@@ -99,13 +102,30 @@ function Save() {
   )
 }
 
+function SideBar() {
+  const [inputText, setInputText] = useState("");
+  let inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    var lowerCase = e.target.value.toLowerCase();
+    setInputText(lowerCase);
+  };
+
+  return (
+    <div className='side-bar'>
+      <SearchBar inputHandler={inputHandler}></SearchBar>
+      <LoginButton/>
+      <List input={inputText}/>
+    </div>
+  );
+}
+
+
 function App() {
   return (
     <>
       <div className='overwatch-team-comp'>
         <div className='main-view'>
           <div className='logo'>
-          <img className='logo-img' src={logo} alt='logo'></img>
+            <img className='logo-img' src={logo} alt='logo'></img>
           </div>
           <HeroView></HeroView>
           <div className='team-comp'>
@@ -118,9 +138,7 @@ function App() {
             <Load></Load>
           </div>
         </div>
-        <div className='side-bar'>
-          <SearchBar></SearchBar>
-        </div>
+        <SideBar></SideBar>
       </div>
     </>
   )

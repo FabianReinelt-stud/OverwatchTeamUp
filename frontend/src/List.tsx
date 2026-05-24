@@ -16,8 +16,8 @@ function List({input}: ListProp) {
         }
     })
 
-    /*TODO: */
     return (
+        <>
         <div className="scrollable-container">
         <ul className="scrollable-list">
             {filteredData.map((item) => (
@@ -25,6 +25,7 @@ function List({input}: ListProp) {
             ))}
         </ul>
         </div>
+        </>
     )
 }
 
