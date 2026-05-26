@@ -165,6 +165,14 @@ idna==3.16 \
     --hash=sha256:cc246e3a3f89580c3a951b5ad298ca4638078b2cdd4f115654332b5c26daded5 \
     --hash=sha256:d7a6da03db833450fca25d2358ac9ff06cd624577a4aea3a596d5c0f77b8e03d
     # via requests
+djangorestframework-simplejwt==5.5.1 \
+    --hash=sha256:2c30f3707053d384e9f315d11c2daccfcb548d4faa453111ca19a542b732e469
+    # via -r requirements.txt
+pyjwt==2.12.0 \
+    --hash=sha256:9bb459d1bdd0387967d287f5656bf7ec2b9a26645d1961628cda1764e087fd6e
+    # via
+    #   -r requirements.txt
+    #   djangorestframework-simplejwt
 psycopg2-binary==2.9.12 \
     --hash=sha256:00814e40fa23c2b37ef0a1e3c749d89982c73a9cb5046137f0752a22d432e82f \
     --hash=sha256:049366c6d884bdcd65d66e6ca1fdbebe670b56c6c9ba46f164e6667e90881964 \

@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -17,6 +18,10 @@ def make_hero(**overrides):
 
 
 def make_team_composition(**overrides):
+    user = overrides.pop("user", None) or User.objects.create_user(
+        username="team-owner",
+        password="test-password",
+    )
     tracer = overrides.pop("tracer", None) or make_hero()
     winston = overrides.pop("winston", None) or make_hero(
         hero_key="winston",
@@ -30,6 +35,7 @@ def make_team_composition(**overrides):
         description="Scientist",
     )
     defaults = {
+        "user": user,
         "name": "Dive Comp",
         "hero_1": winston,
         "hero_2": tracer,
@@ -126,6 +132,14 @@ class TestHeroDetailEndpoint(TestCase):
 class TestTeamCompositionEndpoints(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(
+            username="team-user",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-user",
+            password="test-password",
+        )
         self.tracer = make_hero()
         self.winston = make_hero(
             hero_key="winston",
@@ -147,8 +161,17 @@ class TestTeamCompositionEndpoints(TestCase):
             "hero_5_key": "tracer",
         }
 
+    def authenticate(self, user=None):
+        self.client.force_authenticate(user=user or self.user)
+
+    def test_list_requires_authentication(self):
+        response = self.client.get("/api/team-compositions/")
+
+        assert response.status_code == 401
+
     def test_list_returns_team_compositions(self):
-        make_team_composition(tracer=self.tracer, winston=self.winston)
+        self.authenticate()
+        make_team_composition(user=self.user, tracer=self.tracer, winston=self.winston)
 
         response = self.client.get("/api/team-compositions/")
 
@@ -158,8 +181,25 @@ class TestTeamCompositionEndpoints(TestCase):
         assert response.data[0]["hero_1"]["hero_key"] == "winston"
         assert response.data[0]["average_winrate"] == "50.6"
 
+    def test_list_only_returns_owned_team_compositions(self):
+        self.authenticate()
+        make_team_composition(user=self.user, tracer=self.tracer, winston=self.winston)
+        make_team_composition(
+            user=self.other_user,
+            tracer=self.tracer,
+            winston=self.winston,
+            name="Other Comp",
+        )
+
+        response = self.client.get("/api/team-compositions/")
+
+        assert response.status_code == 200
+        assert len(response.data) == 1
+        assert response.data[0]["name"] == "Dive Comp"
+
     def test_detail_returns_team_composition(self):
-        team = make_team_composition(tracer=self.tracer, winston=self.winston)
+        self.authenticate()
+        team = make_team_composition(user=self.user, tracer=self.tracer, winston=self.winston)
 
         response = self.client.get(f"/api/team-compositions/{team.id}/")
 
@@ -168,11 +208,35 @@ class TestTeamCompositionEndpoints(TestCase):
         assert response.data["hero_2"]["hero_key"] == "tracer"
 
     def test_detail_returns_404_for_unknown_team(self):
+        self.authenticate()
         response = self.client.get("/api/team-compositions/999/")
 
         assert response.status_code == 404
 
+    def test_detail_returns_404_for_another_users_team(self):
+        self.authenticate()
+        team = make_team_composition(
+            user=self.other_user,
+            tracer=self.tracer,
+            winston=self.winston,
+        )
+
+        response = self.client.get(f"/api/team-compositions/{team.id}/")
+
+        assert response.status_code == 404
+
+    def test_create_requires_authentication(self):
+        response = self.client.post(
+            "/api/team-compositions/create/",
+            self.payload,
+            format="json",
+        )
+
+        assert response.status_code == 401
+        assert TeamComposition.objects.count() == 0
+
     def test_create_persists_team_composition(self):
+        self.authenticate()
         response = self.client.post(
             "/api/team-compositions/create/",
             self.payload,
@@ -182,11 +246,13 @@ class TestTeamCompositionEndpoints(TestCase):
         assert response.status_code == 201
         assert TeamComposition.objects.count() == 1
         team = TeamComposition.objects.get(pk=response.data["id"])
+        assert team.user == self.user
         assert team.name == "Dive Comp"
         assert team.hero_1_id == "winston"
         assert response.data["hero_5"]["hero_key"] == "tracer"
 
     def test_create_returns_404_when_a_hero_is_unknown(self):
+        self.authenticate()
         payload = {**self.payload, "hero_5_key": "unknown"}
 
         response = self.client.post(
@@ -199,7 +265,8 @@ class TestTeamCompositionEndpoints(TestCase):
         assert TeamComposition.objects.count() == 0
 
     def test_update_changes_team_composition(self):
-        team = make_team_composition(tracer=self.tracer, winston=self.winston)
+        self.authenticate()
+        team = make_team_composition(user=self.user, tracer=self.tracer, winston=self.winston)
         payload = {
             **self.payload,
             "name": "Updated Dive Comp",
@@ -219,6 +286,7 @@ class TestTeamCompositionEndpoints(TestCase):
         assert response.data["hero_1"]["hero_key"] == "tracer"
 
     def test_update_returns_404_for_unknown_team(self):
+        self.authenticate()
         response = self.client.put(
             "/api/team-compositions/999/update/",
             self.payload,
@@ -227,10 +295,69 @@ class TestTeamCompositionEndpoints(TestCase):
 
         assert response.status_code == 404
 
+    def test_update_returns_404_for_another_users_team(self):
+        self.authenticate()
+        team = make_team_composition(
+            user=self.other_user,
+            tracer=self.tracer,
+            winston=self.winston,
+        )
+
+        response = self.client.put(
+            f"/api/team-compositions/{team.id}/update/",
+            self.payload,
+            format="json",
+        )
+
+        assert response.status_code == 404
+
     def test_delete_removes_team_composition(self):
-        team = make_team_composition(tracer=self.tracer, winston=self.winston)
+        self.authenticate()
+        team = make_team_composition(user=self.user, tracer=self.tracer, winston=self.winston)
 
         response = self.client.delete(f"/api/team-compositions/{team.id}/delete/")
 
         assert response.status_code == 204
         assert TeamComposition.objects.count() == 0
+
+    def test_delete_returns_404_for_another_users_team(self):
+        self.authenticate()
+        team = make_team_composition(
+            user=self.other_user,
+            tracer=self.tracer,
+            winston=self.winston,
+        )
+
+        response = self.client.delete(f"/api/team-compositions/{team.id}/delete/")
+
+        assert response.status_code == 404
+        assert TeamComposition.objects.count() == 1
+
+
+class TestAuthEndpoints(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_register_creates_user(self):
+        response = self.client.post(
+            "/api/auth/register/",
+            {"username": "new-user", "password": "strong-password"},
+            format="json",
+        )
+
+        assert response.status_code == 201
+        assert response.data["username"] == "new-user"
+        assert User.objects.filter(username="new-user").exists()
+
+    def test_token_endpoint_returns_access_and_refresh_tokens(self):
+        User.objects.create_user(username="token-user", password="strong-password")
+
+        response = self.client.post(
+            "/api/auth/token/",
+            {"username": "token-user", "password": "strong-password"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        assert "access" in response.data
+        assert "refresh" in response.data

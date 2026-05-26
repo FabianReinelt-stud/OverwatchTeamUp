@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -46,6 +47,11 @@ class Ability(models.Model):
 
 class TeamComposition(models.Model):
     id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="team_compositions",
+    )
     name = models.CharField(max_length=100)
     
     hero_1 = models.ForeignKey(

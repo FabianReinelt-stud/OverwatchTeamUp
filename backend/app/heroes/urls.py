@@ -1,7 +1,9 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     hero_list,
     hero_detail,
+    register,
     team_composition_list,
     team_composition_detail,
     team_composition_create,
@@ -11,9 +13,10 @@ from .views import (
 
 
 urlpatterns = [
-    path("heroes/",
-         hero_list,
-         name="hero-list"),
+    path("auth/register/", register, name="auth-register"),
+    path("auth/token/", TokenObtainPairView.as_view(), name="token-obtain-pair"),
+    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("heroes/", hero_list, name="hero-list"),
     path("heroes/<str:hero_key>/", hero_detail, name="hero-detail"),
     path("team-compositions/", team_composition_list, name="team-composition-list"),
     path(

@@ -1,5 +1,13 @@
 [
   {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1200000$SBxCZXOGQ5k46vRemTK9aA$CGvr+GnHvd0M4Tm6Oj0xiam6RPv7GOCBkCTp4dCa+/E=",
+      "username": "demo"
+    }
+  },
+  {
     "model": "heroes.hero",
     "pk": "winston",
     "fields": {
@@ -35,6 +43,7 @@
     "model": "heroes.teamcomposition",
     "pk": 1,
     "fields": {
+      "user": 1,
       "name": "Test Dive Comp",
       "hero_1": "winston",
       "hero_2": "tracer",
