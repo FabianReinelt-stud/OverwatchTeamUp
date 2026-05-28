@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
 // This file is generated from backend DRF serializers.
 // Do not edit it by hand. Regenerate it with:
 // python manage.py generate_dtos
