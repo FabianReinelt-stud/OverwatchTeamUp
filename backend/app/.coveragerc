@@ -1,0 +1,7 @@
+[run]
+relative_files = True
+source = backend/app
+omit =
+    backend/app/*/tests.py
+    backend/app/*/migrations/*
+    backend/app/manage.py

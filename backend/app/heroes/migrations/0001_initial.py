@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
             ],
             options={
-                'db_table': 'hero',
+                'db_table': 'heroes',
             },
         ),
     ]
