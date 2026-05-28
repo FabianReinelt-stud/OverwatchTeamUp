@@ -59,6 +59,23 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
+### Generate Frontend DTOs
+TypeScript DTOs can be generated from the backend DRF serializers:
+```bash
+docker compose run --rm backend python manage.py generate_dtos
+```
+
+By default this writes:
+```text
+backend/app/generated/api-dtos.ts
+```
+
+To use these in the React frontend code, write them directly into the frontend source folder from a local 
+backend environment:
+```bash
+python backend/app/manage.py generate_dtos --output ../../frontend/src/api/dtos.ts
+```
+
 ### SonarQube Account
 User: admin
 Password: Overwatchteamup1#

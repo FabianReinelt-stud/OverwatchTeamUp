@@ -6,6 +6,7 @@ from rest_framework.test import APIClient
 
 from heroes.adapters.hero_database_adapter import HeroDataBaseAdapter
 from heroes.domain.entities import HeroEntity
+from heroes.dto_generation import generate_typescript_dtos
 from heroes.models import Hero, TeamComposition
 
 
@@ -361,3 +362,14 @@ class TestAuthEndpoints(TestCase):
         assert response.status_code == 200
         assert "access" in response.data
         assert "refresh" in response.data
+
+
+class TestDtoGeneration(TestCase):
+    def test_generates_team_composition_dtos_from_serializers(self):
+        generated = generate_typescript_dtos()
+
+        assert "export type TeamCompositionDto" in generated
+        assert "hero_1: HeroDto;" in generated
+        assert "average_winrate: string;" in generated
+        assert "export type TeamCompositionCreateUpdateDto" in generated
+        assert "hero_1_key: string;" in generated
