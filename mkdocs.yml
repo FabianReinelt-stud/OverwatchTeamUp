@@ -9,6 +9,7 @@ theme:
 nav:
   - Home: index.md
   - Setup: setup.md
+  - API DTOs: api-dtos.md
   - Architecture:
       - arc42: architecture/arc42.md
       - C4-Modell: architecture/c4-model.md
