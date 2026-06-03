@@ -13,8 +13,14 @@
     grid-row: 1 / 1;
 }
 
-.login-wrapper {}
-
 form {
     margin: 10px;
+}
+
+.form-control{
+    border: 1px solid rgb(201, 201, 201);
+}
+
+.error-control{
+    border: 1px solid red;
 }

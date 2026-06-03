@@ -1,51 +1,3 @@
-.hero-view {
-  display: grid;
-  justify-content: left;
-  text-align: left;
-  grid-template-columns: 1fr 3fr;
-  background-color: rgb(5, 5, 5);
-  border-radius: 10px;
-  margin-left: 10px;
-  height: 65%;
-}
-
-.hero-stat-row {
-  --stat-row-gap: 10px;
-  display: grid;
-  grid-gap: var(--stat-row-gap);
-  justify-content: left;
-  text-align: left;
-  grid-template-columns: 1fr 4.5fr;
-  margin-left: 10px;
-}
-
-.stat-view {
-  display: block;
-  overflow: auto;
-  height: 90%;
-  margin-top: 5%;
-  /*font-size: 1.2vw;*/
-  line-height: normal;
-}
-
-.hero-portrait {
-  margin: 15px;
-  width: 80%;
-  border-radius: 10px;
-}
-
-.hero-name {
-  text-align: center;
-}
-
-.hero-row-name {
-  text-align: left;
-}
-
-.hero-role {
-  justify-content: right;
-}
-
 .logo {
   display: flex;
   align-items: center;
@@ -65,6 +17,12 @@
   height: 100vh;
 }
 
+.overwatch-team-comp {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  background-color: rgb(26, 26, 43);
+}
+
 .team-comp {
   display: grid;
   height: 20%;
@@ -72,52 +30,4 @@
   grid-template-rows: 1fr 1fr;
   background-color: rgb(13, 30, 46);
   border-radius: 10px;
-}
-
-.team-role-select {
-  position: relative;
-  object-fit: contain;
-  margin: 10px;
-  grid-row: 1 / span 2;
-}
-
-.select-frame {
-  position: absolute;
-  grid-row: 1 / span 2;
-}
-
-.role {
-  position: absolute;
-  z-index: 2;
-  grid-row: 1 / span 2;
-}
-
-.team-role-select img {
-  display: block;
-  object-fit: contain;
-  height: 100%;
-  width: 100%;
-  grid-row: 1 / span 2;
-}
-
-.team-menu-item {
-  display: block;
-  margin: auto auto auto -5px;
-  width: 50%;
-  height: 50%;
-  object-fit: contain;
-}
-
-.overwatch-team-comp {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  background-color: rgb(26, 26, 43);
-}
-
-.side-bar {
-  display: grid;
-  height: 90vh;
-  grid-gap: 10px;
-  grid-template-columns: 3fr 1fr;
-  grid-template-rows: 1fr auto;
 }
