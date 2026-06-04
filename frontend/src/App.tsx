@@ -13,11 +13,14 @@ export interface UserContract{
 
 
 function App() {
-  const [loginState, setLoginState] = useState<UserContract>()
+  const [userContract, setUserContract] = useState<UserContract>()
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  console.log(userContract);
   const updateLoginState = (user: UserContract) => {
     console.log("user login updated: ", user.username, user.access, user.refresh)
-    setLoginState(user);
+    setUserContract(user);
+    setIsLoggedIn(true);
   }
 
   return (
@@ -34,8 +37,8 @@ function App() {
             <TeamSlot role={"damage"}></TeamSlot>
             <TeamSlot role={"support"}></TeamSlot>
             <TeamSlot role={"support"}></TeamSlot>
-            <Save></Save>
-            <Load></Load>
+            <Save isLoggedIn={isLoggedIn}></Save>
+            <Load isLoggedIn={isLoggedIn}></Load>
           </div>
         </div>
         <SideBar loginCb={updateLoginState}></SideBar>

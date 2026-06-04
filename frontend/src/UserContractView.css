@@ -17,6 +17,19 @@ form {
     margin: 10px;
 }
 
+.login-wrapper label {
+    font-size: small;
+    margin: 10px;
+}
+
+.login-wrapper input {
+    margin: 10px;
+}
+
+.login-wrapper button {
+    margin: 10px;
+}
+
 .form-control{
     border: 1px solid rgb(201, 201, 201);
 }

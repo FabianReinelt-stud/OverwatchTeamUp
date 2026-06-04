@@ -1,31 +1,33 @@
-.loadBtn {
+.loadBtn,
+.saveBtn,
+.loadBtn-disabled,
+.saveBtn-disabled  {
   display: block;
   width: 30%;
   margin: 10%;
   background-color: rgba(0, 0, 0, 0);
+  aspect-ratio: 1/1;
+  border: none;
+  cursor: pointer;
+}
+
+.loadBtn:hover,
+.saveBtn:hover,
+.loadBtn-disabled,
+.saveBtn-disabled {
+  opacity: 0.5;
+}
+
+.loadBtn,
+.loadBtn-disabled {
   background-image: url("..\src\assets\download.png");
   background-size: 100% 100%;
-  aspect-ratio: 1/1;
-  border: none;
 }
 
-.loadBtn:hover {
-opacity: 0.5;
-}
-
-.saveBtn {
-  display: block;
-  width: 30%;
-  margin: 10%;
-  background-color: rgba(0, 0, 0, 0);
+.saveBtn,
+.saveBtn-disabled {
   background-image: url("..\src\assets\save.png");
   background-size: 100% 100%;
-  aspect-ratio: 1/1;
-  border: none;
-}
-
-.saveBtn:hover {
-opacity: 0.5;
 }
 
 .role {

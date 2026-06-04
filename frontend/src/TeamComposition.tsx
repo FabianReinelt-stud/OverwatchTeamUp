@@ -3,20 +3,25 @@ import support from './assets/support.png'
 import damage from './assets/dmg.png'
 import tank from './assets/tank.png'
 import './TeamComposition.css'
+import { Tooltip } from '@mui/material'
 
-export function Load() {
+export function Load({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
-    <button className='loadBtn'></button>
+    <Tooltip title={isLoggedIn ? "Load an existing team composition from a list on the right" : "Save Team Composition: Please login to use this function"}>
+      <button className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'} ></button>
+    </Tooltip>
   )
 }
 
-export function Save() {
+export function Save({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
-    <button className='saveBtn'></button>
+    <Tooltip title={isLoggedIn ? "Save your current team composition" : "Load Team Composition: Please login to use this function"}>
+      <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}></button>
+    </Tooltip>
   )
 }
 
-function TeamSlot({role}: {role: string}) {
+function TeamSlot({ role }: { role: string }) {
   role.toLowerCase();
   let roleImage;
   if (role === "tank") {
