@@ -129,7 +129,7 @@ function UserContractView({ loginCb }: { loginCb: (user: UserContract) => void }
   const [showRegisterView, setIsRegister] = useState(false);
   const updateContractView = () => setIsRegister(!showRegisterView);
 
-  let registerView = RegisterView(loginCb, updateContractView);
+  let registerView = RegisterView(updateContractView);
   let loginView = LoginView(loginCb, updateContractView);
 
   return (
