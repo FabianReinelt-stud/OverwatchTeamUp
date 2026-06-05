@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 
 class HeroSummarySerializer(serializers.Serializer):
+    hero_key = serializers.CharField()
+    display_name = serializers.CharField()
     display_name = serializers.CharField()
     portrait_url = serializers.CharField()
     role = serializers.CharField()
