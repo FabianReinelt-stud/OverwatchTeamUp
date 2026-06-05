@@ -35,7 +35,7 @@ function List({ input, heroList }: ListProp) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-        }}><p>List of Heroes could not be loaded.</p><p>Please try again later</p></div>
+        }}><p>List of Heroes could not be loaded.</p><p>Please try again later.</p></div>
     } else {
         listItems = <ul className="scrollable-list">
             {filteredData.map((hero) => (

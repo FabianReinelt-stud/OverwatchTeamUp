@@ -67,7 +67,7 @@ const LoginView = (loginCb: (user: UserContract) => void,
   }
 
   return (
-    <>
+    <div className='register-wrapper'>
       <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
         handleLogin(e, { username, password }, updateLoginValidity, loginCb)}>
         <label>Username</label>
@@ -89,7 +89,7 @@ const LoginView = (loginCb: (user: UserContract) => void,
           <button type="reset" onClick={updateContractView}>No Account? Register</button>
         </div>
       </form>
-    </>
+    </div>
   );
 }
 
@@ -99,7 +99,7 @@ const RegisterView = (//TODO add register callback here
   const [password, setPassword] = useState("");
 
   return (
-    <>
+    <div className='register-wrapper'>
       <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
         handleRegister(e, { username, password })}>
         <label>Username</label>
@@ -121,7 +121,7 @@ const RegisterView = (//TODO add register callback here
           <button type="reset" onClick={updateContractView}>Login Instead</button>
         </div>
       </form>
-      </>
+      </div>
   )
 }
 
@@ -133,22 +133,22 @@ function UserContractView({ loginCb }: { loginCb: (user: UserContract) => void }
   let loginView = LoginView(loginCb, updateContractView);
 
   return (
-    <div className="login-wrapper">
+    <div className="view-container" style={showRegisterView? {backgroundColor: "#0f002b"} : {backgroundColor: "#001731"}}>
       {showRegisterView ?  registerView: loginView}
     </div>
   );
 };
 
 function UserContractViewToggle({ loginCb }: { loginCb: (user: UserContract) => void }) {
-  const [showLoginView, setShowLoginView] = useState(false);
-  const onClick = () => setShowLoginView(!showLoginView);
+  const [showUserContract, setShowUserContract] = useState(false);
+  const onClick = () => setShowUserContract(!showUserContract);
   return (
     <>
       <div className="login-button">
         <Button variant="contained" onClick={onClick}>Login</Button>
       </div>
       <div className="login-view-container">
-        {showLoginView ? <UserContractView loginCb={loginCb} /> : null}
+        {showUserContract ? <UserContractView loginCb={loginCb} /> : null}
       </div>
     </>
   );

@@ -20,7 +20,7 @@ function SideBar({loginCb}: {loginCb: (user: UserContract) => void}) {
     setInputText(lowerCase);
   };
 
-  const [heroSummaries, setHeroSummaries] = useState<HeroSummary[]>(dummyData);
+  const [heroSummaries, setHeroSummaries] = useState<HeroSummary[]>(dummyData); //replace dummyData with empty [] later
 
   
     fetch("/api/heroes/", {

@@ -1,3 +1,15 @@
+@font-face{
+  font-family: "BigNoodle";
+  src: local("big_noodle_titling"),
+  url("./fonts/big_noodle_titling.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "BigNoodleOblique";
+  src: local("big_noodle_titling_oblique"),
+  url("./fonts/big_noodle_titling_oblique.ttf") format("truetype");
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -20,7 +32,7 @@
 .overwatch-team-comp {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  background-color: rgb(26, 26, 43);
+  background-color: rgb(39, 73, 110);
 }
 
 .team-comp {
@@ -28,6 +40,5 @@
   height: 20%;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: 1fr 1fr;
-  background-color: rgb(13, 30, 46);
   border-radius: 10px;
 }

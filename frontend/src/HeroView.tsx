@@ -59,8 +59,8 @@ function HeroView() {
 function HeroStatRow({ statName, statValue }: HeroStatProp) {
   return (
     <div className='hero-stat-row'>
-      <div className='stat-name'>{statName}</div>
-      <div className='stat-val'>{statValue}</div>
+      <div className='stat-name'><p>{statName}</p></div>
+      <div className='stat-value'>{statValue}</div>
     </div>
   )
 }

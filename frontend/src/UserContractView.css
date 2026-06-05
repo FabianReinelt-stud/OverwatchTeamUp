@@ -3,8 +3,6 @@
     min-width: 200px;
     margin: auto;
     grid-column: 1 / span 2;
-    background-color: rgb(5, 5, 5);
-    border-radius: 10px;
 }
 
 .login-button {
@@ -17,23 +15,29 @@ form {
     margin: 10px;
 }
 
-.login-wrapper label {
-    font-size: small;
+.view-container {
+    padding: 5%;
+    border-radius: 10px;
+}
+
+.view-container label {
+    font-size: medium;
+    margin: 10px;
+    color: white;
+}
+
+.view-container input {
     margin: 10px;
 }
 
-.login-wrapper input {
+.view-container button {
     margin: 10px;
 }
 
-.login-wrapper button {
-    margin: 10px;
-}
-
-.form-control{
+.form-control {
     border: 1px solid rgb(201, 201, 201);
 }
 
-.error-control{
+.error-control {
     border: 1px solid red;
 }

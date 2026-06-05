@@ -7,7 +7,7 @@ import { Tooltip } from '@mui/material'
 
 export function Load({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
-    <Tooltip title={isLoggedIn ? "Load an existing team composition from a list on the right" : "Save Team Composition: Please login to use this function"}>
+    <Tooltip title={isLoggedIn ? "Load an existing team composition from a list on the right" : "Please login or register to use the save function for your team composition."}>
       <button className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'} ></button>
     </Tooltip>
   )
@@ -15,7 +15,7 @@ export function Load({ isLoggedIn }: { isLoggedIn: boolean }) {
 
 export function Save({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
-    <Tooltip title={isLoggedIn ? "Save your current team composition" : "Load Team Composition: Please login to use this function"}>
+    <Tooltip title={isLoggedIn ? "Save your current team composition" : "Please login or register to use the load function for your existing team compositions."}>
       <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}></button>
     </Tooltip>
   )

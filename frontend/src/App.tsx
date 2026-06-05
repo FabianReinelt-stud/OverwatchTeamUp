@@ -3,7 +3,10 @@ import HeroView from './HeroView'
 import TeamSlot, { Load, Save } from './TeamComposition'
 import SideBar from './SideBar'
 import { useState } from 'react'
+
 import './App.css'
+import './fonts/big_noodle_titling.ttf'
+import './fonts/big_noodle_titling_oblique.ttf'
 
 export interface UserContract{
   username: string
@@ -16,11 +19,18 @@ function App() {
   const [userContract, setUserContract] = useState<UserContract>()
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  console.log(userContract);
   const updateLoginState = (user: UserContract) => {
-    console.log("user login updated: ", user.username, user.access, user.refresh)
     setUserContract(user);
     setIsLoggedIn(true);
+    if(userContract)
+    console.log("user login updated with: ", userContract.username, userContract.access, userContract.refresh)
+  }
+
+  const [selectedHero, setSelectedHero] = useState("");
+
+  const updateSelectedHero = (key: string) => {
+    setSelectedHero(key);
+    console.log("current selected hero: ", selectedHero);
   }
 
   return (

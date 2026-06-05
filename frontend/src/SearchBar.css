@@ -11,6 +11,8 @@
     width: 90%;
     margin-top: 75px;
     margin-left: auto;
+    background-color: rgb(33, 31, 34);
+    border-radius: 5px;
 }
 
 ul li {
