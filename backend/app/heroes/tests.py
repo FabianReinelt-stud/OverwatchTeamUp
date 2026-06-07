@@ -86,7 +86,7 @@ class TestHeroListEndpoint(TestCase):
         make_hero()
         response = self.client.get("/api/heroes/")
         hero = response.data[0]
-        assert set(hero.keys()) == {"display_name", "portrait_url", "role"}
+        assert set(hero.keys()) == {"hero_key", "display_name", "portrait_url", "role"}
 
     def test_empty_db_returns_empty_list(self):
         response = self.client.get("/api/heroes/")
