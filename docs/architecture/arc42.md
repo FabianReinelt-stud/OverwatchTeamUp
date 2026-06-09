@@ -25,135 +25,42 @@ concepts. For documentation of your own system you use better the
 *plain* version.
 ::::
 
-# Introduction and Goals {#section-introduction-and-goals}
+# Introduction and Goals 
+## Requirements Overview 
 
-Describes the relevant requirements and the driving forces that software
-architects and development team must consider. These include
+OverwatchTeamUp is a web application that allows Overwatch players to browse hero statistics and assemble team compositions of five heroes. Hero data (stats, roles, abilities, win rates, pick rates) is sourced from the external OverFast API and stored locally to enable fast, reliable access. Users can create, view, update, and delete named team compositions tied to their account.
 
--   underlying business goals,
+**Essential features:**
 
--   essential features,
+-   Browse all Overwatch heroes with key stats (role, win rate, pick rate, health, abilities)
 
--   essential functional requirements,
+-   View detailed hero profiles including abilities and portraits
 
--   quality goals for the architecture and
+-   Register and authenticate as a user (JWT-based)
 
--   relevant stakeholders and their expectations
+-   Create and manage personal team compositions (5 heroes per team)
 
-## Requirements Overview {#_requirements_overview}
+-   Hero data kept current via a sync mechanism against the external OverFast API
 
-::: formalpara-title
-**Contents**
-:::
+## Quality Goals 
 
-Short description of the functional requirements, driving forces,
-extract (or abstract) of requirements. Link to (hopefully existing)
-requirements documents (with version number and information where to
-find it).
+| Priority | Quality Goal | Motivation |
+|----------|-------------|------------|
+| 1 | **Reliability** | Hero data must be consistent and available even when the external API is temporarily unreachable |
+| 2 | **Security** | Team compositions are private per user; authentication and authorization must be enforced |
+| 3 | **Maintainability** | Hexagonal architecture (ports & adapters) keeps external dependencies replaceable |
+| 4 | **Correctness** | Hero stats displayed must accurately reflect the synced upstream data |
+| 5 | **Usability** | API responses must be fast and well-structured for frontend consumption |
 
-::: formalpara-title
-**Motivation**
-:::
+## Stakeholders 
 
-From the point of view of the end users a system is created or modified
-to improve support of a business activity and/or improve the quality.
+| Role/Name | Contact | Expectations |
+|-----------|---------|--------------|
+| Overwatch Players (end users) | — | Quickly look up hero stats and plan team compositions without leaving the app |
+| Development Team | — | Clear architecture boundaries, testable code, and documented API contracts |
+| External API (OverFast API) | https://overfast-api.tekrop.fr | Data is fetched responsibly and cached locally to avoid excessive requests |
 
-::: formalpara-title
-**Form**
-:::
-
-Short textual description, probably in tabular use-case format. If
-requirements documents exist this overview should refer to these
-documents.
-
-Keep these excerpts as short as possible. Balance readability of this
-document with potential redundancy w.r.t to requirements documents.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Introduction and Goals](https://docs.arc42.org/section-1/) in the
-arc42 documentation.
-
-## Quality Goals {#_quality_goals}
-
-::: formalpara-title
-**Contents**
-:::
-
-The top three (max five) quality goals for the architecture whose
-fulfillment is of highest importance to the major stakeholders. We
-really mean quality goals for the architecture. Don't confuse them with
-project goals. They are not necessarily identical.
-
-Consider this overview of potential topics (based upon the ISO 25010
-standard):
-
-![Categories of Quality
-Requirements](images/01_2_iso-25010-topics-EN-2023.drawio.png)
-
-::: formalpara-title
-**Motivation**
-:::
-
-You should know the quality goals of your most important stakeholders,
-since they will influence fundamental architectural decisions. Make sure
-to be very concrete about these qualities, avoid buzzwords. If you as an
-architect do not know how the quality of your work will be judged...​
-
-::: formalpara-title
-**Form**
-:::
-
-A table with quality goals and concrete scenarios, ordered by priorities
-
-## Stakeholders {#_stakeholders}
-
-::: formalpara-title
-**Contents**
-:::
-
-Explicit overview of stakeholders of the system, i.e. all person, roles
-or organizations that
-
--   should know the architecture
-
--   have to be convinced of the architecture
-
--   have to work with the architecture or with code
-
--   need the documentation of the architecture for their work
-
--   have to come up with decisions about the system or its development
-
-::: formalpara-title
-**Motivation**
-:::
-
-You should know all parties involved in development of the system or
-affected by the system. Otherwise, you may get nasty surprises later in
-the development process. These stakeholders determine the extent and the
-level of detail of your work and its results.
-
-::: formalpara-title
-**Form**
-:::
-
-Table with role names, person names, and their expectations with respect
-to the architecture and its documentation.
-
-+-------------+---------------------------+---------------------------+
-| Role/Name   | Contact                   | Expectations              |
-+=============+===========================+===========================+
-| *           | *\<Contact-1\>*           | *\<Expectation-1\>*       |
-| \<Role-1\>* |                           |                           |
-+-------------+---------------------------+---------------------------+
-| *           | *\<Contact-2\>*           | *\<Expectation-2\>*       |
-| \<Role-2\>* |                           |                           |
-+-------------+---------------------------+---------------------------+
-
-# Architecture Constraints {#section-architecture-constraints}
+# Architecture Constraints 
 
 ::: formalpara-title
 **Contents**
