@@ -1,14 +1,10 @@
 .search-bar-area {
     display: flex;
-    width: 95%;
     align-items: center;
     flex-direction: column;
-    grid-row: 1 / 1;
 }
 
 .search-field {
-    width: 90%;
-    margin-top: 75px;
     margin-left: auto;
     background-color: rgb(33, 31, 34);
     border-radius: 5px;

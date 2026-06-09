@@ -1,19 +1,18 @@
 import logo from './assets/logo.png'
 import HeroView from './HeroView'
 import TeamSlot, { Load, Save } from './TeamComposition'
+import type {TokenResponseDto} from "./data/api-dtos.tsx";
 import SideBar from './SideBar'
-import { useState } from 'react'
 
+import { useState } from 'react'
 import './App.css'
 import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 
 export interface UserContract{
   username: string
-  access: string
-  refresh: string
+ token: TokenResponseDto
 }
-
 
 function App() {
   const [userContract, setUserContract] = useState<UserContract>()
@@ -23,14 +22,7 @@ function App() {
     setUserContract(user);
     setIsLoggedIn(true);
     if(userContract)
-    console.log("user login updated with: ", userContract.username, userContract.access, userContract.refresh)
-  }
-
-  const [selectedHero, setSelectedHero] = useState("");
-
-  const updateSelectedHero = (key: string) => {
-    setSelectedHero(key);
-    console.log("current selected hero: ", selectedHero);
+    console.log("user login updated with: ", userContract.username, userContract.token.access, userContract.token.refresh)
   }
 
   return (

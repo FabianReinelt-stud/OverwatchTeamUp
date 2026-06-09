@@ -5,16 +5,24 @@
         width: 85%;
         min-width: 200px;
         margin: auto;
-        grid-column: 1 / span 2;
-        grid-row-start: 3;
         background-color: rgb(5, 5, 5);
-        border: 5px solid #ffffff;
+        border: 2px solid #ffffff;
         border-radius: 10px;
     }
 
     .scrollable-list {
         padding: 0;
         margin: 0;
+    }
+
+    .scrollable-team{
+        align-items: center;
+        padding: 5px;
+        margin: 10px;
+        font-size: 1.5vw;
+        border-radius: 10px;
+        background-color: rgb(8, 27, 42);
+        border: 1px solid rgb(44, 45, 75);
     }
 
     .scrollable-item {

@@ -1,47 +1,92 @@
-import List from './List'
-import { useState } from "react";
+import List, {TeamList} from './List.tsx'
+import {useState} from "react";
 import UserContractViewToggle from "./UserContractView";
 import SearchBar from "./SearchBar";
-import type { UserContract } from './App';
-import dummyData from "./DummyListData.json"
+import type {UserContract} from './App';
+import dummyData from "./data/DummyListData.json"
 import './SideBar.css'
+import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
+import * as React from "react";
 
-export interface HeroSummary {
-    hero_key: string;
-    display_name: string;
-    portrait_url: string;
-    role: string;
+const heroListAreaStyle = {
+    gridRow: '1 / 1'
 }
 
-function SideBar({loginCb}: {loginCb: (user: UserContract) => void}) {
-  const [inputText, setInputText] = useState("");
-  const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const lowerCase = e.target.value.toLowerCase();
-      setInputText(lowerCase);
-  };
+const heroListFieldStyle = {
+    width: '90%',
+    marginTop: '75px',
+    marginBottom: '10px'
+}
 
-  const [heroSummaries, setHeroSummaries] = useState<HeroSummary[]>(dummyData); //TODO: replace dummyData with empty [] later
+const teamListAreaStyle = {
+    gridRowStart: '4',
+    gridColumnStart: '1',
+    gridColumnEnd: 'span 2'
+}
 
-  
-    fetch("/api/heroes/", {
-    method: "GET"
-  })
-    .then(response => response.json())
-    .then(response => {
-      console.log("hero data successfully loaded: ", response);
-      setHeroSummaries(response);
+const teamListFieldStyle = {
+    width: '85%',
+    margin: '15px auto 10px auto'
+}
+
+function SideBar({loginCb}: { loginCb: (user: UserContract) => void }) {
+    const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
+    const [heroText, setHeroText] = useState("");
+
+    fetch("/api/team-compositions/", {
+        method: "GET"
     })
-    .catch(error => {
-      console.log("could not load hero data: ", error);
-    }); 
+        .then(response => response.json())
+        .then(response => {
+            console.log("hero data successfully loaded: ", response);
+            setTeamList(response);
+        })
+        .catch(error => {
+            console.log("could not load hero data: ", error);
+        });
 
-  return (
-    <div className='side-bar'>
-      <SearchBar inputHandler={inputHandler}></SearchBar>
-      <UserContractViewToggle loginCb={loginCb}/>
-      <List input={inputText} heroList={heroSummaries} />
-    </div>
-  );
+    const [teamList, setTeamList] = useState<TeamCompositionDto[]>([]);
+    const [teamText, setTeamText] = useState("");
+
+    fetch("/api/heroes/", {
+        method: "GET"
+    })
+        .then(response => response.json())
+        .then(response => {
+            console.log("hero data successfully loaded: ", response);
+            setHeroList(response);
+        })
+        .catch(error => {
+            console.log("could not load hero data: ", error);
+        });
+
+    fetch("/api/heroes/", {
+        method: "GET"
+    })
+        .then(response => response.json())
+        .then(response => {
+            console.log("hero data successfully loaded: ", response);
+            setHeroList(response);
+        })
+        .catch(error => {
+            console.log("could not load hero data: ", error);
+        });
+
+    return (
+        <div className='side-bar'>
+            <SearchBar inputHandler={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const lowerCase = e.target.value.toLowerCase();
+                setHeroText(lowerCase);
+            }} searchBarAreaStyle={heroListAreaStyle} searchFieldStyle={heroListFieldStyle}></SearchBar>
+            <UserContractViewToggle loginCb={loginCb}/>
+            <List input={heroText} heroList={heroList}/>
+            <SearchBar inputHandler={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const lowerCase = e.target.value.toLowerCase();
+                setTeamText(lowerCase);
+            }} searchBarAreaStyle={teamListAreaStyle} searchFieldStyle={teamListFieldStyle}></SearchBar>
+            <TeamList teamCompList={teamList} input={teamText}></TeamList>
+        </div>
+    );
 }
 
 export default SideBar;
