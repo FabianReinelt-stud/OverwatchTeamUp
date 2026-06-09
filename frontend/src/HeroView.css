@@ -36,10 +36,10 @@
 }
 
 .hero-name {
-  font-family: "BigNoodleOblique";
+    font-family: "BigNoodleOblique", serif;
   border-radius: 2px;
   font-size: 1.5vw;
-  margin: 0px 50% 10px 10px;
+  margin: 0 50% 10px 10px;
   transform: skew(-14deg);
   text-align: center;
   text-shadow: 1px 1px 2px rgb(57, 57, 83);
@@ -49,9 +49,9 @@
 }
 
 .stat-name {
-  font-family: "BigNoodleOblique";
+    font-family: "BigNoodleOblique", serif;
   font-size: 1.2vw;
-  margin: 0px 10px 10px 0px;
+  margin: 0 10px 10px 0;
   text-align: right;
   color: black;
 }
@@ -65,7 +65,7 @@
 }
 
 .stat-value{
-  font-family: "BigNoodle";
+    font-family: "BigNoodle", serif;
   font-size: 1.5vw;
 }
 

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import './UserContractView.css'
-import { Button } from "@mui/material";
-import type { UserContract } from './App';
+import {Button} from "@mui/material";
+import type {UserContract} from './App';
+import * as React from "react";
 
 const View = {
     LOGIN: 0,
@@ -14,82 +15,88 @@ type View = (typeof View)[keyof typeof View];
 
 
 interface UserLogin {
-  username: string;
-  password: string;
+    username: string;
+    password: string;
 }
 
 const handleLogin = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin,
-  setLoginValidity: (isValid: boolean) => void,
-  loginCb: (user: UserContract) => void) => {
-  e.preventDefault();
+                     setLoginValidity: (isValid: boolean) => void,
+                     loginCb: (user: UserContract) => void) => {
+    e.preventDefault();
 
-  fetch("/api/auth/token/", {
-    method: "POST",
-    body: JSON.stringify({ userLoginData })
-  })
-    .then(response => response.json())
-    .then(response => {
-      console.log("login was successful (access/ refresh): ", response.access, response.refresh);
-      loginCb((userLoginData.username, response.access, response.refresh))
+    fetch("/api/auth/token/", {
+        method: "POST",
+        body: JSON.stringify({userLoginData})
     })
-    .catch(error => {
-      console.log("could not login: ", error);
-      setLoginValidity(false);
-    });
+        .then(response => response.json())
+        .then(response => {
+            console.log("login was successful (access/ refresh): ", response.access, response.refresh);
+            loginCb((userLoginData.username, response.access, response.refresh))
+        })
+        .catch(error => {
+            console.log("could not login: ", error);
+            setLoginValidity(false);
+        });
 }
 
 const LoginView = (loginCb: (user: UserContract) => void,
-  updateContractView: (view: View) => void) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoginValid, setIsLoginValid] = useState(true);
+                   updateContractView: (view: View) => void) => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoginValid, setIsLoginValid] = useState(true);
 
     const updateLoginValidity = (isValid: boolean) => {
         setIsLoginValid(isValid);
     }
 
-  const validateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target?.value && e.target.value.match(/^[a-zA-Z0-9_-]*$/i)) {
-      setUsername(e.target.value)
-        updateLoginValidity(true);
-      return true;
+    const validateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target?.value && e.target.value.match(/^[a-zA-Z0-9_-]*$/i)) {
+            setUsername(e.target.value)
+            updateLoginValidity(true);
+            return true;
+        }
+        updateLoginValidity(false);
+        return false;
     }
-      updateLoginValidity(false);
-    return false;
-  }
 
-  return (
-    <div className='register-wrapper'>
-      <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
-        handleLogin(e, { username, password }, updateLoginValidity, loginCb)}>
-        <label>Username</label>
-        <input type="text"
-          className={isLoginValid ? 'form-control' : 'error-control'}
-          pattern="^[a-zA-Z0-9]+"
-          title='Please only use upper-/lowercase letters and numbers'
-          onChange={(e) => validateUsername(e)}
-          required></input>
-        <label><p></p>Password</label>
-        <input type="password"
-          className={isLoginValid ? 'form-control' : 'error-control'}
-          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-          title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters"
-          onChange={(e) => setPassword(e.target.value)}
-          required></input>
-        <div className='form-buttons'>
-          <button type="submit">Login</button>
-          <button type="reset" onClick={ () => {updateContractView(View.REGISTER)}}>No Account? Register</button>
+    return (
+        <div className='register-wrapper'>
+            <p className="view-name">Login</p>
+            <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
+                handleLogin(e, {username, password}, updateLoginValidity, loginCb)}>
+                <label>Username</label>
+                <input type="text"
+                       className={isLoginValid ? 'form-control' : 'error-control'}
+                       pattern="^[a-zA-Z0-9]+"
+                       title='Please only use upper-/lowercase letters and numbers'
+                       onChange={(e) => validateUsername(e)}
+                       required></input>
+                <label><p></p>Password</label>
+                <input type="password"
+                       className={isLoginValid ? 'form-control' : 'error-control'}
+                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                       title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters"
+                       onChange={(e) => setPassword(e.target.value)}
+                       required></input>
+                <div className='form-buttons'>
+                    <button type="submit">Login</button>
+                    <button type="reset" onClick={() => {
+                        setIsLoginValid(true);
+                        updateContractView(View.REGISTER);
+                    }}>No Account? Register
+                    </button>
+                </div>
+            </form>
         </div>
-      </form>
-    </div>
-  );
+    );
 }
 
-const LoginSuccessView = ()=> {
+const LoginSuccessView = (toggleView: () => void) => {
     //TODO: add tokens timer
     return (
         <div>
             <p>You were successfully logged in.</p>
+            <button type="button" onClick={toggleView}>Close</button>
         </div>
     )
 }
@@ -99,7 +106,7 @@ const handleRegister = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData:
 
     fetch("/api/auth/register", {
         method: "POST",
-        body: JSON.stringify({ userLoginData })
+        body: JSON.stringify({userLoginData})
     })
         .then(response => response.json())
         .then(response => {
@@ -113,35 +120,39 @@ const handleRegister = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData:
 }
 
 const RegisterView = (//TODO add register callback here
-  updateContractView: (view: View) => void) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+    updateContractView: (view: View) => void) => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
 
-  return (
-    <div className='register-wrapper'>
-      <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
-        handleRegister(e, { username, password })}>
-        <label>Username</label>
-        <input type="text"
-          className='form-control'
-          pattern="^[a-zA-Z0-9]+"
-          title='Please only use upper-/lowercase letters and numbers'
-          onChange={(e) => setUsername(e.target.value)}
-          required></input>
-        <label><p></p>Password</label>
-        <input type="password"
-          className='form-control'
-          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-          title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters"
-          onChange={(e) => setPassword(e.target.value)}
-          required></input>
-        <div className='form-buttons'>
-          <button type="submit">Register</button>
-          <button type="reset" onClick={() => {updateContractView(View.LOGIN)}}>Login Instead</button>
+    return (
+        <div className='register-wrapper'>
+            <p className="view-name">Registration</p>
+            <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
+                handleRegister(e, {username, password})}>
+                <label>Username</label>
+                <input type="text"
+                       className='form-control'
+                       pattern="^[a-zA-Z0-9]+"
+                       title='Please only use upper-/lowercase letters and numbers'
+                       onChange={(e) => setUsername(e.target.value)}
+                       required></input>
+                <label><p></p>Password</label>
+                <input type="password"
+                       className='form-control'
+                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                       title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters"
+                       onChange={(e) => setPassword(e.target.value)}
+                       required></input>
+                <div className='form-buttons'>
+                    <button type="submit">Register</button>
+                    <button type="reset" onClick={() => {
+                        updateContractView(View.LOGIN)
+                    }}>Login Instead
+                    </button>
+                </div>
+            </form>
         </div>
-      </form>
-      </div>
-  )
+    )
 }
 
 const RegisterSuccessView = (
@@ -150,48 +161,67 @@ const RegisterSuccessView = (
     return (
         <div>
             <p>Registration was successful. Please login now.</p>
-            <button type="reset" onClick={() => {updateContractView(View.LOGIN)}}>Go to Login</button>
+            <button type="reset" onClick={() => {
+                updateContractView(View.LOGIN)
+            }}>Go to Login
+            </button>
         </div>
     );
 }
 
-function UserContractView({ loginCb }: { loginCb: (user: UserContract) => void }) {
-  const [view, setView] = useState<View>(View.LOGIN);
-  const updateContractView = (view: View) => setView(view);
+interface ViewProp {
+    loginCb: (user: UserContract) => void,
+    toggleView: () => void
+}
 
-  const switchView = (view: View) => {
-      switch(view) {
-          case View.LOGIN: return LoginView(loginCb, updateContractView);
-          case View.LOGINSUCCESS: return LoginSuccessView();
-          case View.REGISTER: return RegisterView(updateContractView);
-          case View.REGISTERSUCCESS: return RegisterSuccessView(updateContractView);
-      }
+function UserContractView({loginCb, toggleView}: ViewProp) {
+    const [view, setView] = useState<View>(View.LOGIN);
+    const updateContractView = (view: View) => setView(view);
+
+    const loginView = LoginView(loginCb, updateContractView);
+    const loginSuccessView = LoginSuccessView(toggleView);
+    const registerView = RegisterView(updateContractView);
+    const registerSuccessView = RegisterSuccessView(updateContractView);
+
+    const switchView = (view: View) => {
+        switch (view) {
+            case View.LOGIN:
+                return loginView;
+            case View.LOGINSUCCESS:
+                return loginSuccessView;
+            case View.REGISTER:
+                return registerView;
+            case View.REGISTERSUCCESS:
+                return registerSuccessView;
+        }
     }
 
     const isLoginView = (view: View) => {
-      return view == View.LOGIN || view == View.LOGINSUCCESS;
+        return view == View.LOGIN || view == View.LOGINSUCCESS;
     }
 
-  return (
-    <div className="view-container" style={isLoginView(view)? {backgroundColor: "#0f002b"} : {backgroundColor: "#001731"}}>
-      {switchView(view)}
-    </div>
-  );
+    return (
+        <div className="view-container"
+             style={isLoginView(view) ? {backgroundColor: "#0f002b"} : {backgroundColor: "#001731"}}>
+            {switchView(view)}
+        </div>
+    );
 }
 
-function UserContractViewToggle({ loginCb }: { loginCb: (user: UserContract) => void }) {
-  const [showUserContract, setShowUserContract] = useState(false);
-  const onClick = () => setShowUserContract(!showUserContract);
-  return (
-    <>
-      <div className="login-button">
-        <Button variant="contained" onClick={onClick}>Login</Button>
-      </div>
-      <div className="login-view-container">
-        {showUserContract ? <UserContractView loginCb={loginCb} /> : null}
-      </div>
-    </>
-  );
+function UserContractViewToggle({loginCb}: { loginCb: (user: UserContract) => void }) {
+    const [showUserContract, setShowUserContract] = useState(false);
+    const onClick = () => setShowUserContract(!showUserContract);
+    return (
+        <>
+            <div className="login-button">
+                <Button variant="contained" onClick={onClick}>Login</Button>
+            </div>
+            <div className="login-view-container">
+                {showUserContract ? <UserContractView loginCb={loginCb}
+                                                      toggleView={() => setShowUserContract(!showUserContract)}/> : null}
+            </div>
+        </>
+    );
 }
 
 export default UserContractViewToggle;
