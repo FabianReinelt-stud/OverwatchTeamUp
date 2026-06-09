@@ -36,6 +36,7 @@ function App() {
   return (
     <>
       <div className='overwatch-team-comp'>
+          <p className="small-screen">We're sorry but this website is best viewed and used at a taller screen ratio.</p>
         <div className='main-view'>
           <div className='logo'>
             <img className='logo-img' src={logo} alt='logo'></img>

@@ -1,44 +1,76 @@
-@font-face{
-  font-family: "BigNoodle";
-  src: local("big_noodle_titling"),
-  url("./fonts/big_noodle_titling.ttf") format("truetype");
+@font-face {
+    font-family: "BigNoodle";
+    src: local("big_noodle_titling"),
+    url("./fonts/big_noodle_titling.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "BigNoodleOblique";
-  src: local("big_noodle_titling_oblique"),
-  url("./fonts/big_noodle_titling_oblique.ttf") format("truetype");
+    font-family: "BigNoodleOblique";
+    src: local("big_noodle_titling_oblique"),
+    url("./fonts/big_noodle_titling_oblique.ttf") format("truetype");
 }
 
-.logo {
-  display: flex;
-  align-items: center;
+@media (min-width: 980px) and (min-width: 630px) {
+    .overwatch-team-comp {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+    }
 }
 
-.logo-img {
-  max-width: 95%;
-  margin: auto;
+@media (max-height: 630px) {
+    .overwatch-team-comp > div{
+        visibility: hidden;
+    }
+
+    .overwatch-team-comp {
+        background-color: rgb(22, 23, 29) !important;
+    }
+
+    .small-screen {
+        display: flex !important;
+        margin: 50vh;
+        grid-column: 1 / span 2;
+    }
 }
 
-.main-view {
-  --main-view-gap: 15px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-content: start;
-  height: 100vh;
+
+.small-screen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
 }
 
 .overwatch-team-comp {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  background-color: rgb(39, 73, 110);
+    background-color: rgb(39, 73, 110);
+    padding: 0 5px 0 10px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    max-width: 95%;
+    margin: auto;
+}
+
+.main-view {
+    --main-view-gap: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-content: start;
+    height: 100vh;
 }
 
 .team-comp {
-  display: grid;
-  height: 20%;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: 1fr 1fr;
-  border-radius: 10px;
+    display: grid;
+    height: 20%;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: 1fr 1fr;
+    border-radius: 10px;
 }

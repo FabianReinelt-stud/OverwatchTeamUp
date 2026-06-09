@@ -27,7 +27,7 @@ function List({ input, heroList }: ListProp) {
     }
 
     let listItems;
-    if (heroList === undefined || heroList.length == 0) {
+    if (heroList.length == 0) {
         listItems = <div  style={{
             height: '100vh',
             width: '100%',

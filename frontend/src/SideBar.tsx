@@ -15,12 +15,12 @@ export interface HeroSummary {
 
 function SideBar({loginCb}: {loginCb: (user: UserContract) => void}) {
   const [inputText, setInputText] = useState("");
-  let inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    var lowerCase = e.target.value.toLowerCase();
-    setInputText(lowerCase);
+  const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const lowerCase = e.target.value.toLowerCase();
+      setInputText(lowerCase);
   };
 
-  const [heroSummaries, setHeroSummaries] = useState<HeroSummary[]>(dummyData); //replace dummyData with empty [] later
+  const [heroSummaries, setHeroSummaries] = useState<HeroSummary[]>(dummyData); //TODO: replace dummyData with empty [] later
 
   
     fetch("/api/heroes/", {
