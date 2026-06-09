@@ -8,7 +8,7 @@ interface InputHandlingProp{
 function SearchBar({inputHandler}: InputHandlingProp) {
   return (
     <div className="search-bar-area">
-      <div className="search">
+      <div className="search-field">
         <TextField
           id="outlined-basic"
           onChange={inputHandler}

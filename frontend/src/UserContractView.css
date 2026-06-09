@@ -48,3 +48,9 @@ form {
 .error-control {
     border: 1px solid red;
 }
+
+@media (max-width: 980px) {
+    .login-button{
+        margin-top: 10px;
+    }
+}
