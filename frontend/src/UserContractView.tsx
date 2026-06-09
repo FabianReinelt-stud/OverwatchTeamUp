@@ -3,6 +3,16 @@ import './UserContractView.css'
 import { Button } from "@mui/material";
 import type { UserContract } from './App';
 
+const View = {
+    LOGIN: 0,
+    LOGINSUCCESS: 1,
+    REGISTER: 2,
+    REGISTERSUCCESS: 3,
+} as const;
+
+type View = (typeof View)[keyof typeof View];
+
+
 interface UserLogin {
   username: string;
   password: string;
@@ -28,42 +38,24 @@ const handleLogin = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: Us
     });
 }
 
-const handleRegister = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin) => {
-  e.preventDefault();
-
-  fetch("/api/auth/register", {
-    method: "POST",
-    body: JSON.stringify({ userLoginData })
-  })
-    .then(response => response.json())
-    .then(response => {
-      console.log("registration was successful (id/username): ", response.id, response.username);
-      //TODO view callback to switch to login view
-    })
-    .catch(error => {
-      console.log("could not register: ", error);
-      //TODO registration feedback
-    })
-}
-
 const LoginView = (loginCb: (user: UserContract) => void,
-  updateContractView: () => void) => {
+  updateContractView: (view: View) => void) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoginValid, setIsLoginValid] = useState(true);
 
+    const updateLoginValidity = (isValid: boolean) => {
+        setIsLoginValid(isValid);
+    }
+
   const validateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target?.value && e.target.value.match(/^[a-zA-Z0-9_-]*$/i)) {
       setUsername(e.target.value)
-      setIsLoginValid(true);
+        updateLoginValidity(true);
       return true;
     }
-    setIsLoginValid(false);
+      updateLoginValidity(false);
     return false;
-  }
-
-  const updateLoginValidity = (isValid: boolean) => {
-    setIsLoginValid(isValid);
   }
 
   return (
@@ -86,15 +78,42 @@ const LoginView = (loginCb: (user: UserContract) => void,
           required></input>
         <div className='form-buttons'>
           <button type="submit">Login</button>
-          <button type="reset" onClick={updateContractView}>No Account? Register</button>
+          <button type="reset" onClick={ () => {updateContractView(View.REGISTER)}}>No Account? Register</button>
         </div>
       </form>
     </div>
   );
 }
 
+const LoginSuccessView = ()=> {
+    //TODO: add tokens timer
+    return (
+        <div>
+            <p>You were successfully logged in.</p>
+        </div>
+    )
+}
+
+const handleRegister = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin) => {
+    e.preventDefault();
+
+    fetch("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ userLoginData })
+    })
+        .then(response => response.json())
+        .then(response => {
+            console.log("registration was successful (id/username): ", response.id, response.username);
+            //TODO view callback to switch to login view
+        })
+        .catch(error => {
+            console.log("could not register: ", error);
+            //TODO registration feedback
+        })
+}
+
 const RegisterView = (//TODO add register callback here
-  updateContractView: () => void) => {
+  updateContractView: (view: View) => void) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -118,26 +137,47 @@ const RegisterView = (//TODO add register callback here
           required></input>
         <div className='form-buttons'>
           <button type="submit">Register</button>
-          <button type="reset" onClick={updateContractView}>Login Instead</button>
+          <button type="reset" onClick={() => {updateContractView(View.LOGIN)}}>Login Instead</button>
         </div>
       </form>
       </div>
   )
 }
 
-function UserContractView({ loginCb }: { loginCb: (user: UserContract) => void }) {
-  const [showRegisterView, setIsRegister] = useState(false);
-  const updateContractView = () => setIsRegister(!showRegisterView);
+const RegisterSuccessView = (
+    updateContractView: (view: View) => void) => {
 
-  let registerView = RegisterView(updateContractView);
-  let loginView = LoginView(loginCb, updateContractView);
+    return (
+        <div>
+            <p>Registration was successful. Please login now.</p>
+            <button type="reset" onClick={() => {updateContractView(View.LOGIN)}}>Go to Login</button>
+        </div>
+    );
+}
+
+function UserContractView({ loginCb }: { loginCb: (user: UserContract) => void }) {
+  const [view, setView] = useState<View>(View.LOGIN);
+  const updateContractView = (view: View) => setView(view);
+
+  const switchView = (view: View) => {
+      switch(view) {
+          case View.LOGIN: return LoginView(loginCb, updateContractView);
+          case View.LOGINSUCCESS: return LoginSuccessView();
+          case View.REGISTER: return RegisterView(updateContractView);
+          case View.REGISTERSUCCESS: return RegisterSuccessView(updateContractView);
+      }
+    }
+
+    const isLoginView = (view: View) => {
+      return view == View.LOGIN || view == View.LOGINSUCCESS;
+    }
 
   return (
-    <div className="view-container" style={showRegisterView? {backgroundColor: "#0f002b"} : {backgroundColor: "#001731"}}>
-      {showRegisterView ?  registerView: loginView}
+    <div className="view-container" style={isLoginView(view)? {backgroundColor: "#0f002b"} : {backgroundColor: "#001731"}}>
+      {switchView(view)}
     </div>
   );
-};
+}
 
 function UserContractViewToggle({ loginCb }: { loginCb: (user: UserContract) => void }) {
   const [showUserContract, setShowUserContract] = useState(false);
