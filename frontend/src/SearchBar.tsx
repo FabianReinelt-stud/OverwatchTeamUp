@@ -5,11 +5,12 @@ import * as React from "react";
 interface SearchBarProp {
     inputHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
     searchBarAreaStyle: React.CSSProperties,
-    searchFieldStyle: React.CSSProperties
+    searchFieldStyle: React.CSSProperties,
+    label: string
 }
 
 function SearchBar(
-    {inputHandler, searchBarAreaStyle, searchFieldStyle}:  SearchBarProp
+    {inputHandler, searchBarAreaStyle, searchFieldStyle, label}:  SearchBarProp
     ) {
   return (
     <div className="search-bar-area" style={searchBarAreaStyle}>
@@ -20,10 +21,10 @@ function SearchBar(
           variant="outlined"
           size="small"
           fullWidth
-          label="Search"
+          label={label}
           sx={{
             input: {color: 'white'},
-            label: {color: 'white'},
+            label: {color: '#b8b8b9'},
             fieldset: {borderColor: 'white'}
           }}
         />

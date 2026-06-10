@@ -1,0 +1,302 @@
+[
+  {
+    "id": 1,
+    "name": "Team01",
+    "hero_1": {
+      "hero_key": "ana",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_2": {
+      "hero_key": "ana1",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_3": {
+      "hero_key": "ana2",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_4": {
+      "hero_key": "ana3",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_5": {
+      "hero_key": "ana4",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "created_at": "2026-06-09",
+    "average_winrate": "62"
+  },
+  {
+    "id": 2,
+    "name": "Team02",
+    "hero_1": {
+      "hero_key": "ana",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_2": {
+      "hero_key": "ana1",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_3": {
+      "hero_key": "ana2",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [
+        {
+          "name": "Nano",
+          "description": "Hero go zoom",
+          "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+        }
+      ]
+    },
+    "hero_4": {
+      "hero_key": "ana3",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [
+        {
+          "name": "Nano",
+          "description": "Hero go zoom",
+          "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+        }
+      ]
+    },
+    "hero_5": {
+      "hero_key": "ana4",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [
+        {
+          "name": "Nano",
+          "description": "Hero go zoom",
+          "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+        }
+      ]
+    },
+    "created_at": "2026-06-09",
+    "average_winrate": "62"
+  },
+  {
+    "id": 3,
+    "name": "ReallyLongTeamName",
+    "hero_1": {
+      "hero_key": "ana",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_2": {
+      "hero_key": "ana1",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [{
+        "name": "Nano",
+        "description": "Hero go zoom",
+        "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+      }]
+    },
+    "hero_3": {
+      "hero_key": "ana2",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [
+        {
+          "name": "Nano",
+          "description": "Hero go zoom",
+          "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+        }
+      ]
+    },
+    "hero_4": {
+      "hero_key": "ana3",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [
+        {
+          "name": "Nano",
+          "description": "Hero go zoom",
+          "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+        }
+      ]
+    },
+    "hero_5": {
+      "hero_key": "ana4",
+      "display_name": "Ana",
+      "role": "support",
+      "subrole": "flanker",
+      "winrate": "42",
+      "pickrate": "42",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+      "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+      "abilities": [
+        {
+          "name": "Nano",
+          "description": "Hero go zoom",
+          "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+        }
+      ]
+    },
+    "created_at": "2026-06-09",
+    "average_winrate": "62"
+  }
+]

@@ -24,6 +24,12 @@ const loadErrorStyle: React.CSSProperties = {
     justifyContent: 'center',
 };
 
+const teamHeroPreviewStyle: React.CSSProperties = {
+    width: "16%",
+    borderRadius: "5px",
+    padding: "1%"
+}
+
 export function TeamList({input, teamCompList}: TeamCompListProp) {
     const filteredTeamComps = teamCompList.filter((team) => {
         if (input === '') {
@@ -36,12 +42,62 @@ export function TeamList({input, teamCompList}: TeamCompListProp) {
     let teamListItems;
 
     if (teamCompList.length == 0) {
-        teamListItems = <div style={loadErrorStyle}><p>No Team Comps found.</p><p>Please create a new one or try again later.</p></div>;
+        teamListItems =
+            <div style={loadErrorStyle}><p>No Team Comps found.</p><p>Please create a new ones or try again later.</p>
+            </div>;
     } else {
         teamListItems =
             <ul className="scrollable-list">
                 {filteredTeamComps.map((team) => (
-                    <li className="scrollable-item" key={team.id}>{team.name}</li>
+                    <li className="scrollable-item" key={team.id}
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "3fr 2fr",
+                            gridTemplateRows: "0.5fr 1fr",
+                            fontSize: "1.1em",
+                        }}>
+                        <p style={{
+                            gridRowStart: "1",
+                            gridColumn: "1",
+                            margin: "auto",
+                        }}>{team.name}</p>
+                        <p style={{
+                            gridRowStart: "1",
+                            gridColumn: "2",
+                            margin: "auto",
+                        }}>Avg WR: {team.average_winrate}</p>
+                        <div style={{
+                            margin: "auto",
+                            gridRow: "2",
+                            gridColumn: "1/ span 2"
+                        }}>
+                            <div style={{
+                                display: "flex",
+                                justifyContent: "space-evenly"
+                            }}>
+                                <img
+                                    src={team.hero_1.portrait_url}
+                                    alt={team.hero_1.display_name}
+                                    style={teamHeroPreviewStyle}></img>
+                                <img
+                                    src={team.hero_2.portrait_url}
+                                    alt={team.hero_2.display_name}
+                                    style={teamHeroPreviewStyle}></img>
+                                <img
+                                    src={team.hero_3.portrait_url}
+                                    alt={team.hero_3.display_name}
+                                    style={teamHeroPreviewStyle}></img>
+                                <img
+                                    src={team.hero_3.portrait_url}
+                                    alt={team.hero_3.display_name}
+                                    style={teamHeroPreviewStyle}></img>
+                                <img
+                                    src={team.hero_3.portrait_url}
+                                    alt={team.hero_3.display_name}
+                                    style={teamHeroPreviewStyle}></img>
+                            </div>
+                        </div>
+                    </li>
                 ))}
             </ul>;
     }
@@ -78,7 +134,9 @@ function List({input, heroList}: HeroListProp) {
 
     let heroListItems;
     if (heroList.length == 0) {
-        heroListItems = <div style={loadErrorStyle}><p>List of Heroes could not be loaded.</p><p>Please try again later.</p></div>;;
+        heroListItems =
+            <div style={loadErrorStyle}><p>List of Heroes could not be loaded.</p><p>Please try again later.</p></div>;
+        ;
     } else {
         heroListItems =
             <ul className="scrollable-list">
