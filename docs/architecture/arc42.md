@@ -1,30 +1,4 @@
----
-date: July 2025
-title: "![arc42](images/arc42-logo.png) Template"
----
-
-# 
-
-**About arc42**
-
-arc42, the template for documentation of software and system
-architecture.
-
-Template Version 9.0-EN. (based upon AsciiDoc version), July 2025
-
-Created, maintained and © by Dr. Peter Hruschka, Dr. Gernot Starke and
-contributors. See <https://arc42.org>.
-
-:::: note
-::: title
-:::
-
-This version of the template contains some help and explanations. It is
-used for familiarization with arc42 and the understanding of the
-concepts. For documentation of your own system you use better the
-*plain* version.
-::::
-
+# Overwatch TeamUp Architecture Document
 # Introduction and Goals 
 ## Requirements Overview 
 
@@ -44,13 +18,13 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 ## Quality Goals 
 
-| Priority | Quality Goal | Motivation |
-|----------|-------------|------------|
-| 1 | **Reliability** | Hero data must be consistent and available even when the external API is temporarily unreachable |
-| 2 | **Security** | Team compositions are private per user; authentication and authorization must be enforced |
-| 3 | **Maintainability** | Hexagonal architecture (ports & adapters) keeps external dependencies replaceable |
-| 4 | **Correctness** | Hero stats displayed must accurately reflect the synced upstream data |
-| 5 | **Usability** | API responses must be fast and well-structured for frontend consumption |
+| Priority | Quality Goal | Motivation | Metric |
+|----------|-------------|------------|--------|
+| 1 | **Reliability** | Hero data must be consistent and available even when the external API is temporarily unreachable | Hero list endpoint returns data within 500ms even when OverFast API is unreachable; `sync_heroes` is the only code path that calls the external API |
+| 2 | **Security** | Team compositions are private per user; authentication and authorization must be enforced | Unauthenticated requests to team composition endpoints return 401; requests with a valid JWT cannot access another user's data (404); tokens older than 30 minutes are rejected |
+| 3 | **Maintainability** | Hexagonal architecture (ports & adapters) keeps external dependencies replaceable | Replacing the OverFast API requires changes in exactly one file (`overfast_api_adapter.py`); no direct `import requests` outside of adapters |
+| 4 | **Correctness** | Hero stats displayed must accurately reflect the synced upstream data | After `sync_heroes`, hero stats in the database match the OverFast API values for the same hero key; all heroes from the external API are present locally after sync |
+| 5 | **Usability** | API responses must be fast and well-structured for frontend consumption | Hero list and detail endpoints respond in under 200ms; all endpoints return consistent JSON following the documented DTO structure |
 
 ## Stakeholders 
 
@@ -58,42 +32,16 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 |-----------|---------|--------------|
 | Overwatch Players (end users) | — | Quickly look up hero stats and plan team compositions without leaving the app |
 | Development Team | — | Clear architecture boundaries, testable code, and documented API contracts |
-| External API (OverFast API) | https://overfast-api.tekrop.fr | Data is fetched responsibly and cached locally to avoid excessive requests |
+
 
 # Architecture Constraints 
 
-::: formalpara-title
-**Contents**
-:::
-
-Any requirement that constraints software architects in their freedom of
-design and implementation decisions or decision about the development
-process. These constraints sometimes go beyond individual systems and
-are valid for whole organizations and companies.
-
-::: formalpara-title
-**Motivation**
-:::
-
-Architects should know exactly where they are free in their design
-decisions and where they must adhere to constraints. Constraints must
-always be dealt with; they may be negotiable, though.
-
-::: formalpara-title
-**Form**
-:::
-
-Simple tables of constraints with explanations. If needed you can
-subdivide them into technical constraints, organizational and political
-constraints and conventions (e.g. programming or versioning guidelines,
-documentation or naming conventions)
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Architecture Constraints](https://docs.arc42.org/section-2/) in the
-arc42 documentation.
+| Constraint | Explanation |
+|------------|-------------|
+| **Python / Django backend** | The team has Python expertise; the backend framework is fixed for the duration of the project |
+| **PostgreSQL as database** | Chosen due to team familiarity and existing infrastructure; switching engines would require significant migration effort |
+| **OverFast API as sole hero data source** | All hero data originates from this third-party public API. It has no SLA and no authentication, meaning it can change or go offline at any time. Hero data must therefore be cached locally rather than fetched live |
+| **OverFast API data limitations** | Win rate and pick rate are only available for competitive PC EU rankings. Other regions, platforms, or game modes are not covered |
 
 # Context and Scope {#section-context-and-scope}
 
