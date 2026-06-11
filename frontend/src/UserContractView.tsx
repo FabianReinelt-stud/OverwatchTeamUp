@@ -1,8 +1,13 @@
 import {useState} from 'react';
 import './UserContractView.css'
 import {Button} from "@mui/material";
-import type {UserContract} from './App';
 import * as React from "react";
+import type {TokenResponseDto} from "./data/api-dtos.tsx";
+
+export interface UserContract{
+    username: string
+    token: TokenResponseDto
+}
 
 const View = {
     LOGIN: 0,
@@ -21,7 +26,7 @@ interface UserLogin {
 
 const handleLogin = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin,
                      setLoginValidity: (isValid: boolean) => void,
-                     loginCb: (user: UserContract) => void) => {
+                     updateLoginState: (user: UserContract) => void) => {
     e.preventDefault();
 
     fetch("/api/auth/token/", {
@@ -31,7 +36,7 @@ const handleLogin = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: Us
         .then(response => response.json())
         .then(response => {
             console.log("login was successful (access/ refresh): ", response.access, response.refresh);
-            loginCb((userLoginData.username, response.access, response.refresh))
+            updateLoginState((userLoginData.username, response.access, response.refresh))
         })
         .catch(error => {
             console.log("could not login: ", error);
@@ -39,37 +44,46 @@ const handleLogin = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: Us
         });
 }
 
-const LoginView = (loginCb: (user: UserContract) => void,
+const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                    updateContractView: (view: View) => void) => {
+    const [userContract, setUserContract] = useState<UserContract>()
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoginValid, setIsLoginValid] = useState(true);
+    const updateUserContract = (user: UserContract) => {
+        setUserContract(user);
+        updateLoginState(true);
+        if(userContract) {
+            console.log("user login updated with: ", userContract.username, userContract.token.access, userContract.token.refresh)
+        }
+    }
 
     const updateLoginValidity = (isValid: boolean) => {
         setIsLoginValid(isValid);
     }
 
     const validateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target?.value && e.target.value.match(/^[a-zA-Z0-9_-]*$/i)) {
-            setUsername(e.target.value)
-            updateLoginValidity(true);
-            return true;
-        }
-        updateLoginValidity(false);
-        return false;
+        return e.target?.value && e.target.value.match(/^[a-zA-Z0-9_-]*$/i);
     }
 
     return (
         <div className='register-wrapper'>
             <p className="view-name">Login</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
-                handleLogin(e, {username, password}, updateLoginValidity, loginCb)}>
+                handleLogin(e, {username, password}, updateLoginValidity, updateUserContract)}>
                 <label>Username</label>
                 <input type="text"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="^[a-zA-Z0-9]+"
                        title='Please only use upper-/lowercase letters and numbers'
-                       onChange={(e) => validateUsername(e)}
+                       onChange={(e) => {
+                           if(validateUsername(e)) {
+                               setUsername(e.target.value)
+                               updateLoginValidity(true);
+                           } else {
+                               updateLoginValidity(false);
+                           }
+                       }}
                        required></input>
                 <label><p></p>Password</label>
                 <input type="password"
@@ -170,15 +184,15 @@ const RegisterSuccessView = (
 }
 
 interface ViewProp {
-    loginCb: (user: UserContract) => void,
+    updateLoginState: (isLoggedIn: boolean) => void,
     toggleView: () => void
 }
 
-function UserContractView({loginCb, toggleView}: ViewProp) {
+function UserContractView({updateLoginState, toggleView}: ViewProp) {
     const [view, setView] = useState<View>(View.LOGIN);
     const updateContractView = (view: View) => setView(view);
 
-    const loginView = LoginView(loginCb, updateContractView);
+    const loginView = LoginView(updateLoginState, updateContractView);
     const loginSuccessView = LoginSuccessView(toggleView);
     const registerView = RegisterView(updateContractView);
     const registerSuccessView = RegisterSuccessView(updateContractView);
@@ -208,7 +222,7 @@ function UserContractView({loginCb, toggleView}: ViewProp) {
     );
 }
 
-function UserContractViewToggle({loginCb}: { loginCb: (user: UserContract) => void }) {
+function UserContractViewToggle({updateLoginState}: { updateLoginState: (isLoggedIn: boolean) => void }) {
     const [showUserContract, setShowUserContract] = useState(false);
     const onClick = () => setShowUserContract(!showUserContract);
     return (
@@ -217,7 +231,7 @@ function UserContractViewToggle({loginCb}: { loginCb: (user: UserContract) => vo
                 <Button variant="contained" onClick={onClick}>Login</Button>
             </div>
             <div className="login-view-container">
-                {showUserContract ? <UserContractView loginCb={loginCb}
+                {showUserContract ? <UserContractView updateLoginState={updateLoginState}
                                                       toggleView={() => setShowUserContract(!showUserContract)}/> : null}
             </div>
         </>

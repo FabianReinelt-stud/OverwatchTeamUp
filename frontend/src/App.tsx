@@ -1,28 +1,22 @@
 import logo from './assets/logo.png'
 import HeroView from './HeroView'
 import TeamSlot, { Load, Save } from './TeamComposition'
-import type {TokenResponseDto} from "./data/api-dtos.tsx";
 import SideBar from './SideBar'
-
 import { useState } from 'react'
 import './App.css'
 import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 
-export interface UserContract{
-  username: string
- token: TokenResponseDto
-}
-
 function App() {
-  const [userContract, setUserContract] = useState<UserContract>()
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [showTeamCompView, setShowTeamCompView] = useState(false);
 
-  const updateLoginState = (user: UserContract) => {
-    setUserContract(user);
-    setIsLoggedIn(true);
-    if(userContract)
-    console.log("user login updated with: ", userContract.username, userContract.token.access, userContract.token.refresh)
+  const updateLoginState = (isLoggedIn: boolean) => {
+      setIsLoggedIn(isLoggedIn);
+    }
+
+  const updateTeamCompViewState = () => {
+      setShowTeamCompView(!showTeamCompView);
   }
 
   return (
@@ -33,7 +27,7 @@ function App() {
           <div className='logo'>
             <img className='logo-img' src={logo} alt='logo'></img>
           </div>
-          <HeroView></HeroView>
+            <HeroView></HeroView>
           <div className='team-comp'>
             <TeamSlot role={"tank"}></TeamSlot>
             <TeamSlot role={"damage"}></TeamSlot>
@@ -41,10 +35,10 @@ function App() {
             <TeamSlot role={"support"}></TeamSlot>
             <TeamSlot role={"support"}></TeamSlot>
             <Save isLoggedIn={isLoggedIn}></Save>
-            <Load isLoggedIn={isLoggedIn}></Load>
+            <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
           </div>
         </div>
-        <SideBar loginCb={updateLoginState}></SideBar>
+        <SideBar updateLoginState={updateLoginState} showTeamCompView={showTeamCompView}></SideBar>
       </div>
     </>
   )

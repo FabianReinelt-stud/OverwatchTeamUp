@@ -5,17 +5,22 @@ import tank from './assets/tank.png'
 import './TeamComposition.css'
 import { Tooltip } from '@mui/material'
 
-export function Load({ isLoggedIn }: { isLoggedIn: boolean }) {
+interface LoadTeamProp{
+isLoggedIn: boolean,
+updateTeamCompViewState: () => void
+}
+
+export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
   return (
-    <Tooltip title={isLoggedIn ? "Load an existing team composition from a list on the right" : "Please login or register to use the save function for your team composition."}>
-      <button className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'} ></button>
+    <Tooltip title={isLoggedIn ? "Click to open Team Comp table" : "Please login or register to use the save function for your team composition."}>
+      <button onClick={updateTeamCompViewState} className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'} ></button>
     </Tooltip>
   )
 }
 
 export function Save({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
-    <Tooltip title={isLoggedIn ? "Save your current team composition" : "Please login or register to use the load function for your existing team compositions."}>
+    <Tooltip title={isLoggedIn ? "Click to save current Team Comp" : "Please login or register to use the load function for your existing team compositions."}>
       <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}></button>
     </Tooltip>
   )

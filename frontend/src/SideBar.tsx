@@ -2,7 +2,6 @@ import List, {TeamList} from './List.tsx'
 import {useState} from "react";
 import UserContractViewToggle from "./UserContractView";
 import SearchBar from "./SearchBar";
-import type {UserContract} from './App';
 import dummyData from "./data/HeroDummyData.json"
 import teamDummyData from "./data/TeamDummyData.json"
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
@@ -29,7 +28,12 @@ const teamListFieldStyle = {
     margin: '15px auto 10px auto'
 }
 
-function SideBar({loginCb}: { loginCb: (user: UserContract) => void }) {
+interface SideBarProp {
+    updateLoginState: (isLoggedIn: boolean) => void,
+    showTeamCompView: boolean
+}
+
+function SideBar({updateLoginState, showTeamCompView}: SideBarProp) {
     const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
     const [heroText, setHeroText] = useState("");
 
@@ -73,15 +77,21 @@ function SideBar({loginCb}: { loginCb: (user: UserContract) => void }) {
                 <SearchBar inputHandler={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const lowerCase = e.target.value.toLowerCase();
                     setHeroText(lowerCase);
-                }} searchBarAreaStyle={heroListAreaStyle} searchFieldStyle={heroListFieldStyle} label={"Search Heroes"}></SearchBar>
-                <UserContractViewToggle loginCb={loginCb}/>
+                }} searchBarAreaStyle={heroListAreaStyle} searchFieldStyle={heroListFieldStyle}
+                           label={"Search Heroes"}></SearchBar>
+                <UserContractViewToggle updateLoginState={updateLoginState}/>
             </div>
             <List input={heroText} heroList={heroList}/>
-            <SearchBar inputHandler={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const lowerCase = e.target.value.toLowerCase();
-                setTeamText(lowerCase);
-            }} searchBarAreaStyle={teamListAreaStyle} searchFieldStyle={teamListFieldStyle} label={"Search Team Compositions"}></SearchBar>
-            <TeamList teamCompList={teamList} input={teamText}></TeamList>
+            {showTeamCompView ? <SearchBar
+                inputHandler={
+                    (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const lowerCase = e.target.value.toLowerCase();
+                        setTeamText(lowerCase);
+                    }}
+                searchBarAreaStyle={teamListAreaStyle}
+                searchFieldStyle={teamListFieldStyle}
+                label={"Search Team Compositions"}></SearchBar> : null}
+            {showTeamCompView? <TeamList teamCompList={teamList} input={teamText}></TeamList>: null}
         </div>
     );
 }

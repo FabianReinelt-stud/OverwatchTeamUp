@@ -18,6 +18,11 @@
   opacity: 0.5;
 }
 
+.loadBtn:active,
+.saveBtn:active{
+    opacity: 1;
+}
+
 .loadBtn,
 .loadBtn-disabled {
   background-image: url("..\src\assets\download.png");
