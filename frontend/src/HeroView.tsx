@@ -1,5 +1,4 @@
 import './HeroView.css'
-import {useState} from "react";
 import type {AbilityDto, HeroDto} from "./data/api-dtos.tsx";
 
 interface HeroStatProp {
@@ -16,7 +15,8 @@ interface HeroAbilityProp {
 }
 
 interface HeroViewProp {
-    heroKey: string
+    currentHero: HeroDto;
+    loadingError: boolean;
 }
 
 const messageStyle: React.CSSProperties = {
@@ -42,30 +42,9 @@ const abilityRowStyle: React.CSSProperties = {
     borderTop: "2px solid dimgrey"
 }
 
-function HeroView({heroKey}: HeroViewProp) {
-    const [currentHeroKey, setCurrentHeroKey] = useState("");
-    const [currentHero, setCurrentHero] = useState<HeroDto>();
-    const [loadingError, setLoadingError] = useState(false);
-
-    if (heroKey != currentHeroKey && currentHeroKey != "") {
-        fetch("/api/heroes/" + heroKey + "/", {
-            method: "GET"
-        })
-            .then(response => response.json())
-            .then(response => {
-                console.log("hero data successfully loaded for view: ", response);
-                setCurrentHeroKey(response.hero_key);
-                setCurrentHero(response);
-                setLoadingError(false);
-            })
-            .catch(error => {
-                console.log("could not load hero data for view: ", error);
-                setLoadingError(true);
-            });
-    }
-
+function HeroView({currentHero, loadingError}: HeroViewProp) {
     let heroView;
-    if (currentHero) {
+    if (currentHero.hero_key != "") {
         heroView = <HeroStats hero={currentHero}/>;
     } else {
         heroView = <div className="introduction" style={messageStyle}>
@@ -136,7 +115,7 @@ function HeroAbilityRow({abilities, abilityColor, rowStyle}: HeroAbilityProp) {
                 <p style={{backgroundColor: "#ffc70e"}}>Abilities</p></div>
             <div className='stat-value'>{
                 abilities.map((ability) => (
-                        <div style={{display: "grid"}}>
+                        <div key={ability.name} style={{display: "grid"}}>
                             <div className="hero-stat-row" style={rowStyle}>
                                 <div className="stat-name" style={{display: "flex", flexDirection: "column"}}>
                                     <p style={{backgroundColor: abilityColor}}>{ability.name}</p>
@@ -146,7 +125,7 @@ function HeroAbilityRow({abilities, abilityColor, rowStyle}: HeroAbilityProp) {
                                             objectFit: "contain",
                                             width: "60%",
                                             height: "60%",
-                                            margin: "auto"
+                                            margin: "10px auto 10px auto"
                                         }}/>
                                 </div>
                                 <div className='stat-value'>{ability.description}</div>

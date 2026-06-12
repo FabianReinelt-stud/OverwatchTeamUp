@@ -38,7 +38,7 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideB
     const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
     const [heroText, setHeroText] = useState("");
 
-    if(heroList.length == 0) {
+    if (heroList.length == 0) {
         fetch("/api/heroes/", {
             method: "GET"
         })
@@ -55,7 +55,7 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideB
     const [teamList, setTeamList] = useState<TeamCompositionDto[]>(teamDummyData);
     const [teamText, setTeamText] = useState("");
 
-    if(teamList.length == 0) {
+    if (teamList.length == 0) {
         fetch("/api/team-compositions/", {
             method: "GET"
         })
@@ -87,16 +87,21 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideB
                 <UserContractViewToggle updateLoginState={updateLoginState}/>
             </div>
             <List input={heroText} heroList={heroList} updateSelectedHero={updateSelectedHero}/>
-            {showTeamCompView ? <SearchBar
-                inputHandler={
-                    (e: React.ChangeEvent<HTMLInputElement>) => {
-                        const lowerCase = e.target.value.toLowerCase();
-                        setTeamText(lowerCase);
-                    }}
-                searchBarAreaStyle={teamListAreaStyle}
-                searchFieldStyle={teamListFieldStyle}
-                label={"Search Team Compositions"}></SearchBar> : null}
-            {showTeamCompView? <TeamList teamCompList={teamList} input={teamText}></TeamList>: null}
+            {showTeamCompView ?
+                <SearchBar
+                    inputHandler={
+                        (e: React.ChangeEvent<HTMLInputElement>) => {
+                            const lowerCase = e.target.value.toLowerCase();
+                            setTeamText(lowerCase);
+                        }}
+                    searchBarAreaStyle={teamListAreaStyle}
+                    searchFieldStyle={teamListFieldStyle}
+                    label={"Search Team Compositions"}>
+                </SearchBar> :
+                null}
+            {showTeamCompView ?
+                <TeamList teamCompList={teamList} input={teamText}></TeamList> :
+                null}
         </div>
     );
 }
