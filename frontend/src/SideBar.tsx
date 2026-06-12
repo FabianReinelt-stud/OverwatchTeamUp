@@ -30,39 +30,44 @@ const teamListFieldStyle = {
 
 interface SideBarProp {
     updateLoginState: (isLoggedIn: boolean) => void,
-    showTeamCompView: boolean
+    showTeamCompView: boolean,
+    updateSelectedHero: (heroKey: string) => void
 }
 
-function SideBar({updateLoginState, showTeamCompView}: SideBarProp) {
+function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideBarProp) {
     const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
     const [heroText, setHeroText] = useState("");
 
-    fetch("/api/heroes/", {
-        method: "GET"
-    })
-        .then(response => response.json())
-        .then(response => {
-            console.log("hero data successfully loaded: ", response);
-            setHeroList(response);
+    if(heroList.length == 0) {
+        fetch("/api/heroes/", {
+            method: "GET"
         })
-        .catch(error => {
-            console.log("could not load hero data: ", error);
-        });
+            .then(response => response.json())
+            .then(response => {
+                console.log("hero data successfully loaded: ", response);
+                setHeroList(response);
+            })
+            .catch(error => {
+                console.log("could not load hero data: ", error);
+            });
+    }
 
     const [teamList, setTeamList] = useState<TeamCompositionDto[]>(teamDummyData);
     const [teamText, setTeamText] = useState("");
 
-    fetch("/api/team-compositions/", {
-        method: "GET"
-    })
-        .then(response => response.json())
-        .then(response => {
-            console.log("team data successfully loaded: ", response);
-            setTeamList(response);
+    if(teamList.length == 0) {
+        fetch("/api/team-compositions/", {
+            method: "GET"
         })
-        .catch(error => {
-            console.log("could not load team data: ", error);
-        });
+            .then(response => response.json())
+            .then(response => {
+                console.log("team data successfully loaded: ", response);
+                setTeamList(response);
+            })
+            .catch(error => {
+                console.log("could not load team data: ", error);
+            });
+    }
 
     return (
         <div className='side-bar' style={{
@@ -81,7 +86,7 @@ function SideBar({updateLoginState, showTeamCompView}: SideBarProp) {
                            label={"Search Heroes"}></SearchBar>
                 <UserContractViewToggle updateLoginState={updateLoginState}/>
             </div>
-            <List input={heroText} heroList={heroList}/>
+            <List input={heroText} heroList={heroList} updateSelectedHero={updateSelectedHero}/>
             {showTeamCompView ? <SearchBar
                 inputHandler={
                     (e: React.ChangeEvent<HTMLInputElement>) => {

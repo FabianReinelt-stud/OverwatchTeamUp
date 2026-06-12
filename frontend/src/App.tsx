@@ -10,6 +10,7 @@ import './fonts/big_noodle_titling_oblique.ttf'
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [showTeamCompView, setShowTeamCompView] = useState(false);
+  const [selectedHeroKey, setSelectedHeroKey] = useState("");
 
   const updateLoginState = (isLoggedIn: boolean) => {
       setIsLoggedIn(isLoggedIn);
@@ -17,6 +18,11 @@ function App() {
 
   const updateTeamCompViewState = () => {
       setShowTeamCompView(!showTeamCompView);
+  }
+
+  const updateSelectedHero = (heroKey: string) => {
+      console.log("updated selected hero: ", heroKey)
+      setSelectedHeroKey(heroKey);
   }
 
   return (
@@ -27,7 +33,7 @@ function App() {
           <div className='logo'>
             <img className='logo-img' src={logo} alt='logo'></img>
           </div>
-            <HeroView></HeroView>
+            <HeroView heroKey={selectedHeroKey}></HeroView>
           <div className='team-comp'>
             <TeamSlot role={"tank"}></TeamSlot>
             <TeamSlot role={"damage"}></TeamSlot>
@@ -38,7 +44,7 @@ function App() {
             <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
           </div>
         </div>
-        <SideBar updateLoginState={updateLoginState} showTeamCompView={showTeamCompView}></SideBar>
+        <SideBar updateLoginState={updateLoginState} showTeamCompView={showTeamCompView} updateSelectedHero={updateSelectedHero}></SideBar>
       </div>
     </>
   )

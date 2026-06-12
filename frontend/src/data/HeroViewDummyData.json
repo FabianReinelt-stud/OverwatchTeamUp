@@ -1,0 +1,25 @@
+{
+  "hero_key": "ana",
+  "display_name": "Ana",
+  "role": "support",
+  "subrole": "flanker",
+  "winrate": "42",
+  "pickrate": "42",
+  "health": 225,
+  "armor": 0,
+  "shields": 0,
+  "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
+  "description": "Armed with his Peacekeeper revolver, Cassidy takes out targets with deadeye precision and dives out of danger with eagle-like speed.",
+  "abilities": [
+    {
+      "name": "Nano",
+      "description": "a very long text a very long text a very long text a very long text a very long text a very long text a very long text a very long text a very long text a very long text a very long text a very long text",
+      "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+    },
+    {
+      "name": "A Very Long Ability Name",
+      "description": "Punch a hero's lights out",
+      "icon": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/24a3f2f619859812bba6b6374513fa971b6b19ccb34950c02118b41cc4f93142.png"
+    }
+  ]
+}

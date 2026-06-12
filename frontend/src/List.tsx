@@ -8,6 +8,7 @@ import * as React from "react";
 interface HeroListProp {
     input: string;
     heroList: HeroSummaryDto[];
+    updateSelectedHero: (selectedHero: string) => void;
 }
 
 interface TeamCompListProp {
@@ -103,17 +104,13 @@ export function TeamList({input, teamCompList}: TeamCompListProp) {
     }
 
     return (
-        <div className="scrollable-container"
-             style={{
-                 gridColumn: '1 / span 2',
-                 gridRowStart: '5'
-             }}>
+        <div className="scrollable-container" style={{margin: "auto"}}>
             {teamListItems}
         </div>
     )
 }
 
-function List({input, heroList}: HeroListProp) {
+function List({input, heroList, updateSelectedHero}: HeroListProp) {
     const filteredHeroes = heroList.filter((hero) => {
         if (input === '') {
             return hero;
@@ -136,26 +133,36 @@ function List({input, heroList}: HeroListProp) {
     if (heroList.length == 0) {
         heroListItems =
             <div style={loadErrorStyle}><p>List of Heroes could not be loaded.</p><p>Please try again later.</p></div>;
-        ;
     } else {
         heroListItems =
             <ul className="scrollable-list">
                 {filteredHeroes.map((hero) => (
                     <li className="scrollable-item" key={hero.hero_key}>
-                        <img className="hero-preview"
-                             src={hero.portrait_url}
-                             alt="ana"></img>{hero.display_name}
-                        <img className="hero-role" src={getHeroRoleImg(hero.role)} alt='hero role'></img></li>
+                        <button
+                            onClick={() => updateSelectedHero(hero.hero_key)}
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "2.5fr 6fr 1.5fr",
+                                width: "100%",
+                                background: "transparent",
+                                border: "none",
+                                fontSize: "1vw",
+                                textAlign: "center",
+                                placeItems: "center",
+                                margin: "auto"
+                            }}>
+                            <img className="hero-preview"
+                                 src={hero.portrait_url}
+                                 alt="ana"></img>{hero.display_name}
+                            <img className="hero-role" src={getHeroRoleImg(hero.role)} alt='hero role'></img>
+                        </button>
+                    </li>
                 ))}
             </ul>;
     }
 
     return (
-        <div className="scrollable-container"
-             style={{
-                 gridColumn: '1 / span 2',
-                 gridRowStart: '3'
-             }}>
+        <div className="scrollable-container" style={{margin: "15px auto"}}>
             {heroListItems}
         </div>
     )

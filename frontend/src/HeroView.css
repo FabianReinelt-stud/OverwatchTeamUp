@@ -1,78 +1,83 @@
+.introduction p {
+    margin-bottom: 15px;
+}
+
+.introduction span {
+    color: #01c3ff;
+}
+
 .hero-view {
-  display: grid;
-  justify-content: left;
-  text-align: left;
-  grid-template-columns: 1fr 3fr;
-  background-color: rgb(5, 5, 5);
-  border-radius: 10px;
-  margin-left: 10px;
-  height: 65%;
-  border: 5px solid white;
+    display: grid;
+    justify-content: left;
+    text-align: left;
+    grid-template-columns: 1fr 3fr;
+    background-color: rgb(5, 5, 5);
+    border-radius: 10px;
+    margin-left: 10px;
+    height: 65%;
+    border: 5px solid white;
 }
 
 .hero-stat-row {
-  --stat-row-gap: 10px;
-  display: grid;
-  grid-gap: var(--stat-row-gap);
-  justify-content: left;
-  text-align: left;
-  grid-template-columns: 1fr 4.5fr;
-  margin-left: 10px;
+    --stat-row-gap: 10px;
+    display: grid;
+    grid-gap: var(--stat-row-gap);
+    justify-content: left;
+    text-align: left;
+    margin-left: 10px;
 }
 
 .stat-view {
-  display: block;
-  overflow: auto;
-  height: 90%;
-  margin-top: 5%;
-  /*font-size: 1.2vw;*/
-  line-height: normal;
+    display: block;
+    overflow: auto;
+    height: 90%;
+    margin-top: 5%;
+    margin-right: 2%;
+    line-height: normal;
 }
 
 .hero-portrait {
-  margin: 15px;
-  width: 80%;
-  border-radius: 10px;
+    margin: 15px;
+    width: 80%;
+    border-radius: 10px;
 }
 
 .hero-name {
     font-family: "BigNoodleOblique", serif;
-  border-radius: 2px;
-  font-size: 1.5vw;
-  margin: 0 50% 10px 10px;
-  transform: skew(-14deg);
-  text-align: center;
-  text-shadow: 1px 1px 2px rgb(57, 57, 83);
-  border: 1px solid rgb(1, 194, 254);
-  background-color: rgb(1, 194, 254);
-  color: white;
+    border-radius: 2px;
+    font-size: 1.5vw;
+    margin: 0 50% 10px 10px;
+    transform: skew(-14deg);
+    text-align: center;
+    text-shadow: 1px 1px 2px rgb(57, 57, 83);
+    border: 1px solid rgb(1, 194, 254);
+    background-color: rgb(1, 194, 254);
+    color: white;
 }
 
 .stat-name {
     font-family: "BigNoodleOblique", serif;
-  font-size: 1.2vw;
-  margin: 0 10px 10px 0;
-  text-align: right;
-  color: black;
+    font-size: 1.2vw;
+    margin: 5px 10px 10px 0;
+    text-align: right;
+    color: black;
 }
 
 .stat-name p {
-  padding: 2px 10px 2px 2px;
-  background-color: rgb(255, 199, 14);
-  border: 1px solid rgb(255, 199, 14);
-  border-radius: 2px;
-  transform: skew(-14deg);
+    padding: 2px 10px 2px 2px;
+    border-radius: 2px;
+    transform: skew(-14deg);
 }
 
-.stat-value{
+.stat-value {
     font-family: "BigNoodle", serif;
-  font-size: 1.5vw;
+    font-size: 1.5vw;
 }
 
 .hero-row-name {
-  text-align: left;
+    text-align: left;
 }
 
 .hero-role {
-  justify-content: right;
+    justify-content: right;
 }

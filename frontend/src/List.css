@@ -4,7 +4,6 @@
         height: 100%;
         width: 85%;
         min-width: 200px;
-        margin: auto;
         background-color: rgb(5, 5, 5);
         border: 2px solid #ffffff;
         border-radius: 10px;
@@ -26,8 +25,6 @@
     }
 
     .scrollable-item {
-        display: grid;
-        grid-template-columns: 2.5fr 6fr 1.5fr;
         align-items: center;
         padding: 5px;
         margin: 10px;
@@ -38,13 +35,13 @@
     }
 
     .hero-preview{
-        width: 50%;
-        margin: 5%;
+        width: 75%;
+        margin: 1%;
         padding-right: 10px;
         border-radius: 5px;
     }
 
     .hero-role{
         display: block;
-        width: 80%;
+        width: 100%;
     }
