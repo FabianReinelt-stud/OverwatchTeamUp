@@ -7,7 +7,6 @@ import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 import TeamComposition from "./TeamComposition";
 import type { HeroDto, TeamCompositionDto} from "./data/api-dtos.tsx";
-import dummyHero from './data/HeroViewDummyData.json'
 
 const emptyHero = {
     hero_key: "",
@@ -72,13 +71,6 @@ function App() {
         }
     }
 
-    const deselectHero = () => {
-        console.log("before: ",emptyHero)
-        setSelectedHero(JSON.parse(JSON.stringify(emptyHero)));
-        console.log("after: ", JSON.parse(JSON.stringify(emptyHero)))
-        console.log(selectedHero)
-    }
-
     const confirmHeroSelection = (teamSlot: number) => {
         if (!selectedHero || isHeroInTeam(selectedHero.hero_key)) return;
 
@@ -112,12 +104,9 @@ function App() {
                     ...currentTeamComp,
                     hero_5: selectedHero
                 })
-                console.log(currentTeamComp.hero_5);
                 break;
         }
-        console.log("new team comp", currentTeamComp);
-        deselectHero();
-        console.log("updated: ", selectedHero)
+        setSelectedHero(JSON.parse(JSON.stringify(emptyHero)));
     }
 
     const isHeroInTeam = (heroKey: string) => {
