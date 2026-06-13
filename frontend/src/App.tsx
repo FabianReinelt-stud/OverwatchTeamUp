@@ -7,6 +7,7 @@ import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 import TeamComposition from "./TeamComposition";
 import type {HeroDto, TeamCompositionDto} from "./data/api-dtos.tsx";
+import dummyHero from './data/HeroViewDummyData.json'
 
 const emptyHero = {
     hero_key: "",
@@ -64,10 +65,11 @@ function App() {
 
     const updateTeamComp = (teamComp: TeamCompositionDto) => {
         setCurrentTeamComp(teamComp);
+        console.log("updated team composition: ", teamComp)
     }
 
     const [selectedHeroKey, setSelectedHeroKey] = useState("");
-    const [selectedHero, setSelectedHero] = useState<HeroDto>(JSON.parse(JSON.stringify(emptyHero)));
+    const [selectedHero, setSelectedHero] = useState<HeroDto>(dummyHero);
     const [heroLoadingError, setHeroLoadingError] = useState(false);
 
     const updateSelectedHero = (heroKey: string) => {
@@ -89,25 +91,44 @@ function App() {
     }
 
     const confirmHeroSelection = (teamSlot: number) => {
-        if (!selectedHero || isHeroInTeam(selectedHero.hero_key, currentTeamComp)) return;
+        if (!selectedHero) {
+            return;
+        }
+        const isInTeam = isHeroInTeam(selectedHero.hero_key, currentTeamComp);
+
         switch (teamSlot) {
             case 0:
                 setCurrentTeamComp({...currentTeamComp, hero_1: selectedHero});
                 break;
             case 1:
-                setCurrentTeamComp({...currentTeamComp, hero_2: selectedHero})
+                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_3.hero_key) {
+                    setCurrentTeamComp({...currentTeamComp, hero_2: selectedHero, hero_3: emptyHero})
+                } else {
+                    setCurrentTeamComp({...currentTeamComp, hero_2: selectedHero})
+                }
                 break;
             case 2:
-                setCurrentTeamComp({...currentTeamComp, hero_3: selectedHero})
+                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_2.hero_key) {
+                    setCurrentTeamComp({...currentTeamComp, hero_2: emptyHero, hero_3: selectedHero})
+                } else {
+                    setCurrentTeamComp({...currentTeamComp, hero_3: selectedHero})
+                }
                 break;
             case 3:
-                setCurrentTeamComp({...currentTeamComp, hero_4: selectedHero})
+                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_5.hero_key) {
+                    setCurrentTeamComp({...currentTeamComp, hero_4: selectedHero, hero_5: emptyHero})
+                } else {
+                    setCurrentTeamComp({...currentTeamComp, hero_4: selectedHero})
+                }
                 break;
             case 4:
-                setCurrentTeamComp({...currentTeamComp, hero_5: selectedHero})
+                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_4.hero_key) {
+                    setCurrentTeamComp({...currentTeamComp, hero_4: emptyHero, hero_5: selectedHero})
+                } else {
+                    setCurrentTeamComp({...currentTeamComp, hero_5: selectedHero})
+                }
                 break;
         }
-        setSelectedHero(JSON.parse(JSON.stringify(emptyHero)));
     }
 
     return (
@@ -123,7 +144,7 @@ function App() {
                     <TeamComposition
                         isLoggedIn={isLoggedIn}
                         updateTeamCompViewState={updateTeamCompViewState}
-                        hero={selectedHero}
+                        selectedHero={dummyHero}
                         confirmHeroSelection={confirmHeroSelection}
                         teamComp={currentTeamComp}
                         incrementNumTeamComps={incrementNumTeamComps}
@@ -131,8 +152,9 @@ function App() {
                     ></TeamComposition>
                 </div>
                 <SideBar updateLoginState={updateLoginState}
-                         showTeamCompView={showTeamCompView}
+                         updateTeamComp={updateTeamComp}
                          updateSelectedHero={updateSelectedHero}
+                         showTeamCompView={showTeamCompView}
                          numTeamComps={numTeamComps}></SideBar>
             </div>
         </>

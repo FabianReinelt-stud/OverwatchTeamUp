@@ -4,36 +4,36 @@ import selectSupport from './assets/teamcomp_select_support.png'
 import backgroundSupport from './assets/teamcomp_bg_support.png'
 import backgroundDamage from './assets/teamcomp_bg_damage.png'
 import backgroundTank from './assets/teamcomp_bg_tank.png'
-import {useState} from "react";
 import {Tooltip} from '@mui/material'
 import type {HeroDto, TeamCompositionCreateUpdateDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import './TeamComposition.css'
 
 interface BaseTeamCompProp {
-    hero: HeroDto
+    selectedHero: HeroDto,
     confirmHeroSelection: (slot: number) => void
 }
 
-interface LoginStateProp{
+interface LoginStateProp {
     isLoggedIn: boolean
 }
 
-interface LoadTeamProp extends  LoginStateProp{
+interface LoadTeamProp extends LoginStateProp {
     updateTeamCompViewState: () => void
 }
 
-interface SaveTeamProp extends LoginStateProp{
+interface SaveTeamProp extends LoginStateProp {
     teamComp: TeamCompositionDto,
     incrementNumTeamComps: () => void
     updateTeamComp: (teamCompUp: TeamCompositionDto) => void
 }
 
 interface TeamSlotProp extends BaseTeamCompProp {
+    hero: HeroDto,
     slot: number,
     defaultRole: string,
 }
 
-interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveTeamProp{
+interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveTeamProp {
     updateTeamCompViewState: () => void,
 }
 
@@ -95,7 +95,7 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
             hero_5_key: teamComp.hero_5.hero_key,
         }
 
-        fetch("/api/team-compositions/"+teamComp.id+"/update/",{
+        fetch("/api/team-compositions/" + teamComp.id + "/update/", {
             method: "PUT",
             body: JSON.stringify(teamCompUpdate)
         })
@@ -120,12 +120,8 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
     )
 }
 
-function TeamSlot({defaultRole, hero, slot, confirmHeroSelection}: TeamSlotProp) {
-    const [slotNumber] = useState(slot);
-    const [heroImage, setHeroImage] = useState("");
-    const [currentHero, setCurrentHero] = useState<HeroDto>();
-
-    const heroRole = hero ? hero.role : "";
+function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}: TeamSlotProp) {
+    const heroRole = selectedHero.hero_key != "" ? selectedHero.role : "";
     heroRole.toLowerCase();
     defaultRole.toLowerCase();
 
@@ -133,14 +129,13 @@ function TeamSlot({defaultRole, hero, slot, confirmHeroSelection}: TeamSlotProp)
     let frameImage;
 
     const handleSlotSelected = () => {
-        if (!hero) {
+        if (selectedHero.hero_key == "") {
             return;
-        } else if (!currentHero || hero.hero_key != currentHero.hero_key
-            && hero.role == defaultRole) {
-            console.log("placing hero " + hero.display_name + " into slot " + slotNumber);
-            setHeroImage(hero.portrait_url);
-            setCurrentHero(hero);
-            confirmHeroSelection(slotNumber);
+        } else if (selectedHero.hero_key != ""
+            && selectedHero.hero_key != hero.hero_key
+            && selectedHero.role == defaultRole) {
+            console.log("placing hero " + hero.display_name + " into slot " + slot);
+            confirmHeroSelection(slot);
         }
     }
 
@@ -157,9 +152,9 @@ function TeamSlot({defaultRole, hero, slot, confirmHeroSelection}: TeamSlotProp)
 
     return (
         <div className='team-role-select'>
-            <img className={heroRole == defaultRole && !currentHero ? 'role' : 'role-disabled'}
-                 src={currentHero ? heroImage : roleImage}
-                 style={currentHero ? {
+            <img className={heroRole == defaultRole && selectedHero.hero_key != "" ? 'role' : 'role-disabled'}
+                 src={hero.hero_key != "" ? hero.portrait_url : roleImage}
+                 style={hero.hero_key != "" ? {
                      maskSize: "120%",
                      transform: "scale(0.85)"
                  } : {maskSize: "contain"}}
@@ -173,26 +168,26 @@ function TeamSlot({defaultRole, hero, slot, confirmHeroSelection}: TeamSlotProp)
 function TeamComposition({
                              isLoggedIn,
                              updateTeamCompViewState,
-                             hero,
                              confirmHeroSelection,
                              teamComp,
                              incrementNumTeamComps,
-    updateTeamComp
+                             updateTeamComp,
+                             selectedHero
                          }: TeamCompProp) {
-
     return (
         <div className='team-comp'>
-            <TeamSlot defaultRole={"tank"} hero={hero} slot={0}
+            <TeamSlot defaultRole={"tank"} hero={teamComp.hero_1} selectedHero={selectedHero} slot={0}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"damage"} hero={hero} slot={1}
+            <TeamSlot defaultRole={"damage"} hero={teamComp.hero_2} selectedHero={selectedHero} slot={1}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"damage"} hero={hero} slot={2}
+            <TeamSlot defaultRole={"damage"} hero={teamComp.hero_3} selectedHero={selectedHero} slot={2}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"support"} hero={hero} slot={3}
+            <TeamSlot defaultRole={"support"} hero={teamComp.hero_4} selectedHero={selectedHero} slot={3}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"support"} hero={hero} slot={4}
+            <TeamSlot defaultRole={"support"} hero={teamComp.hero_5} selectedHero={selectedHero} slot={4}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <Save isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps} updateTeamComp={updateTeamComp}></Save>
+            <Save isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps}
+                  updateTeamComp={updateTeamComp}></Save>
             <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
         </div>)
 }

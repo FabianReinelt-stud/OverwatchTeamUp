@@ -4,6 +4,7 @@ import tank from './assets/tank.png'
 import "./List.css"
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import * as React from "react";
+import {useState} from "react";
 
 interface HeroListProp {
     input: string;
@@ -12,8 +13,14 @@ interface HeroListProp {
 }
 
 interface TeamCompListProp {
-    input: string;
-    teamCompList: TeamCompositionDto[];
+    input: string,
+    teamCompList: TeamCompositionDto[],
+    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
+}
+
+interface TeamListButtonProp {
+    team: TeamCompositionDto,
+    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
 }
 
 const loadErrorStyle: React.CSSProperties = {
@@ -31,7 +38,7 @@ const teamHeroPreviewStyle: React.CSSProperties = {
     padding: "1%"
 }
 
-export function TeamList({input, teamCompList}: TeamCompListProp) {
+export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp) {
     const filteredTeamComps = teamCompList.filter((team) => {
         if (input === '') {
             return team;
@@ -40,8 +47,8 @@ export function TeamList({input, teamCompList}: TeamCompListProp) {
         }
     });
 
-    let teamListItems;
 
+    let teamListItems;
     if (teamCompList.length == 0) {
         teamListItems =
             <div style={loadErrorStyle}><p>No Team Comps found.</p><p>Please create a new ones or try again later.</p>
@@ -50,55 +57,7 @@ export function TeamList({input, teamCompList}: TeamCompListProp) {
         teamListItems =
             <ul className="scrollable-list">
                 {filteredTeamComps.map((team) => (
-                    <li className="scrollable-item" key={team.id}
-                        style={{
-                            display: "grid",
-                            gridTemplateColumns: "3fr 2fr",
-                            gridTemplateRows: "0.5fr 1fr",
-                            fontSize: "1.1em",
-                        }}>
-                        <p style={{
-                            gridRowStart: "1",
-                            gridColumn: "1",
-                            margin: "auto",
-                        }}>{team.name}</p>
-                        <p style={{
-                            gridRowStart: "1",
-                            gridColumn: "2",
-                            margin: "auto",
-                        }}>Avg WR: {team.average_winrate}</p>
-                        <div style={{
-                            margin: "auto",
-                            gridRow: "2",
-                            gridColumn: "1/ span 2"
-                        }}>
-                            <div style={{
-                                display: "flex",
-                                justifyContent: "space-evenly"
-                            }}>
-                                <img
-                                    src={team.hero_1.portrait_url}
-                                    alt={team.hero_1.display_name}
-                                    style={teamHeroPreviewStyle}></img>
-                                <img
-                                    src={team.hero_2.portrait_url}
-                                    alt={team.hero_2.display_name}
-                                    style={teamHeroPreviewStyle}></img>
-                                <img
-                                    src={team.hero_3.portrait_url}
-                                    alt={team.hero_3.display_name}
-                                    style={teamHeroPreviewStyle}></img>
-                                <img
-                                    src={team.hero_3.portrait_url}
-                                    alt={team.hero_3.display_name}
-                                    style={teamHeroPreviewStyle}></img>
-                                <img
-                                    src={team.hero_3.portrait_url}
-                                    alt={team.hero_3.display_name}
-                                    style={teamHeroPreviewStyle}></img>
-                            </div>
-                        </div>
-                    </li>
+                    <TeamListButton team={team} updateTeamComp={updateTeamComp} key={team.id}></TeamListButton>
                 ))}
             </ul>;
     }
@@ -108,6 +67,74 @@ export function TeamList({input, teamCompList}: TeamCompListProp) {
             {teamListItems}
         </div>
     )
+}
+
+function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
+    const [teamComp] = useState(team);
+    const handleTeamSelected = () => {
+        if(!teamComp){
+            console.log("This button does not have an assigned team composition");
+            return;
+        }
+        console.log("sending update: ", teamComp);
+        updateTeamComp(teamComp);
+    }
+
+    return (
+        <li className="scrollable-item">
+            <button
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "3fr 2fr",
+                    gridTemplateRows: "0.5fr 1fr",
+                    fontSize: "0.7em",
+                    background: "transparent",
+                    border: "none",
+                }}
+                onClick={handleTeamSelected}>
+                <p style={{
+                    gridRowStart: "1",
+                    gridColumn: "1",
+                    margin: "auto",
+                }}>{team.name}</p>
+                <p style={{
+                    gridRowStart: "1",
+                    gridColumn: "2",
+                    margin: "auto",
+                }}>Avg WR: {team.average_winrate}</p>
+                <div style={{
+                    margin: "auto",
+                    gridRow: "2",
+                    gridColumn: "1/ span 2"
+                }}>
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "space-evenly"
+                    }}>
+                        <img
+                            src={team.hero_1.portrait_url}
+                            alt={team.hero_1.display_name}
+                            style={teamHeroPreviewStyle}></img>
+                        <img
+                            src={team.hero_2.portrait_url}
+                            alt={team.hero_2.display_name}
+                            style={teamHeroPreviewStyle}></img>
+                        <img
+                            src={team.hero_3.portrait_url}
+                            alt={team.hero_3.display_name}
+                            style={teamHeroPreviewStyle}></img>
+                        <img
+                            src={team.hero_3.portrait_url}
+                            alt={team.hero_3.display_name}
+                            style={teamHeroPreviewStyle}></img>
+                        <img
+                            src={team.hero_3.portrait_url}
+                            alt={team.hero_3.display_name}
+                            style={teamHeroPreviewStyle}></img>
+                    </div>
+                </div>
+            </button>
+        </li>)
 }
 
 function List({input, heroList, updateSelectedHero}: HeroListProp) {

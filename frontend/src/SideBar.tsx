@@ -29,13 +29,14 @@ const teamListFieldStyle = {
 }
 
 interface SideBarProp {
-    updateLoginState: (isLoggedIn: boolean) => void,
-    showTeamCompView: boolean,
-    updateSelectedHero: (heroKey: string) => void,
     numTeamComps: number
+    updateLoginState: (isLoggedIn: boolean) => void,
+    updateSelectedHero: (heroKey: string) => void,
+    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
+    showTeamCompView: boolean,
 }
 
-function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTeamComps}: SideBarProp) {
+function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTeamComps, updateTeamComp}: SideBarProp) {
     const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
     const [heroText, setHeroText] = useState("");
 
@@ -104,7 +105,7 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTea
                 </SearchBar> :
                 null}
             {showTeamCompView ?
-                <TeamList teamCompList={teamList} input={teamText}></TeamList> :
+                <TeamList teamCompList={teamList} input={teamText} updateTeamComp={updateTeamComp}></TeamList> :
                 null}
         </div>
     );
