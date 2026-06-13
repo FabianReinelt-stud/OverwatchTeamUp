@@ -4,17 +4,23 @@ import selectSupport from './assets/teamcomp_select_support.png'
 import backgroundSupport from './assets/teamcomp_bg_support.png'
 import backgroundDamage from './assets/teamcomp_bg_damage.png'
 import backgroundTank from './assets/teamcomp_bg_tank.png'
-import './TeamComposition.css'
-import {Tooltip} from '@mui/material'
-import type {HeroDto} from "./data/api-dtos.tsx";
 import {useState} from "react";
+import {Tooltip} from '@mui/material'
+import type {HeroDto, TeamCompositionCreateUpdateDto, TeamCompositionDto} from "./data/api-dtos.tsx";
+import './TeamComposition.css'
 
 interface LoadTeamProp {
     isLoggedIn: boolean,
     updateTeamCompViewState: () => void
 }
 
-interface BaseTeamCompProp{
+interface SaveTeamProp {
+    isLoggedIn: boolean,
+    teamComp: TeamCompositionDto,
+    incrementNumTeamComps: () => void
+}
+
+interface BaseTeamCompProp {
     hero: HeroDto
     confirmHeroSelection: (slot: number) => void
 }
@@ -22,9 +28,11 @@ interface BaseTeamCompProp{
 interface TeamCompProp extends BaseTeamCompProp {
     isLoggedIn: boolean,
     updateTeamCompViewState: () => void,
+    teamComp: TeamCompositionDto,
+    incrementNumTeamComps: () => void
 }
 
-interface TeamSlotProp extends BaseTeamCompProp{
+interface TeamSlotProp extends BaseTeamCompProp {
     slot: number,
     defaultRole: string,
 }
@@ -38,74 +46,120 @@ export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
     )
 }
 
-export function Save({isLoggedIn}: { isLoggedIn: boolean }) {
+export function Save({isLoggedIn, teamComp, incrementNumTeamComps}: SaveTeamProp) {
+    const confirmTeamSave = () => {
+        if (!teamComp) {
+            alert("Please create a team comp to save.");
+            return;
+        }
+        const teamName = prompt("Please input the name of the team", "Team 01");
+        if (teamName) {
+            const teamCompSave: TeamCompositionCreateUpdateDto = {
+                name: teamName,
+                hero_1_key: teamComp.hero_1.hero_key,
+                hero_2_key: teamComp.hero_2.hero_key,
+                hero_3_key: teamComp.hero_3.hero_key,
+                hero_4_key: teamComp.hero_4.hero_key,
+                hero_5_key: teamComp.hero_5.hero_key,
+            }
+            fetch("/api/team-compositions/create/", {
+                method: "POST",
+                body: JSON.stringify(teamCompSave)
+            })
+                .then(response => response.json())
+                .then(response => {
+                    incrementNumTeamComps();
+                    console.log("created new team: ", response);
+                    alert(teamName + " was successfully saved.");
+                })
+                .catch(error => {
+                    console.log("could not save team comp: ", error);
+                    alert("Sorry but your team comp could not be saved. Please try again later.");
+                })
+        }
+    }
+
     return (
         <Tooltip
             title={isLoggedIn ? "Click to save current Team Comp" : "Please login or register to use the load function for your existing team compositions."}>
-            <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}></button>
+            <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}
+                    onClick={confirmTeamSave}></button>
         </Tooltip>
     )
 }
 
 function TeamSlot({defaultRole, hero, slot, confirmHeroSelection}: TeamSlotProp) {
     const [slotNumber] = useState(slot);
-    const [roleImage, setRoleImage] = useState("");
+    const [heroImage, setHeroImage] = useState("");
     const [currentHero, setCurrentHero] = useState<HeroDto>();
 
     const heroRole = hero ? hero.role : "";
     heroRole.toLowerCase();
     defaultRole.toLowerCase();
 
-    let roleImg;
-    let frameImg;
+    let roleImage;
+    let frameImage;
 
     const handleSlotSelected = () => {
-        if(!hero) {
+        if (!hero) {
             return;
-        }
-        else if (!currentHero ||hero.hero_key != currentHero.hero_key
+        } else if (!currentHero || hero.hero_key != currentHero.hero_key
             && hero.role == defaultRole) {
-            console.log("placing hero " + hero.display_name +" into slot "+ slotNumber);
-            setRoleImage(hero.portrait_url);
+            console.log("placing hero " + hero.display_name + " into slot " + slotNumber);
+            setHeroImage(hero.portrait_url);
             setCurrentHero(hero);
             confirmHeroSelection(slotNumber);
         }
     }
 
     if (defaultRole === "tank") {
-        roleImg = <img className={heroRole == defaultRole && !currentHero ? 'role' : 'role-disabled'} src={currentHero? roleImage : backgroundTank} alt='tank role'
-                       onClick={handleSlotSelected}></img>;
-        frameImg = <img className='select-frame' src={selectTank} alt='select frame for tank role'></img>;
-    }
-    else if (defaultRole === "damage") {
-        roleImg = <img className={heroRole == defaultRole && !currentHero ? 'role' : 'role-disabled'} src={currentHero? roleImage : backgroundDamage} alt='damage role'
-                       onClick={handleSlotSelected}></img>;
-        frameImg = <img className='select-frame' src={selectDamage} alt='select frame for damage role'></img>;
-    }
-    else if (defaultRole === "support") {
-        roleImg = <img className={heroRole == defaultRole && !currentHero ? 'role' : 'role-disabled'} src={currentHero? roleImage : backgroundSupport} alt='support role'
-                       onClick={handleSlotSelected}></img>;
-        frameImg = <img className='select-frame' src={selectSupport} alt='select frame for support role'></img>;
+        roleImage = backgroundTank;
+        frameImage = selectTank;
+    } else if (defaultRole === "damage") {
+        roleImage = backgroundDamage;
+        frameImage = selectDamage;
+    } else if (defaultRole === "support") {
+        roleImage = backgroundSupport;
+        frameImage = selectSupport;
     }
 
     return (
         <div className='team-role-select'>
-            {roleImg}
-            {frameImg}
+            <img className={heroRole == defaultRole && !currentHero ? 'role' : 'role-disabled'}
+                 src={currentHero ? heroImage : roleImage}
+                 style={currentHero ? {
+                     maskSize: "120%",
+                     transform: "scale(0.85)"
+                 } : {maskSize: "contain"}}
+                 alt={defaultRole}
+                 onClick={handleSlotSelected}></img>
+            <img className='select-frame' src={frameImage} alt={defaultRole + " team slot frame"}></img>
         </div>
     )
 }
 
-function TeamComposition({isLoggedIn, updateTeamCompViewState, hero, confirmHeroSelection}: TeamCompProp) {
+function TeamComposition({
+                             isLoggedIn,
+                             updateTeamCompViewState,
+                             hero,
+                             confirmHeroSelection,
+                             teamComp,
+                             incrementNumTeamComps
+                         }: TeamCompProp) {
 
     return (
         <div className='team-comp'>
-            <TeamSlot defaultRole={"tank"} hero={hero} slot={0} confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"damage"} hero={hero} slot={1} confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"damage"} hero={hero} slot={2} confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"support"} hero={hero} slot={3} confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <TeamSlot defaultRole={"support"} hero={hero} slot={4} confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <Save isLoggedIn={isLoggedIn}></Save>
+            <TeamSlot defaultRole={"tank"} hero={hero} slot={0}
+                      confirmHeroSelection={confirmHeroSelection}></TeamSlot>
+            <TeamSlot defaultRole={"damage"} hero={hero} slot={1}
+                      confirmHeroSelection={confirmHeroSelection}></TeamSlot>
+            <TeamSlot defaultRole={"damage"} hero={hero} slot={2}
+                      confirmHeroSelection={confirmHeroSelection}></TeamSlot>
+            <TeamSlot defaultRole={"support"} hero={hero} slot={3}
+                      confirmHeroSelection={confirmHeroSelection}></TeamSlot>
+            <TeamSlot defaultRole={"support"} hero={hero} slot={4}
+                      confirmHeroSelection={confirmHeroSelection}></TeamSlot>
+            <Save isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps}></Save>
             <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
         </div>)
 }

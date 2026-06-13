@@ -6,7 +6,7 @@ import './App.css'
 import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 import TeamComposition from "./TeamComposition";
-import type { HeroDto, TeamCompositionDto} from "./data/api-dtos.tsx";
+import type {HeroDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 
 const emptyHero = {
     hero_key: "",
@@ -35,28 +35,41 @@ const emptyTeamComp = {
     average_winrate: "undefined"
 }
 
+const isHeroInTeam = (heroKey: string, currentTeamComp: TeamCompositionDto) => {
+    return heroKey == currentTeamComp.hero_1.hero_key
+        || heroKey == currentTeamComp.hero_2.hero_key
+        || heroKey == currentTeamComp.hero_3.hero_key
+        || heroKey == currentTeamComp.hero_4.hero_key
+        || heroKey == currentTeamComp.hero_5.hero_key;
+}
+
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const [showTeamCompView, setShowTeamCompView] = useState(false);
-    const [selectedHeroKey, setSelectedHeroKey] = useState("");
-    const [selectedHero, setSelectedHero] = useState<HeroDto>(JSON.parse(JSON.stringify(emptyHero)));
-    const [heroLoadingError, setHeroLoadingError] = useState(false);
-    const [currentTeamComp, setCurrentTeamComp] = useState<TeamCompositionDto>(JSON.parse(JSON.stringify(emptyTeamComp)));
 
     const updateLoginState = (isLoggedIn: boolean) => {
         setIsLoggedIn(isLoggedIn);
     }
 
+    const [showTeamCompView, setShowTeamCompView] = useState(false);
+    const [numTeamComps, setNumTeamComps] = useState(0);
+    const [currentTeamComp, setCurrentTeamComp] = useState<TeamCompositionDto>(JSON.parse(JSON.stringify(emptyTeamComp)));
+
     const updateTeamCompViewState = () => {
         setShowTeamCompView(!showTeamCompView);
     }
 
+    const incrementNumTeamComps = () => {
+        setNumTeamComps(numTeamComps => numTeamComps + 1);
+    }
+
+    const [selectedHeroKey, setSelectedHeroKey] = useState("");
+    const [selectedHero, setSelectedHero] = useState<HeroDto>(JSON.parse(JSON.stringify(emptyHero)));
+    const [heroLoadingError, setHeroLoadingError] = useState(false);
+
     const updateSelectedHero = (heroKey: string) => {
         console.log("updated selected hero: ", heroKey)
-        if (selectedHeroKey != "" && !isHeroInTeam(heroKey)) {
-            fetch("/api/heroes/" + selectedHeroKey + "/", {
-                method: "GET"
-            })
+        if (selectedHeroKey != "" && !isHeroInTeam(heroKey, currentTeamComp)) {
+            fetch("/api/heroes/" + selectedHeroKey + "/", {method: "GET"})
                 .then(response => response.json())
                 .then(response => {
                     console.log("hero data successfully loaded for view: ", response);
@@ -72,49 +85,25 @@ function App() {
     }
 
     const confirmHeroSelection = (teamSlot: number) => {
-        if (!selectedHero || isHeroInTeam(selectedHero.hero_key)) return;
-
+        if (!selectedHero || isHeroInTeam(selectedHero.hero_key, currentTeamComp)) return;
         switch (teamSlot) {
             case 0:
-                setCurrentTeamComp({
-                    ...currentTeamComp,
-                    hero_1: selectedHero
-                });
+                setCurrentTeamComp({...currentTeamComp, hero_1: selectedHero});
                 break;
             case 1:
-                setCurrentTeamComp({
-                    ...currentTeamComp,
-                    hero_2: selectedHero
-                })
+                setCurrentTeamComp({...currentTeamComp, hero_2: selectedHero})
                 break;
             case 2:
-                setCurrentTeamComp({
-                    ...currentTeamComp,
-                    hero_3: selectedHero
-                })
+                setCurrentTeamComp({...currentTeamComp, hero_3: selectedHero})
                 break;
             case 3:
-                setCurrentTeamComp({
-                    ...currentTeamComp,
-                    hero_4: selectedHero
-                })
+                setCurrentTeamComp({...currentTeamComp, hero_4: selectedHero})
                 break;
             case 4:
-                setCurrentTeamComp({
-                    ...currentTeamComp,
-                    hero_5: selectedHero
-                })
+                setCurrentTeamComp({...currentTeamComp, hero_5: selectedHero})
                 break;
         }
         setSelectedHero(JSON.parse(JSON.stringify(emptyHero)));
-    }
-
-    const isHeroInTeam = (heroKey: string) => {
-        return heroKey == currentTeamComp.hero_1.hero_key
-            || heroKey == currentTeamComp.hero_2.hero_key
-            || heroKey == currentTeamComp.hero_3.hero_key
-            || heroKey == currentTeamComp.hero_4.hero_key
-            || heroKey == currentTeamComp.hero_5.hero_key;
     }
 
     return (
@@ -132,10 +121,14 @@ function App() {
                         updateTeamCompViewState={updateTeamCompViewState}
                         hero={selectedHero}
                         confirmHeroSelection={confirmHeroSelection}
+                        teamComp={currentTeamComp}
+                        incrementNumTeamComps={incrementNumTeamComps}
                     ></TeamComposition>
                 </div>
-                <SideBar updateLoginState={updateLoginState} showTeamCompView={showTeamCompView}
-                         updateSelectedHero={updateSelectedHero}></SideBar>
+                <SideBar updateLoginState={updateLoginState}
+                         showTeamCompView={showTeamCompView}
+                         updateSelectedHero={updateSelectedHero}
+                         numTeamComps={numTeamComps}></SideBar>
             </div>
         </>
     )

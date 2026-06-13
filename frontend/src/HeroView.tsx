@@ -1,5 +1,6 @@
 import './HeroView.css'
 import type {AbilityDto, HeroDto} from "./data/api-dtos.tsx";
+import * as React from "react";
 
 interface HeroStatProp {
     statName: string;
@@ -126,7 +127,8 @@ function HeroAbilityRow({abilities, abilityColor, rowStyle}: HeroAbilityProp) {
                                             width: "60%",
                                             height: "60%",
                                             margin: "10px auto 10px auto"
-                                        }}/>
+                                        }}
+                                    alt={ability.name + " icon"}/>
                                 </div>
                                 <div className='stat-value'>{ability.description}</div>
                             </div>

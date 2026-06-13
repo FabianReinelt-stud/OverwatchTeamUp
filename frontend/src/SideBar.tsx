@@ -31,10 +31,11 @@ const teamListFieldStyle = {
 interface SideBarProp {
     updateLoginState: (isLoggedIn: boolean) => void,
     showTeamCompView: boolean,
-    updateSelectedHero: (heroKey: string) => void
+    updateSelectedHero: (heroKey: string) => void,
+    numTeamComps: number
 }
 
-function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideBarProp) {
+function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTeamComps}: SideBarProp) {
     const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
     const [heroText, setHeroText] = useState("");
 
@@ -55,19 +56,23 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideB
     const [teamList, setTeamList] = useState<TeamCompositionDto[]>(teamDummyData);
     const [teamText, setTeamText] = useState("");
 
-    if (teamList.length == 0) {
-        fetch("/api/team-compositions/", {
-            method: "GET"
-        })
-            .then(response => response.json())
-            .then(response => {
-                console.log("team data successfully loaded: ", response);
-                setTeamList(response);
+    const refreshTeamTable = () => {
+        console.log("refreshing");
+        if (teamList.length == 0) {
+            fetch("/api/team-compositions/", {
+                method: "GET"
             })
-            .catch(error => {
-                console.log("could not load team data: ", error);
-            });
+                .then(response => response.json())
+                .then(response => {
+                    console.log("team data successfully loaded: ", response);
+                    setTeamList(response);
+                })
+                .catch(error => {
+                    console.log("could not load team data: ", error);
+                });
+        }
     }
+    refreshTeamTable();
 
     return (
         <div className='side-bar' style={{
@@ -96,7 +101,7 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero}: SideB
                         }}
                     searchBarAreaStyle={teamListAreaStyle}
                     searchFieldStyle={teamListFieldStyle}
-                    label={"Search Team Compositions"}>
+                    label={"Search " + numTeamComps + " Team Compositions"}>
                 </SearchBar> :
                 null}
             {showTeamCompView ?
