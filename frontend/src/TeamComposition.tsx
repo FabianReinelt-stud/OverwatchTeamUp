@@ -9,32 +9,32 @@ import {Tooltip} from '@mui/material'
 import type {HeroDto, TeamCompositionCreateUpdateDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import './TeamComposition.css'
 
-interface LoadTeamProp {
-    isLoggedIn: boolean,
-    updateTeamCompViewState: () => void
-}
-
-interface SaveTeamProp {
-    isLoggedIn: boolean,
-    teamComp: TeamCompositionDto,
-    incrementNumTeamComps: () => void
-}
-
 interface BaseTeamCompProp {
     hero: HeroDto
     confirmHeroSelection: (slot: number) => void
 }
 
-interface TeamCompProp extends BaseTeamCompProp {
-    isLoggedIn: boolean,
-    updateTeamCompViewState: () => void,
+interface LoginStateProp{
+    isLoggedIn: boolean
+}
+
+interface LoadTeamProp extends  LoginStateProp{
+    updateTeamCompViewState: () => void
+}
+
+interface SaveTeamProp extends LoginStateProp{
     teamComp: TeamCompositionDto,
     incrementNumTeamComps: () => void
+    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
 }
 
 interface TeamSlotProp extends BaseTeamCompProp {
     slot: number,
     defaultRole: string,
+}
+
+interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveTeamProp{
+    updateTeamCompViewState: () => void,
 }
 
 export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
@@ -46,7 +46,7 @@ export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
     )
 }
 
-export function Save({isLoggedIn, teamComp, incrementNumTeamComps}: SaveTeamProp) {
+export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamComp}: SaveTeamProp) {
     const confirmTeamSave = () => {
         if (!teamComp) {
             alert("Please create a team comp to save.");
@@ -69,6 +69,7 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps}: SaveTeamProp
                 .then(response => response.json())
                 .then(response => {
                     incrementNumTeamComps();
+                    updateTeamComp(response);
                     console.log("created new team: ", response);
                     alert(teamName + " was successfully saved.");
                 })
@@ -79,11 +80,42 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps}: SaveTeamProp
         }
     }
 
+    const updateExistingTeam = () => {
+        if (!teamComp) {
+            alert("Something went wrong. Please reload the team you are trying to edit.")
+            return;
+        }
+
+        const teamCompUpdate: TeamCompositionCreateUpdateDto = {
+            name: teamComp.name,
+            hero_1_key: teamComp.hero_1.hero_key,
+            hero_2_key: teamComp.hero_2.hero_key,
+            hero_3_key: teamComp.hero_3.hero_key,
+            hero_4_key: teamComp.hero_4.hero_key,
+            hero_5_key: teamComp.hero_5.hero_key,
+        }
+
+        fetch("/api/team-compositions/"+teamComp.id+"/update/",{
+            method: "PUT",
+            body: JSON.stringify(teamCompUpdate)
+        })
+            .then(response => response.json())
+            .then(response => {
+                updateTeamComp(response);
+                console.log("updated existing team: ", response);
+                alert(teamComp.name + " was successfully updated");
+            })
+            .catch(error => {
+                console.log("could not update team: ", error)
+                alert("Sorry but your team comp could not be updated. Please try again later.")
+            })
+    }
+
     return (
         <Tooltip
             title={isLoggedIn ? "Click to save current Team Comp" : "Please login or register to use the load function for your existing team compositions."}>
             <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}
-                    onClick={confirmTeamSave}></button>
+                    onClick={teamComp.id == -1 ? confirmTeamSave : updateExistingTeam}></button>
         </Tooltip>
     )
 }
@@ -144,7 +176,8 @@ function TeamComposition({
                              hero,
                              confirmHeroSelection,
                              teamComp,
-                             incrementNumTeamComps
+                             incrementNumTeamComps,
+    updateTeamComp
                          }: TeamCompProp) {
 
     return (
@@ -159,7 +192,7 @@ function TeamComposition({
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
             <TeamSlot defaultRole={"support"} hero={hero} slot={4}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <Save isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps}></Save>
+            <Save isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps} updateTeamComp={updateTeamComp}></Save>
             <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
         </div>)
 }

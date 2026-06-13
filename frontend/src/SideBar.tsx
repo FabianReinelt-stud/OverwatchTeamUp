@@ -57,7 +57,6 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTea
     const [teamText, setTeamText] = useState("");
 
     const refreshTeamTable = () => {
-        console.log("refreshing");
         if (teamList.length == 0) {
             fetch("/api/team-compositions/", {
                 method: "GET"

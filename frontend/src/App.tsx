@@ -24,7 +24,7 @@ const emptyHero = {
 }
 
 const emptyTeamComp = {
-    id: 0,
+    id: -1,
     name: "defaultName",
     hero_1: emptyHero,
     hero_2: emptyHero,
@@ -60,6 +60,10 @@ function App() {
 
     const incrementNumTeamComps = () => {
         setNumTeamComps(numTeamComps => numTeamComps + 1);
+    }
+
+    const updateTeamComp = (teamComp: TeamCompositionDto) => {
+        setCurrentTeamComp(teamComp);
     }
 
     const [selectedHeroKey, setSelectedHeroKey] = useState("");
@@ -123,6 +127,7 @@ function App() {
                         confirmHeroSelection={confirmHeroSelection}
                         teamComp={currentTeamComp}
                         incrementNumTeamComps={incrementNumTeamComps}
+                        updateTeamComp={updateTeamComp}
                     ></TeamComposition>
                 </div>
                 <SideBar updateLoginState={updateLoginState}
