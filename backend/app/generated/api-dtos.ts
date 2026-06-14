@@ -1,4 +1,3 @@
-/* eslint-disable */
 // This file is generated from backend DRF serializers.
 // Do not edit it by hand. Regenerate it with:
 // python manage.py generate_dtos

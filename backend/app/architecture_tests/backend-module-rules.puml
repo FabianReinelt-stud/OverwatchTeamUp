@@ -1,0 +1,36 @@
+@startuml
+title Executable backend module dependencies
+
+[views]
+[serializers]
+[services]
+[ports]
+[domain]
+[adapters]
+[models]
+[urls]
+[management]
+[dto_generation]
+
+[urls] --> [views]
+
+[views] --> [serializers]
+[views] --> [services]
+[views] --> [adapters] : Views construct concrete adapters only to inject them into services.
+[views] --> [domain]
+
+[services] --> [ports]
+[services] --> [domain]
+
+[ports] --> [domain]
+
+[adapters] --> [ports]
+[adapters] --> [domain]
+[adapters] --> [models]
+
+[management] --> [services]
+[management] --> [adapters]
+[management] --> [dto_generation]
+
+[dto_generation] --> [serializers]
+@enduml

@@ -57,6 +57,10 @@ jobs:
         working-directory: backend/app
         run: python manage.py migrate --noinput
 
+      - name: Check backend architecture
+        working-directory: backend/app
+        run: python -m unittest discover -s architecture_tests -v
+
       - name: Run Django tests with coverage
         run: |
           coverage run --rcfile=backend/app/.coveragerc backend/app/manage.py test heroes
