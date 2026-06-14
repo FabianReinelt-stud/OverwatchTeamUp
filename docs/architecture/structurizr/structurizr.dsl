@@ -95,13 +95,13 @@ workspace "OverwatchTeamUp" "C4 model of the OverwatchTeamUp application." {
     views {
         systemContext owtu "Context_Diagram" {
             include *
-            autoLayout lr 400 200
+            autoLayout lr 200 100
             description "System context for OverwatchTeamUp."
         }
 
         container owtu "Container_Diagram" {
             include *
-            autoLayout lr 450 250
+            autoLayout lr 150 90
             description "Runtime containers and external dependencies of OverwatchTeamUp."
         }
 
