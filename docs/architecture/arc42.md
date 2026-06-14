@@ -1,192 +1,47 @@
----
-date: July 2025
-title: "![arc42](images/arc42-logo.png) Template"
----
+# Overwatch TeamUp Architecture Document
+# Introduction and Goals 
+## Requirements Overview 
 
-# 
+OverwatchTeamUp is a web application that allows Overwatch players to browse hero statistics and assemble team compositions of five heroes. Hero data (stats, roles, abilities, win rates, pick rates) is sourced from the external OverFast API and stored locally to enable fast, reliable access. Users can create, view, update, and delete named team compositions tied to their account.
 
-**About arc42**
+**Essential features:**
 
-arc42, the template for documentation of software and system
-architecture.
+-   Browse all Overwatch heroes with key stats (role, win rate, pick rate, health, abilities)
 
-Template Version 9.0-EN. (based upon AsciiDoc version), July 2025
+-   View detailed hero profiles including abilities and portraits
 
-Created, maintained and © by Dr. Peter Hruschka, Dr. Gernot Starke and
-contributors. See <https://arc42.org>.
+-   Register and authenticate as a user (JWT-based)
 
-:::: note
-::: title
-:::
+-   Create and manage personal team compositions (5 heroes per team)
 
-This version of the template contains some help and explanations. It is
-used for familiarization with arc42 and the understanding of the
-concepts. For documentation of your own system you use better the
-*plain* version.
-::::
+-   Hero data kept current via a sync mechanism against the external OverFast API
 
-# Introduction and Goals {#section-introduction-and-goals}
+## Quality Goals 
 
-Describes the relevant requirements and the driving forces that software
-architects and development team must consider. These include
+| Priority | Quality Goal | Motivation | Metric |
+|----------|-------------|------------|--------|
+| 1 | **Reliability** | Hero data must be consistent and available even when the external API is temporarily unreachable | Hero list endpoint returns data within 500ms even when OverFast API is unreachable; `sync_heroes` is the only code path that calls the external API |
+| 2 | **Security** | Team compositions are private per user; authentication and authorization must be enforced | Unauthenticated requests to team composition endpoints return 401; requests with a valid JWT cannot access another user's data (404); tokens older than 30 minutes are rejected |
+| 3 | **Maintainability** | Hexagonal architecture (ports & adapters) keeps external dependencies replaceable | Replacing the OverFast API requires changes in exactly one file (`overfast_api_adapter.py`); no direct `import requests` outside of adapters |
+| 4 | **Correctness** | Hero stats displayed must accurately reflect the synced upstream data | After `sync_heroes`, hero stats in the database match the OverFast API values for the same hero key; all heroes from the external API are present locally after sync |
+| 5 | **Usability** | API responses must be fast and well-structured for frontend consumption | Hero list and detail endpoints respond in under 200ms; all endpoints return consistent JSON following the documented DTO structure |
 
--   underlying business goals,
+## Stakeholders 
 
--   essential features,
+| Role/Name | Contact | Expectations |
+|-----------|---------|--------------|
+| Overwatch Players (end users) | — | Quickly look up hero stats and plan team compositions without leaving the app |
+| Development Team | — | Clear architecture boundaries, testable code, and documented API contracts |
 
--   essential functional requirements,
 
--   quality goals for the architecture and
+# Architecture Constraints 
 
--   relevant stakeholders and their expectations
-
-## Requirements Overview {#_requirements_overview}
-
-::: formalpara-title
-**Contents**
-:::
-
-Short description of the functional requirements, driving forces,
-extract (or abstract) of requirements. Link to (hopefully existing)
-requirements documents (with version number and information where to
-find it).
-
-::: formalpara-title
-**Motivation**
-:::
-
-From the point of view of the end users a system is created or modified
-to improve support of a business activity and/or improve the quality.
-
-::: formalpara-title
-**Form**
-:::
-
-Short textual description, probably in tabular use-case format. If
-requirements documents exist this overview should refer to these
-documents.
-
-Keep these excerpts as short as possible. Balance readability of this
-document with potential redundancy w.r.t to requirements documents.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Introduction and Goals](https://docs.arc42.org/section-1/) in the
-arc42 documentation.
-
-## Quality Goals {#_quality_goals}
-
-::: formalpara-title
-**Contents**
-:::
-
-The top three (max five) quality goals for the architecture whose
-fulfillment is of highest importance to the major stakeholders. We
-really mean quality goals for the architecture. Don't confuse them with
-project goals. They are not necessarily identical.
-
-Consider this overview of potential topics (based upon the ISO 25010
-standard):
-
-![Categories of Quality
-Requirements](images/01_2_iso-25010-topics-EN-2023.drawio.png)
-
-::: formalpara-title
-**Motivation**
-:::
-
-You should know the quality goals of your most important stakeholders,
-since they will influence fundamental architectural decisions. Make sure
-to be very concrete about these qualities, avoid buzzwords. If you as an
-architect do not know how the quality of your work will be judged...​
-
-::: formalpara-title
-**Form**
-:::
-
-A table with quality goals and concrete scenarios, ordered by priorities
-
-## Stakeholders {#_stakeholders}
-
-::: formalpara-title
-**Contents**
-:::
-
-Explicit overview of stakeholders of the system, i.e. all person, roles
-or organizations that
-
--   should know the architecture
-
--   have to be convinced of the architecture
-
--   have to work with the architecture or with code
-
--   need the documentation of the architecture for their work
-
--   have to come up with decisions about the system or its development
-
-::: formalpara-title
-**Motivation**
-:::
-
-You should know all parties involved in development of the system or
-affected by the system. Otherwise, you may get nasty surprises later in
-the development process. These stakeholders determine the extent and the
-level of detail of your work and its results.
-
-::: formalpara-title
-**Form**
-:::
-
-Table with role names, person names, and their expectations with respect
-to the architecture and its documentation.
-
-+-------------+---------------------------+---------------------------+
-| Role/Name   | Contact                   | Expectations              |
-+=============+===========================+===========================+
-| *           | *\<Contact-1\>*           | *\<Expectation-1\>*       |
-| \<Role-1\>* |                           |                           |
-+-------------+---------------------------+---------------------------+
-| *           | *\<Contact-2\>*           | *\<Expectation-2\>*       |
-| \<Role-2\>* |                           |                           |
-+-------------+---------------------------+---------------------------+
-
-# Architecture Constraints {#section-architecture-constraints}
-
-::: formalpara-title
-**Contents**
-:::
-
-Any requirement that constraints software architects in their freedom of
-design and implementation decisions or decision about the development
-process. These constraints sometimes go beyond individual systems and
-are valid for whole organizations and companies.
-
-::: formalpara-title
-**Motivation**
-:::
-
-Architects should know exactly where they are free in their design
-decisions and where they must adhere to constraints. Constraints must
-always be dealt with; they may be negotiable, though.
-
-::: formalpara-title
-**Form**
-:::
-
-Simple tables of constraints with explanations. If needed you can
-subdivide them into technical constraints, organizational and political
-constraints and conventions (e.g. programming or versioning guidelines,
-documentation or naming conventions)
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Architecture Constraints](https://docs.arc42.org/section-2/) in the
-arc42 documentation.
+| Constraint | Explanation |
+|------------|-------------|
+| **Python / Django backend** | The team has Python expertise; the backend framework is fixed for the duration of the project |
+| **PostgreSQL as database** | Chosen due to team familiarity and existing infrastructure; switching engines would require significant migration effort |
+| **OverFast API as sole hero data source** | All hero data originates from this third-party public API. It has no SLA and no authentication, meaning it can change or go offline at any time. Hero data must therefore be cached locally rather than fetched live |
+| **OverFast API data limitations** | Win rate and pick rate are only available for competitive PC EU rankings. Other regions, platforms, or game modes are not covered |
 
 # Context and Scope {#section-context-and-scope}
 
