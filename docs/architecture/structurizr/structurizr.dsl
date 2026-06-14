@@ -95,26 +95,63 @@ workspace "OverwatchTeamUp" "C4 model of the OverwatchTeamUp application." {
     views {
         systemContext owtu "Context_Diagram" {
             include *
-            autoLayout lr
+            autoLayout lr 400 200
             description "System context for OverwatchTeamUp."
         }
 
         container owtu "Container_Diagram" {
             include *
-            autoLayout lr
+            autoLayout lr 450 250
             description "Runtime containers and external dependencies of OverwatchTeamUp."
         }
 
         component owtu.backend "Component_Diagram_Backend" {
             include *
-            autoLayout lr
+            autoLayout tb 150 90
             description "Implemented components of the Django backend."
+        }
+
+        component owtu.backend "Component_Diagram_Team_Composition" {
+            include owtu.frontend
+            include owtu.backend.teamCompositionApi
+            include owtu.backend.serializers
+            include owtu.backend.teamCompositionService
+            include owtu.backend.domainModel
+            include owtu.backend.heroPort
+            include owtu.backend.teamCompositionPort
+            include owtu.backend.heroDatabaseAdapter
+            include owtu.backend.teamCompositionDatabaseAdapter
+            include owtu.database
+            autoLayout lr 100 90
+            description "Team composition creation, validation, and persistence."
+        }
+
+        component owtu.backend "Component_Diagram_Hero_Sync" {
+            include owtu.backend.heroSyncCommand
+            include owtu.backend.heroSyncService
+            include owtu.backend.domainModel
+            include owtu.backend.heroPort
+            include owtu.backend.externalHeroSourcePort
+            include owtu.backend.heroDatabaseAdapter
+            include owtu.backend.overfastApiAdapter
+            include owtu.database
+            include externalHeroApi
+            autoLayout lr 120 90
+            description "Synchronization of hero data from OverFast into PostgreSQL."
         }
 
         component owtu.frontend "Component_Diagram_Frontend" {
             include *
-            autoLayout lr
+            autoLayout lr 400 200
             description "Current frontend prototype components on the frontend branch."
+        }
+
+        dynamic owtu.backend "Login_Flow" {
+            owtu.frontend -> owtu.backend.authenticationApi "Submits username and password" "JSON/HTTPS"
+            owtu.backend.authenticationApi -> owtu.database "Loads the user and verifies the password" "Django ORM/SQL"
+            owtu.backend.authenticationApi -> owtu.frontend "Returns access and refresh tokens" "JSON/HTTPS"
+            autoLayout lr 250 100
+            description "Login flow using Django REST Framework Simple JWT."
         }
 
         styles {
