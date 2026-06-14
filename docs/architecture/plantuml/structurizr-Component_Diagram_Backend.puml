@@ -78,6 +78,11 @@ rectangle "OverwatchTeamUp\n<size:16>[Software System]</size>" <<Boundary-T3Zlcn
     rectangle "==Hero API Views\n<size:16>[Component: Django REST Framework function-based views]</size>\n\nProvides public endpoints for listing heroes and retrieving hero details." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.HeroAPIViews
     rectangle "==Team Composition API Views\n<size:16>[Component: Django REST Framework function-based views]</size>\n\nProvides authenticated CRUD endpoints scoped to the current user's team compositions." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews
     rectangle "==API Serializers\n<size:16>[Component: Django REST Framework serializers]</size>\n\nValidates request payloads and maps domain entities to API DTOs." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.APISerializers
+    rectangle "==Team Composition Service\n<size:16>[Component: Python application service]</size>\n\nCoordinates team composition use cases and enforces creation and update rules through the domain model." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.TeamCompositionService
+    rectangle "==Domain Model\n<size:16>[Component: Python dataclasses]</size>\n\nDefines hero and team composition entities, including unique-hero and role-distribution rules." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.DomainModel
+    rectangle "==Hero Port\n<size:16>[Component: Python abstract base class]</size>\n\nDefines hero query and persistence operations required by application services." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.HeroPort
+    rectangle "==Team Composition Port\n<size:16>[Component: Python abstract base class]</size>\n\nDefines user-scoped team composition persistence operations." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.TeamCompositionPort
+    rectangle "==External Hero Source Port\n<size:16>[Component: Python abstract base class]</size>\n\nDefines the external hero data required by synchronization." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.ExternalHeroSourcePort
     rectangle "==Hero Database Adapter\n<size:16>[Component: Python, Django ORM]</size>\n\nImplements the hero persistence port using Django models and maps between database records and domain entities." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter
     rectangle "==Team Composition Database Adapter\n<size:16>[Component: Python, Django ORM]</size>\n\nImplements user-scoped team composition persistence and maps records to domain entities." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.TeamCompositionDatabaseAdapter
     rectangle "==Hero Sync Command\n<size:16>[Component: Django management command]</size>\n\nRuns the hero synchronization during backend startup or via manage.py sync_heroes." <<Element-RWxlbWVudA==>> as OverwatchTeamUp.BackendAPI.HeroSyncCommand
@@ -97,14 +102,26 @@ OverwatchTeamUp.BackendAPI.AuthenticationAPI --> OverwatchTeamUp.Database <<Rela
 OverwatchTeamUp.BackendAPI.HeroAPIViews --> OverwatchTeamUp.BackendAPI.APISerializers <<Relationship-UmVsYXRpb25zaGlw>> : "Serializes responses with"
 OverwatchTeamUp.BackendAPI.HeroAPIViews --> OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Reads heroes through"
 OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews --> OverwatchTeamUp.BackendAPI.APISerializers <<Relationship-UmVsYXRpb25zaGlw>> : "Validates requests and serializes responses with"
-OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews --> OverwatchTeamUp.BackendAPI.TeamCompositionDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Reads and writes team compositions through"
-OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews --> OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Resolves selected heroes through"
+OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews --> OverwatchTeamUp.BackendAPI.TeamCompositionService <<Relationship-UmVsYXRpb25zaGlw>> : "Executes use cases through"
+OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews --> OverwatchTeamUp.BackendAPI.TeamCompositionDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Wires into the service"
+OverwatchTeamUp.BackendAPI.TeamCompositionAPIViews --> OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Wires into the service"
 OverwatchTeamUp.BackendAPI.TeamCompositionDatabaseAdapter --> OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Loads referenced heroes through"
+OverwatchTeamUp.BackendAPI.TeamCompositionService --> OverwatchTeamUp.BackendAPI.TeamCompositionPort <<Relationship-UmVsYXRpb25zaGlw>> : "Persists compositions through"
+OverwatchTeamUp.BackendAPI.TeamCompositionService --> OverwatchTeamUp.BackendAPI.HeroPort <<Relationship-UmVsYXRpb25zaGlw>> : "Resolves selected heroes through"
+OverwatchTeamUp.BackendAPI.TeamCompositionService --> OverwatchTeamUp.BackendAPI.DomainModel <<Relationship-UmVsYXRpb25zaGlw>> : "Creates and validates"
+OverwatchTeamUp.BackendAPI.TeamCompositionDatabaseAdapter --> OverwatchTeamUp.BackendAPI.TeamCompositionPort <<Relationship-UmVsYXRpb25zaGlw>> : "Implements"
+OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter --> OverwatchTeamUp.BackendAPI.HeroPort <<Relationship-UmVsYXRpb25zaGlw>> : "Implements"
+OverwatchTeamUp.BackendAPI.OverFastAPIAdapter --> OverwatchTeamUp.BackendAPI.ExternalHeroSourcePort <<Relationship-UmVsYXRpb25zaGlw>> : "Implements"
+OverwatchTeamUp.BackendAPI.HeroPort --> OverwatchTeamUp.BackendAPI.DomainModel <<Relationship-UmVsYXRpb25zaGlw>> : "Uses"
+OverwatchTeamUp.BackendAPI.TeamCompositionPort --> OverwatchTeamUp.BackendAPI.DomainModel <<Relationship-UmVsYXRpb25zaGlw>> : "Uses"
+OverwatchTeamUp.BackendAPI.ExternalHeroSourcePort --> OverwatchTeamUp.BackendAPI.DomainModel <<Relationship-UmVsYXRpb25zaGlw>> : "Uses"
 OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter --> OverwatchTeamUp.Database <<Relationship-UmVsYXRpb25zaGlw>> : "Reads and writes heroes and abilities\n<size:16>[Django ORM/SQL]</size>"
 OverwatchTeamUp.BackendAPI.TeamCompositionDatabaseAdapter --> OverwatchTeamUp.Database <<Relationship-UmVsYXRpb25zaGlw>> : "Reads and writes user-owned team compositions\n<size:16>[Django ORM/SQL]</size>"
 OverwatchTeamUp.BackendAPI.HeroSyncCommand --> OverwatchTeamUp.BackendAPI.HeroSyncService <<Relationship-UmVsYXRpb25zaGlw>> : "Starts"
-OverwatchTeamUp.BackendAPI.HeroSyncService --> OverwatchTeamUp.BackendAPI.OverFastAPIAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Fetches heroes through"
-OverwatchTeamUp.BackendAPI.HeroSyncService --> OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Upserts heroes through"
+OverwatchTeamUp.BackendAPI.HeroSyncCommand --> OverwatchTeamUp.BackendAPI.OverFastAPIAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Wires into the service"
+OverwatchTeamUp.BackendAPI.HeroSyncCommand --> OverwatchTeamUp.BackendAPI.HeroDatabaseAdapter <<Relationship-UmVsYXRpb25zaGlw>> : "Wires into the service"
+OverwatchTeamUp.BackendAPI.HeroSyncService --> OverwatchTeamUp.BackendAPI.ExternalHeroSourcePort <<Relationship-UmVsYXRpb25zaGlw>> : "Fetches heroes through"
+OverwatchTeamUp.BackendAPI.HeroSyncService --> OverwatchTeamUp.BackendAPI.HeroPort <<Relationship-UmVsYXRpb25zaGlw>> : "Upserts heroes through"
 OverwatchTeamUp.BackendAPI.OverFastAPIAdapter --> OverFastAPI <<Relationship-UmVsYXRpb25zaGlw>> : "Fetches hero lists, details, and competitive statistics from\n<size:16>[JSON/HTTPS]</size>"
 
 @enduml
