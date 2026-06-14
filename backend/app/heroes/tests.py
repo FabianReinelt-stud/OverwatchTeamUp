@@ -35,14 +35,59 @@ def make_team_composition(**overrides):
         portrait_url="http://example.com/winston.png",
         description="Scientist",
     )
+    genji, _ = Hero.objects.get_or_create(
+        hero_key="genji",
+        defaults={
+            "display_name": "Genji",
+            "role": "Damage",
+            "subrole": "Flanker",
+            "winrate": Decimal("52.0"),
+            "pickrate": Decimal("3.0"),
+            "health": 250,
+            "armor": 0,
+            "shields": 0,
+            "portrait_url": "http://example.com/genji.png",
+            "description": "Cybernetic ninja",
+        },
+    )
+    mercy, _ = Hero.objects.get_or_create(
+        hero_key="mercy",
+        defaults={
+            "display_name": "Mercy",
+            "role": "Support",
+            "subrole": "Healer",
+            "winrate": Decimal("49.0"),
+            "pickrate": Decimal("5.0"),
+            "health": 225,
+            "armor": 0,
+            "shields": 0,
+            "portrait_url": "http://example.com/mercy.png",
+            "description": "Guardian angel",
+        },
+    )
+    lucio, _ = Hero.objects.get_or_create(
+        hero_key="lucio",
+        defaults={
+            "display_name": "Lucio",
+            "role": "Support",
+            "subrole": "Support",
+            "winrate": Decimal("51.0"),
+            "pickrate": Decimal("4.0"),
+            "health": 225,
+            "armor": 0,
+            "shields": 0,
+            "portrait_url": "http://example.com/lucio.png",
+            "description": "Freedom fighter DJ",
+        },
+    )
     defaults = {
         "user": user,
         "name": "Dive Comp",
         "hero_1": winston,
         "hero_2": tracer,
-        "hero_3": tracer,
-        "hero_4": winston,
-        "hero_5": tracer,
+        "hero_3": genji,
+        "hero_4": mercy,
+        "hero_5": lucio,
     }
     defaults.update(overrides)
     return TeamComposition.objects.create(**defaults)
@@ -153,13 +198,49 @@ class TestTeamCompositionEndpoints(TestCase):
             portrait_url="http://example.com/winston.png",
             description="Scientist",
         )
+        self.genji = make_hero(
+            hero_key="genji",
+            display_name="Genji",
+            role="Damage",
+            subrole="Flanker",
+            winrate=Decimal("52.0"),
+            portrait_url="http://example.com/genji.png",
+            description="Cybernetic ninja",
+        )
+        self.mercy = make_hero(
+            hero_key="mercy",
+            display_name="Mercy",
+            role="Support",
+            subrole="Healer",
+            winrate=Decimal("49.0"),
+            portrait_url="http://example.com/mercy.png",
+            description="Guardian angel",
+        )
+        self.lucio = make_hero(
+            hero_key="lucio",
+            display_name="Lucio",
+            role="Support",
+            subrole="Support",
+            winrate=Decimal("51.0"),
+            portrait_url="http://example.com/lucio.png",
+            description="Freedom fighter DJ",
+        )
+        self.dva = make_hero(
+            hero_key="dva",
+            display_name="D.Va",
+            role="Tank",
+            subrole="Initiator",
+            winrate=Decimal("50.5"),
+            portrait_url="http://example.com/dva.png",
+            description="MEKA pilot",
+        )
         self.payload = {
             "name": "Dive Comp",
             "hero_1_key": "winston",
             "hero_2_key": "tracer",
-            "hero_3_key": "tracer",
-            "hero_4_key": "winston",
-            "hero_5_key": "tracer",
+            "hero_3_key": "genji",
+            "hero_4_key": "mercy",
+            "hero_5_key": "lucio",
         }
 
     def authenticate(self, user=None):
@@ -250,7 +331,35 @@ class TestTeamCompositionEndpoints(TestCase):
         assert team.user == self.user
         assert team.name == "Dive Comp"
         assert team.hero_1_id == "winston"
-        assert response.data["hero_5"]["hero_key"] == "tracer"
+        assert response.data["hero_5"]["hero_key"] == "lucio"
+
+    def test_create_rejects_duplicate_heroes(self):
+        self.authenticate()
+        payload = {**self.payload, "hero_3_key": "tracer"}
+
+        response = self.client.post(
+            "/api/team-compositions/create/",
+            payload,
+            format="json",
+        )
+
+        assert response.status_code == 400
+        assert "different heroes" in response.data["error"]
+        assert TeamComposition.objects.count() == 0
+
+    def test_create_rejects_invalid_role_distribution(self):
+        self.authenticate()
+        payload = {**self.payload, "hero_4_key": "dva"}
+
+        response = self.client.post(
+            "/api/team-compositions/create/",
+            payload,
+            format="json",
+        )
+
+        assert response.status_code == 400
+        assert "one Tank, two Damage, and two Support" in response.data["error"]
+        assert TeamComposition.objects.count() == 0
 
     def test_create_returns_404_when_a_hero_is_unknown(self):
         self.authenticate()
@@ -271,7 +380,7 @@ class TestTeamCompositionEndpoints(TestCase):
         payload = {
             **self.payload,
             "name": "Updated Dive Comp",
-            "hero_1_key": "tracer",
+            "hero_1_key": "dva",
         }
 
         response = self.client.put(
@@ -283,8 +392,8 @@ class TestTeamCompositionEndpoints(TestCase):
         assert response.status_code == 200
         team.refresh_from_db()
         assert team.name == "Updated Dive Comp"
-        assert team.hero_1_id == "tracer"
-        assert response.data["hero_1"]["hero_key"] == "tracer"
+        assert team.hero_1_id == "dva"
+        assert response.data["hero_1"]["hero_key"] == "dva"
 
     def test_update_returns_404_for_unknown_team(self):
         self.authenticate()
