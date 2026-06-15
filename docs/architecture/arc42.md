@@ -45,431 +45,206 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 # Context and Scope {#section-context-and-scope}
 
-::: formalpara-title
-**Contents**
-:::
-
-Context and scope - as the name suggests - delimits your system (i.e.
-your scope) from all its communication partners (neighboring systems and
-users, i.e. the context of your system). It thereby specifies the
-external interfaces.
-
-If necessary, differentiate the business context (domain specific inputs
-and outputs) from the technical context (channels, protocols, hardware).
-
-::: formalpara-title
-**Motivation**
-:::
-
-The domain interfaces and technical interfaces to communication partners
-are among your system's most critical aspects. Make sure that you
-completely understand them.
-
-::: formalpara-title
-**Form**
-:::
-
-Various options:
-
--   Context diagrams
-
--   Lists of communication partners and their interfaces.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Context and Scope](https://docs.arc42.org/section-3/) in the arc42
-documentation.
+OverwatchTeamUp interacts with two external parties: the end users who consume the REST API, and the OverFast API from which all hero data originates. Everything else (database, Django framework) is internal to the system.
 
 ## Business Context {#_business_context}
 
-::: formalpara-title
-**Contents**
-:::
+| Communication Partner | Inputs to the system | Outputs from the system |
+|-----------------------|---------------------|------------------------|
+| **Overwatch Player (End User)** | Registration credentials, login credentials, team composition create/update/delete requests | JWT access and refresh tokens, hero list, hero detail, team composition data |
+| **OverFast API** | Hero roster, hero detail (role, abilities, stats, portrait), hero win rate and pick rate per hero key | HTTP GET requests to `/heroes`, `/heroes/{key}`, `/heroes/stats` |
 
-Specification of **all** communication partners (users, IT-systems, ...​)
-with explanations of domain specific inputs and outputs or interfaces.
-Optionally you can add domain specific formats or communication
-protocols.
-
-::: formalpara-title
-**Motivation**
-:::
-
-All stakeholders should understand which data are exchanged with the
-environment of the system.
-
-::: formalpara-title
-**Form**
-:::
-
-All kinds of diagrams that show the system as a black box and specify
-the domain interfaces to communication partners.
-
-Alternatively (or additionally) you can use a table. The title of the
-table is the name of your system, the three columns contain the name of
-the communication partner, the inputs, and the outputs.
-
-**\<Diagram or Table\>**
-
-**\<optionally: Explanation of external domain interfaces\>**
+The end user never contacts the OverFast API directly. All hero data enters the system through the `sync_heroes` management command and is served to users from the local database.
 
 ## Technical Context {#_technical_context}
 
-::: formalpara-title
-**Contents**
-:::
-
-Technical interfaces (channels and transmission media) linking your
-system to its environment. In addition a mapping of domain specific
-input/output to the channels, i.e. an explanation which I/O uses which
-channel.
-
-::: formalpara-title
-**Motivation**
-:::
-
-Many stakeholders make architectural decision based on the technical
-interfaces between the system and its context. Especially infrastructure
-or hardware designers decide these technical interfaces.
-
-::: formalpara-title
-**Form**
-:::
-
-E.g. UML deployment diagram describing channels to neighboring systems,
-together with a mapping table showing the relationships between channels
-and input/output.
-
-**\<Diagram or Table\>**
-
-**\<optionally: Explanation of technical interfaces\>**
-
-**\<Mapping Input/Output to Channels\>**
+| Partner | Channel | Protocol | Direction | Notes |
+|---------|---------|----------|-----------|-------|
+| End User / Frontend client | TCP port 8000 | HTTP, REST/JSON | Bidirectional | JWT passed as `Authorization: Bearer <token>` header on authenticated endpoints |
+| OverFast API (`overfast-api.tekrop.fr`) | HTTPS | REST/JSON | Pull (system initiates; hero data flows back as response) | Called exclusively by `OverfastAPIAdapter` during `sync_heroes`; three endpoints used: `/heroes`, `/heroes/{key}`, `/heroes/stats` |
+| PostgreSQL database | TCP port 5432 (internal Docker network) | PostgreSQL wire protocol | Bidirectional | Accessed via Django ORM; not reachable from outside the Docker network |
 
 # Solution Strategy {#section-solution-strategy}
 
-::: formalpara-title
-**Contents**
-:::
-
-A short summary and explanation of the fundamental decisions and
-solution strategies, that shape system architecture. It includes
-
--   technology decisions
-
--   decisions about the top-level decomposition of the system, e.g.
-    usage of an architectural pattern or design pattern
-
--   decisions on how to achieve key quality goals
-
--   relevant organizational decisions, e.g. selecting a development
-    process or delegating certain tasks to third parties.
-
-::: formalpara-title
-**Motivation**
-:::
-
-These decisions form the cornerstones for your architecture. They are
-the foundation for many other detailed decisions or implementation
-rules.
-
-::: formalpara-title
-**Form**
-:::
-
-Keep the explanations of such key decisions short.
-
-Motivate what was decided and why it was decided that way, based upon
-problem statement, quality goals and key constraints. Refer to details
-in the following sections.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Solution Strategy](https://docs.arc42.org/section-4/) in the arc42
-documentation.
+| Decision | Rationale | Quality Goal |
+|----------|-----------|--------------|
+| **Hexagonal Architecture (Ports & Adapters)** | The domain is decoupled from Django, the database, and the OverFast API via explicit port interfaces and adapter implementations. External dependencies can be swapped without touching business logic. | Maintainability |
+| **Local hero data cache** | Hero data is synced from OverFast into PostgreSQL rather than fetched live per request. The app continues to serve hero data even if the external API is unreachable. | Reliability |
+| **`sync_heroes` as the single external API entry point** | All OverFast API calls are isolated in one management command that runs at startup. No view or service calls the API directly, keeping the boundary explicit and testable. | Reliability, Maintainability |
+| **JWT stateless authentication** | Authentication is handled via short-lived JWT tokens, requiring no server-side session state. This fits cleanly with a stateless REST API. | Security |
+| **TypeScript DTO generation** | Frontend types are auto-generated from DRF serializers via `dto_generation.py`, ensuring the frontend contract always stays in sync with the backend response structure. | Correctness |
 
 # Building Block View {#section-building-block-view}
 
-::: formalpara-title
-**Content**
-:::
-
-The building block view shows the static decomposition of the system
-into building blocks (modules, components, subsystems, classes,
-interfaces, packages, libraries, frameworks, layers, partitions, tiers,
-functions, macros, operations, data structures, ...​) as well as their
-dependencies (relationships, associations, ...​)
-
-This view is mandatory for every architecture documentation. In analogy
-to a house this is the *floor plan*.
-
-::: formalpara-title
-**Motivation**
-:::
-
-Maintain an overview of your source code by making its structure
-understandable through abstraction.
-
-This allows you to communicate with your stakeholder on an abstract
-level without disclosing implementation details.
-
-::: formalpara-title
-**Form**
-:::
-
-The building block view is a hierarchical collection of black boxes and
-white boxes (see figure below) and their descriptions.
-
-![Hierarchy of building blocks](images/05_building_blocks-EN.png)
-
-**Level 1** is the white box description of the overall system together
-with black box descriptions of all contained building blocks.
-
-**Level 2** zooms into some building blocks of level 1. Thus it contains
-the white box description of selected building blocks of level 1,
-together with black box descriptions of their internal building blocks.
-
-**Level 3** zooms into selected building blocks of level 2, and so on.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Building Block View](https://docs.arc42.org/section-5/) in the
-arc42 documentation.
-
 ## Whitebox Overall System {#_whitebox_overall_system}
 
-Here you describe the decomposition of the overall system using the
-following white box template. It contains
+The backend is a single Django project containing one application module (`heroes`) that holds all domain logic, API endpoints, and data access code. The `config` package is the Django project root and has no business logic.
 
--   an overview diagram
+| Building Block | Responsibility |
+|----------------|----------------|
+| **`heroes`** (Django app) | All domain logic, REST API endpoints, data persistence, external API sync, and DTO generation |
+| **`config`** | Django project settings, root URL routing (`/api/` to `heroes`), WSGI/ASGI entry points |
 
--   a motivation for the decomposition
+The `heroes` app is the sole runtime component. Everything described in Level 2 is internal to it.
 
--   black box descriptions of the contained building blocks. For these
-    we offer you alternatives:
 
-    -   use *one* table for a short and pragmatic overview of all
-        contained building blocks and their interfaces
 
-    -   use a list of black box descriptions of the building blocks
-        according to the black box template (see below). Depending on
-        your choice of tool this list could be sub-chapters (in text
-        files), sub-pages (in a Wiki) or nested elements (in a modeling
-        tool).
+## Level 2 — `heroes` App Decomposition {#_level_2}
 
--   (optional:) important interfaces, that are not explained in the
-    black box templates of a building block, but are very important for
-    understanding the white box. Since there are so many ways to specify
-    interfaces why do not provide a specific template for them. In the
-    worst case you have to specify and describe syntax, semantics,
-    protocols, error handling, restrictions, versions, qualities,
-    necessary compatibilities and many things more. In the best case you
-    will get away with examples or simple signatures.
+The `heroes` app is organized into layers following the Hexagonal Architecture pattern. Dependencies flow inward: views and adapters depend on ports and domain; domain depends on nothing.
 
-***\<Overview Diagram\>***
+| Layer | Package / File | Responsibility |
+|-------|----------------|----------------|
+| **Domain** | `heroes/domain/entities.py` | Pure Python dataclasses (`HeroEntity`, `AbilityEntity`, `TeamCompositionEntity`); no framework imports |
+| **Ports** | `heroes/ports/` | Abstract interfaces: `HeroPort`, `TeamCompositionPort`, `ExternalHeroSourcePort`; define contracts without implementations |
+| **Database Adapters** | `heroes/adapters/hero_database_adapter.py`, `team_composition_adapter.py` | Implement `HeroPort` and `TeamCompositionPort`; translate between Django ORM models and domain entities |
+| **External API Adapter** | `heroes/adapters/overfast_api_adapter.py` | Implements `ExternalHeroSourcePort`; fetches hero data from the OverFast API and maps responses to domain entities |
+| **Domain Service** | `heroes/services/hero_sync_service.py` | Orchestrates the hero sync: pulls from `ExternalHeroSourcePort`, pushes to `HeroPort` via `upsert` |
+| **Django Models** | `heroes/models.py` | ORM schema: `Hero`, `Ability`, `TeamComposition`; persistence only, no domain logic |
+| **Views** | `heroes/views.py` | DRF function-based views; receives HTTP requests, calls adapters, returns serialized responses |
+| **Serializers** | `heroes/serializers.py` | Translate between domain entities and JSON; `HeroSummarySerializer`, `HeroSerializer`, `TeamCompositionSerializer`, `TeamCompositionCreateUpdateSerializer`, `RegisterSerializer` |
+| **Management Commands** | `heroes/management/commands/sync_heroes.py` | Entry point for hero data sync; wires `OverfastAPIAdapter` to `HeroSyncService` to `HeroDataBaseAdapter`; runs at startup |
+| **DTO Generation** | `heroes/dto_generation.py`, `heroes/management/commands/generate_dtos.py` | Generates TypeScript types from DRF serializers; keeps frontend types in sync with API responses |
 
-Motivation
+```mermaid
+graph TD
+    CMD["sync_heroes
+(management command)"]
+    DTO["dto_generation.py"]
 
-:   *\<text explanation\>*
+    subgraph APILayer["REST API Layer"]
+        Views["views.py"]
+        Ser["serializers.py"]
+    end
 
-Contained Building Blocks
+    subgraph SvcLayer["Services"]
+        SS["HeroSyncService"]
+    end
 
-:   *\<Description of contained building block (black boxes)\>*
+    subgraph PortLayer["Ports (Interfaces)"]
+        HP["HeroPort"]
+        TCP["TeamCompositionPort"]
+        ESP["ExternalHeroSourcePort"]
+    end
 
-Important Interfaces
+    subgraph AdapterLayer["Adapters"]
+        HDBA["HeroDataBaseAdapter"]
+        TCDA["TeamCompositionDatabaseAdapter"]
+        OFA["OverfastAPIAdapter"]
+    end
 
-:   *\<Description of important interfaces\>*
+    subgraph DomainLayer["Domain"]
+        Entities["entities.py
+HeroEntity · AbilityEntity · TeamCompositionEntity"]
+    end
 
-Insert your explanations of black boxes from level 1:
+    subgraph PersistLayer["Persistence"]
+        Models["models.py
+Hero · Ability · TeamComposition"]
+    end
 
-If you use tabular form you will only describe your black boxes with
-name and responsibility according to the following schema:
+    CMD --> SS & OFA & HDBA
+    SS --> ESP & HP
+    OFA --> ESP
+    HDBA --> HP & Models
+    TCDA --> TCP & Models
+    Views --> HDBA & TCDA & Ser
+    DTO --> Ser
+    HP & TCP & ESP --> Entities
+```
 
-+----------------------+-----------------------------------------------+
-| **Name**             | **Responsibility**                            |
-+======================+===============================================+
-| *\<black box 1\>*    |  *\<Text\>*                                   |
-+----------------------+-----------------------------------------------+
-| *\<black box 2\>*    |  *\<Text\>*                                   |
-+----------------------+-----------------------------------------------+
-
-If you use a list of black box descriptions then you fill in a separate
-black box template for every important building block . Its headline is
-the name of the black box.
-
-### \<Name black box 1\> {#_name_black_box_1}
-
-Here you describe \<black box 1\> according the the following black box
-template:
-
--   Purpose/Responsibility
-
--   Interface(s), when they are not extracted as separate paragraphs.
-    This interfaces may include qualities and performance
-    characteristics.
-
--   (Optional) Quality-/Performance characteristics of the black box,
-    e.g.availability, run time behavior, ...​.
-
--   (Optional) directory/file location
-
--   (Optional) Fulfilled requirements (if you need traceability to
-    requirements).
-
--   (Optional) Open issues/problems/risks
-
-*\<Purpose/Responsibility\>*
-
-*\<Interface(s)\>*
-
-*\<(Optional) Quality/Performance Characteristics\>*
-
-*\<(Optional) Directory/File Location\>*
-
-*\<(Optional) Fulfilled Requirements\>*
-
-*\<(optional) Open Issues/Problems/Risks\>*
-
-### \<Name black box 2\> {#_name_black_box_2}
-
-*\<black box template\>*
-
-### \<Name black box n\> {#_name_black_box_n}
-
-*\<black box template\>*
-
-### \<Name interface 1\> {#_name_interface_1}
-
-...​
-
-### \<Name interface m\> {#_name_interface_m}
-
-## Level 2 {#_level_2}
-
-Here you can specify the inner structure of (some) building blocks from
-level 1 as white boxes.
-
-You have to decide which building blocks of your system are important
-enough to justify such a detailed description. Please prefer relevance
-over completeness. Specify important, surprising, risky, complex or
-volatile building blocks. Leave out normal, simple, boring or
-standardized parts of your system
-
-### White Box *\<building block 1\>* {#_white_box_building_block_1}
-
-...​describes the internal structure of *building block 1*.
-
-*\<white box template\>*
-
-### White Box *\<building block 2\>* {#_white_box_building_block_2}
-
-*\<white box template\>*
-
-...​
-
-### White Box *\<building block m\>* {#_white_box_building_block_m}
-
-*\<white box template\>*
-
-## Level 3 {#_level_3}
-
-Here you can specify the inner structure of (some) building blocks from
-level 2 as white boxes.
-
-When you need more detailed levels of your architecture please copy this
-part of arc42 for additional levels.
-
-### White Box \<\_building block x.1\_\> {#_white_box_building_block_x_1}
-
-Specifies the internal structure of *building block x.1*.
-
-*\<white box template\>*
-
-### White Box \<\_building block x.2\_\> {#_white_box_building_block_x_2}
-
-*\<white box template\>*
-
-### White Box \<\_building block y.1\_\> {#_white_box_building_block_y_1}
-
-*\<white box template\>*
 
 # Runtime View {#section-runtime-view}
 
-::: formalpara-title
-**Contents**
-:::
+Three scenarios are documented here — startup sync, hero list request, and team composition creation — as they cover the most architecturally significant interactions between building blocks.
 
-The runtime view describes concrete behavior and interactions of the
-system's building blocks in form of scenarios from the following areas:
+## RT-01: Startup Hero Sync {#_rt_01}
 
--   important use cases or features: how do building blocks execute
-    them?
+Triggered by Docker Compose at every container start. The `sync_heroes` command is the only code path that contacts the OverFast API.
 
--   interactions at critical external interfaces: how do building blocks
-    cooperate with users and neighboring systems?
+```mermaid
+sequenceDiagram
+    participant DC as Docker Compose
+    participant CMD as sync_heroes
+    participant SS as HeroSyncService
+    participant OFA as OverfastAPIAdapter
+    participant API as OverFast API
+    participant HDBA as HeroDataBaseAdapter
+    participant DB as PostgreSQL
 
--   operation and administration: launch, start-up, stop
+    DC->>CMD: python manage.py sync_heroes
+    CMD->>SS: sync()
+    SS->>OFA: fetch_all()
+    OFA->>API: GET /heroes
+    API-->>OFA: [{key: ana, ...}, ...]
+    OFA->>API: GET /heroes/stats?platform=pc&gamemode=competitive&region=europe
+    API-->>OFA: [{hero: ana, winrate: 46.8, pickrate: 26.6}, ...]
+    loop for each hero key
+        OFA->>API: GET /heroes/{key}
+        API-->>OFA: {name, role, abilities, hitpoints, ...}
+    end
+    OFA-->>SS: list[HeroEntity]
+    loop for each HeroEntity
+        SS->>HDBA: upsert(hero)
+        HDBA->>DB: INSERT ... ON CONFLICT DO UPDATE
+    end
+    SS-->>CMD: hero count synced
+    CMD->>DC: exit 0 → runserver starts
+```
 
--   error and exception scenarios
+## RT-02: Hero List Request {#_rt_02}
 
-Remark: The main criterion for the choice of possible scenarios
-(sequences, workflows) is their **architectural relevance**. It is
-**not** important to describe a large number of scenarios. You should
-rather document a representative selection.
+A client requests all heroes. The OverFast API is not involved — data is served entirely from the local database.
 
-::: formalpara-title
-**Motivation**
-:::
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant View as hero_list view
+    participant HDBA as HeroDataBaseAdapter
+    participant DB as PostgreSQL
+    participant Ser as HeroSummarySerializer
 
-You should understand how (instances of) building blocks of your system
-perform their job and communicate at runtime. You will mainly capture
-scenarios in your documentation to communicate your architecture to
-stakeholders that are less willing or able to read and understand the
-static models (building block view, deployment view).
+    Client->>View: GET /api/heroes/
+    View->>HDBA: get_all()
+    HDBA->>DB: SELECT * FROM heroes
+    DB-->>HDBA: Hero rows
+    HDBA-->>View: list[HeroEntity]
+    View->>Ser: serialize(heroes, many=True)
+    Ser-->>View: JSON
+    View-->>Client: 200 OK [{hero_key, display_name, portrait_url, role}, ...]
+```
 
-::: formalpara-title
-**Form**
-:::
+## RT-03: Create Team Composition {#_rt_03}
 
-There are many notations for describing scenarios, e.g.
+An authenticated user creates a new team composition. The JWT middleware validates the token before the view is reached. Each hero key in the request body is resolved to a `HeroEntity` before the composition is persisted.
 
--   numbered list of steps (in natural language)
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant JWT as JWT Middleware
+    participant View as team_composition_create view
+    participant Ser as TeamCompositionCreateUpdateSerializer
+    participant HDBA as HeroDataBaseAdapter
+    participant TCDA as TeamCompositionDatabaseAdapter
+    participant DB as PostgreSQL
 
--   activity diagrams or flow charts
-
--   sequence diagrams
-
--   BPMN or EPCs (event process chains)
-
--   state machines
-
--   ...​
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Runtime View](https://docs.arc42.org/section-6/) in the arc42
-documentation.
-
-## \<Runtime Scenario 1\> {#_runtime_scenario_1}
-
--   *\<insert runtime diagram or textual description of the scenario\>*
-
--   *\<insert description of the notable aspects of the interactions
-    between the building block instances depicted in this diagram.\>*
-
-## \<Runtime Scenario 2\> {#_runtime_scenario_2}
-
-## ...​
-
-## \<Runtime Scenario n\> {#_runtime_scenario_n}
+    Client->>JWT: POST /api/team-compositions/create/ + Authorization: Bearer <token>
+    JWT->>JWT: validate token, extract user
+    JWT->>View: request (user attached)
+    View->>Ser: validate(request.data)
+    Ser-->>View: validated_data {name, hero_1..5 keys}
+    loop for each hero_key (5x)
+        View->>HDBA: get_by_key(hero_key)
+        HDBA->>DB: SELECT FROM heroes WHERE hero_key = ?
+        DB-->>HDBA: Hero row
+        HDBA-->>View: HeroEntity
+    end
+    View->>TCDA: create(TeamCompositionEntity, user)
+    TCDA->>DB: INSERT INTO team_comps
+    DB-->>TCDA: saved row with id
+    TCDA-->>View: TeamCompositionEntity
+    View-->>Client: 201 Created {id, name, hero_1..5, average_winrate}
+```
 
 # Deployment View {#section-deployment-view}
 
@@ -716,175 +491,127 @@ arc42 documentation. There you will find links and examples about ADR.
 
 # Quality Requirements {#section-quality-scenarios}
 
-::: formalpara-title
-**Content**
-:::
-
-This section contains all relevant quality requirements.
-
-The most important of these requirements have already been described in
-section 1.2. (quality goals), therefore they should only be referenced
-here. In this section 10 you should also capture quality requirements
-with lesser importance, which will not create high risks when they are
-not fully achieved (but might be *nice-to-have*).
-
-::: formalpara-title
-**Motivation**
-:::
-
-Since quality requirements will have a lot of influence on architectural
-decisions you should know what qualities are really important for your
-stakeholders, in a specific and measurable way.
-
--   See [Quality Requirements](https://docs.arc42.org/section-10/) in
-    the arc42 documentation.
-
--   See the extensive [Q42 quality model on
-    https://quality.arc42.org](https://quality.arc42.org).
+The top five quality requirements are defined in section 1.2 with concrete metrics. This section adds lower-priority requirements and expands each goal into a detailed scenario.
 
 ## Quality Requirements Overview {#_quality_requirements_overview}
 
-::: formalpara-title
-**Content**
-:::
-
-An overview or summary of quality requirements.
-
-::: formalpara-title
-**Motivation**
-:::
-
-Often we encounter dozens (or even hundreds) of detailed quality
-requirements. In this overview section you should try to summarize, e.g.
-by describing categories or topics (as suggested by [ISO
-25010:2023](https://www.iso.org/obp/ui/#iso:std:iso-iec:25010:ed-2:v1:en)
-or [Q42](https://quality.arc42.org))
-
-If these summary descriptions are already precise, specific enough and
-measurable, you may skip section 10.2.
-
-::: formalpara-title
-**Form**
-:::
-
-Use a simple table in which each line contains a category or topic and a
-short description of the quality requirement. Alternatively, you may use
-a mindmap to structure these quality requirements. In literature, the
-idea of a *quality attribute tree* has also been described, which puts
-the generic term \"quality\" as the root and uses a tree-like refinement
-of the term \"quality\". \[Bass+21\] introduced the term \"Quality
-Attribute Utility Tree\" for this purpose.
+| Category | Quality Requirement |
+|----------|-------------------|
+| Reliability | Hero data remains available when the OverFast API is unreachable |
+| Security | Users can only access and modify their own team compositions |
+| Maintainability | External data source can be replaced without changes to domain logic |
+| Correctness | Hero stats in the database match the upstream API after every sync |
+| Usability | API responses are fast and follow a consistent, documented structure |
+| Testability | Domain logic and adapters can be tested independently without a live database or external API |
+| Interoperability | The REST API can be consumed by any frontend framework without backend changes |
 
 ## Quality Scenarios {#_quality_scenarios}
 
-::: formalpara-title
-**Content**
-:::
+### QS-01: Hero Data Available When External API Is Down
 
-Quality scenarios make quality requirements concrete and allow to decide
-whether they are fulfilled (in the sense of acceptance criteria). Ensure
-that your scenarios are specific and measurable.
+| Field | Description |
+|-------|-------------|
+| **Scenario ID** | QS-01 |
+| **Scenario Name** | Hero Data Available When External API Is Down |
+| **Source** | End user |
+| **Stimulus** | User requests the hero list while the OverFast API is unreachable |
+| **Environment** | Normal runtime; OverFast API is down or timing out |
+| **Artifact** | `HeroDataBaseAdapter`, PostgreSQL database |
+| **Response** | The system serves hero data from the local database without contacting the external API |
+| **Response Measure** | Hero list endpoint returns HTTP 200 with full data within 500ms |
 
-Two kinds of scenarios are especially useful:
+---
 
--   *Usage scenarios* (also called application scenarios or use case
-    scenarios) describe the system's runtime reaction to a certain
-    stimulus. This also includes scenarios that describe the system's
-    efficiency or performance. Example: The system reacts to a user's
-    request within one second.
+### QS-02: Unauthenticated Access to Team Compositions Rejected
 
--   *Change scenarios* describe the desired effect of a modification or
-    extension of the system or of its immediate environment. Example:
-    Additional functionality is implemented or requirements for a
-    quality attribute change, and the effort or duration of the change
-    is measured.
+| Field | Description |
+|-------|-------------|
+| **Scenario ID** | QS-02 |
+| **Scenario Name** | Unauthenticated Access to Team Compositions Rejected |
+| **Source** | Anonymous user or client without a JWT token |
+| **Stimulus** | GET request to `/api/team-compositions/` without an Authorization header |
+| **Environment** | Normal runtime |
+| **Artifact** | `team_composition_list` view, JWT authentication middleware |
+| **Response** | The system rejects the request without exposing any data |
+| **Response Measure** | HTTP 401 returned; no team composition data included in the response |
 
-::: formalpara-title
-**Form**
-:::
+---
 
-Typical information for detailed scenarios include the following:
+### QS-03: User Cannot Access Another User's Team Composition
 
-In short form (favoured in the Q42 model):
+| Field | Description |
+|-------|-------------|
+| **Scenario ID** | QS-03 |
+| **Scenario Name** | Cross-User Data Isolation |
+| **Source** | Authenticated user |
+| **Stimulus** | User A sends a GET request for a team composition owned by User B |
+| **Environment** | Normal runtime; User A holds a valid JWT |
+| **Artifact** | `TeamCompositionDatabaseAdapter`, `team_composition_detail` view |
+| **Response** | The system treats the resource as non-existent for User A |
+| **Response Measure** | HTTP 404 returned; User B's data is not exposed |
 
--   **Context/Background**: What kind of system or component, what is
-    the envirionment or situation?
+---
 
--   **Source/Stimulus**: Who or what initiates or triggers a behaviour,
-    reaction or action.
+### QS-04: External API Adapter Can Be Replaced
 
--   **Metric/Acceptance Criteria**: A response including a *measure* or
-    *metric*
+| Field | Description |
+|-------|-------------|
+| **Scenario ID** | QS-04 |
+| **Scenario Name** | External API Adapter Replacement |
+| **Source** | Developer |
+| **Stimulus** | OverFast API is replaced by a different hero data source |
+| **Environment** | Development; new data source has a different response format |
+| **Artifact** | `overfast_api_adapter.py`, `ExternalHeroSourcePort` |
+| **Response** | Developer creates a new adapter implementing `ExternalHeroSourcePort`; no changes needed in domain logic, services, or other adapters |
+| **Response Measure** | Only `overfast_api_adapter.py` is modified or replaced; all existing tests pass without changes |
 
-The long form of scenarios (favoured by the SEI and \[Bass+21\]) is more
-detailed and includes the following information:
+---
 
--   **Scenario ID**: A unique identifier for the scenario.
+### QS-05: Hero Stats Match Upstream After Sync
 
--   **Scenario Name**: A short, descriptive name for the scenario.
+| Field | Description |
+|-------|-------------|
+| **Scenario ID** | QS-05 |
+| **Scenario Name** | Hero Stats Correctness After Sync |
+| **Source** | `sync_heroes` management command (triggered at startup) |
+| **Stimulus** | `sync_heroes` completes successfully |
+| **Environment** | Normal startup; OverFast API is reachable |
+| **Artifact** | `OverfastAPIAdapter`, `HeroSyncService`, PostgreSQL database |
+| **Response** | All heroes returned by the OverFast API are present in the local database with matching stats |
+| **Response Measure** | Hero count in DB equals hero count from API; winrate and pickrate values match the API response for every hero key |
 
--   **Source**: The entity (user, system, or event) that initiates the
-    scenario.
+---
 
--   **Stimulus**: The triggering event or condition the system must
-    address.
+### QS-06: Hero Endpoints Respond Within Acceptable Time
 
--   **Environment**: The operational context or condition under which
-    the system experiences the stimulus.
-
--   **Artifact**: The building-blocks or other elements of the system
-    affected by the stimulus.
-
--   **Response**: The outcome or behavior the system exhibits in
-    reaction to the stimulus.
-
--   **Response Measure**: The criteria or metric by which the system's
-    response is evaluated.
-
-::: formalpara-title
-**Examples**
-:::
-
-See [the Q42 quality model website](https://quality.arc42.org) for
-detailed examples of quality requirements.
-
--   Len Bass, Paul Clements, Rick Kazman: \"Software Architecture in
-    Practice\", 4th Edition, Addison-Wesley, 2021.
+| Field | Description |
+|-------|-------------|
+| **Scenario ID** | QS-06 |
+| **Scenario Name** | Hero Endpoint Response Time |
+| **Source** | End user or frontend client |
+| **Stimulus** | GET request to `/api/heroes/` or `/api/heroes/{key}/` |
+| **Environment** | Normal runtime; hero data is present in the database |
+| **Artifact** | `hero_list` and `hero_detail` views, `HeroDataBaseAdapter` |
+| **Response** | The system queries the local database and returns a serialized response |
+| **Response Measure** | Response delivered within 200ms |
 
 # Risks and Technical Debts {#section-technical-risks}
 
-::: formalpara-title
-**Contents**
-:::
+## Risks
 
-A list of identified technical risks or technical debts, ordered by
-priority
+| Priority | Risk | Impact | Mitigation |
+|----------|------|--------|------------|
+| High | **OverFast API is a single point of failure** — no SLA, no authentication; it can change its response format or go offline at any time | `sync_heroes` fails silently or crashes; hero data goes stale with no automatic recovery | Cache data locally (already done); monitor the API; implement error handling in `sync_heroes` to alert on failure |
+| Medium | **Win rate and pick rate data is narrow** — only sourced from EU competitive PC rankings | Stats may be misleading or irrelevant for players in other regions or game modes | Make the region and game mode configurable; document the data source clearly in the UI |
+| Medium | **No rate limiting on any endpoint** — the API is fully open | A client could hammer endpoints, degrading performance for all users | Add rate limiting via Django middleware or a reverse proxy |
 
-::: formalpara-title
-**Motivation**
-:::
+## Technical Debts
 
-"Risk management is project management for grown-ups" (Tim Lister,
-Atlantic Systems Guild.)
-
-This should be your motto for systematic detection and evaluation of
-risks and technical debts in the architecture, which will be needed by
-management stakeholders (e.g. project managers, product owners) as part
-of the overall risk analysis and measurement planning.
-
-::: formalpara-title
-**Form**
-:::
-
-List of risks and/or technical debts, probably including suggested
-measures to minimize, mitigate or avoid risks or reduce technical debts.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Risks and Technical Debt](https://docs.arc42.org/section-11/) in
-the arc42 documentation.
+| Priority | Debt | Impact | Suggested Fix |
+|----------|------|--------|---------------|
+| High | **Fixed 5-hero team schema** — team size is hardcoded as five separate foreign key columns in the database | Supporting flexible team sizes requires a full schema redesign and migration | Replace the five FK columns with a many-to-many join table |
+| Medium | **`sync_heroes` runs on every startup** — no freshness check | Startup is blocked on the external API every time, even if data is already up to date | Add a last-synced timestamp and only re-sync if data is older than a threshold |
+| Low | **No pagination on the hero list endpoint** | Works fine for the current roster size but will degrade if the hero pool grows significantly | Add cursor or page-based pagination to `/api/heroes/` |
 
 # Glossary {#section-glossary}
 
