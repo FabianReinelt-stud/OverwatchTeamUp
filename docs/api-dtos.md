@@ -1,20 +1,5 @@
 # API DTOs
 
-The frontend DTOs are generated from the backend DRF serializers. The generated
-TypeScript file is the technical source for the frontend contract.
-
-Generate DTOs with:
-
-```bash
-docker compose run --rm backend python manage.py generate_dtos
-```
-
-Default output:
-
-```text
-backend/app/generated/api-dtos.ts
-```
-
 ## Usage Table
 
 | Use case | Method | Endpoint | Request DTO | Response DTO |
@@ -34,4 +19,20 @@ Team composition endpoints require a bearer access token:
 
 ```http
 Authorization: Bearer <access-token>
+```
+
+### How to generate
+
+The frontend DTOs are generated from the backend DRF serializers.
+
+Generate DTOs with:
+
+```bash
+docker compose run --rm backend python manage.py generate_dtos
+```
+
+Default output:
+
+```text
+backend/app/generated/api-dtos.ts
 ```

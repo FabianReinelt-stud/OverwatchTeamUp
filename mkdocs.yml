@@ -14,6 +14,7 @@ nav:
       - arc42: architecture/arc42.md
       - C4-Modell: architecture/c4-model.md
   - ADRs:
+      - Template: adr/template.md
       - React frontend: adr/001-frontend-react.md
       - Spring Boot backend: adr/002-backend-spring-boot.md
       - PostgreSQL database: adr/003-database-postgres.md
