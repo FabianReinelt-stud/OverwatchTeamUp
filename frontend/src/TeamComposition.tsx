@@ -24,8 +24,9 @@ interface LoadTeamProp extends LoginStateProp {
 
 interface SaveTeamProp extends LoginStateProp {
     teamComp: TeamCompositionDto,
-    incrementNumTeamComps: () => void
-    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
+    updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
+    incrementNumTeamComps?: (num: number, isModifier: boolean) => void,
+    numTeamComps: number,
 }
 
 interface TeamSlotProp extends BaseTeamCompProp {
@@ -38,6 +39,14 @@ interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveTeamProp {
     updateTeamCompViewState: () => void,
 }
 
+const isFullTeam = (team: TeamCompositionDto) => {
+    return team.hero_1.hero_key != ""
+        && team.hero_2.hero_key != ""
+        && team.hero_3.hero_key != ""
+        && team.hero_4.hero_key != ""
+        && team.hero_5.hero_key != ""
+}
+
 export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
     const handleLoad = () => {
         if (!isLoggedIn) {
@@ -47,56 +56,16 @@ export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
     }
 
     return (
-        <Tooltip
-            title={isLoggedIn ? "Click to open Team Comp table" : "Please login or register to use the save function for your team composition."}>
-            <button onClick={handleLoad} className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'}></button>
-        </Tooltip>
+        <div className="team-button-wrapper">
+            <Tooltip
+                title={isLoggedIn ? "Click to open Team Comp table" : "Please login to use the load function for your existing team compositions."}>
+                <button onClick={handleLoad} className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'}></button>
+            </Tooltip>
+        </div>
     )
 }
 
-export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamComp}: SaveTeamProp) {
-    const confirmTeamSave = () => {
-        if (!isLoggedIn) {
-            alert("Please login or register to save your team composition.");
-            return;
-        }
-        if (!teamComp) {
-            alert("Please create a team comp to save.");
-            return;
-        }
-        const teamName = prompt("Please input the name of the team", "Team 01");
-        if (teamName) {
-            const teamCompSave: TeamCompositionCreateUpdateDto = {
-                name: teamName,
-                hero_1_key: teamComp.hero_1.hero_key,
-                hero_2_key: teamComp.hero_2.hero_key,
-                hero_3_key: teamComp.hero_3.hero_key,
-                hero_4_key: teamComp.hero_4.hero_key,
-                hero_5_key: teamComp.hero_5.hero_key,
-            }
-            fetchJsonWithAuthRefresh("/api/team-compositions/create/", {
-                method: "POST",
-                body: JSON.stringify(teamCompSave)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Team composition could not be saved");
-                    }
-                    return response.json();
-                })
-                .then(response => {
-                    incrementNumTeamComps();
-                    updateTeamComp(response);
-                    console.log("created new team: ", response);
-                    alert(teamName + " was successfully saved.");
-                })
-                .catch(error => {
-                    console.log("could not save team comp: ", error);
-                    alert("Sorry but your team comp could not be saved. Please try again later.");
-                })
-        }
-    }
-
+export function SaveUpdate({isLoggedIn, teamComp, updateTeamComp}: SaveTeamProp) {
     const updateExistingTeam = () => {
         if (!isLoggedIn) {
             alert("Please login or register to update your team composition.");
@@ -118,6 +87,7 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
 
         fetchJsonWithAuthRefresh("/api/team-compositions/" + teamComp.id + "/update/", {
             method: "PUT",
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(teamCompUpdate)
         })
             .then(response => {
@@ -138,32 +108,87 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
     }
 
     return (
-        <Tooltip
-            title={isLoggedIn ? "Click to save current Team Comp" : "Please login or register to use the load function for your existing team compositions."}>
-            <button className={isLoggedIn ? 'saveBtn' : 'saveBtn-disabled'}
-                    onClick={teamComp.id == -1 ? confirmTeamSave : updateExistingTeam}></button>
-        </Tooltip>
+        <div className="team-button-wrapper">
+            <Tooltip
+                title={isLoggedIn ? "Click to update current Team Comp" : "Please login to use the update function for your existing team compositions."}>
+                <button className={isLoggedIn ? 'saveBtn-update' : 'saveBtn-update-disabled'}
+                        onClick={updateExistingTeam}></button>
+            </Tooltip>
+        </div>
+    )
+}
+
+export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamComp, numTeamComps}: SaveTeamProp) {
+    const confirmTeamSave = () => {
+        if (!isLoggedIn) {
+            alert("Please login or register to save your team composition.");
+            return;
+        }
+        if (!teamComp || !isFullTeam(teamComp)) {
+            alert("Please create a full team comp to save.");
+            return;
+        }
+
+        const teamName = prompt("Please input the name of the team", "Team " + (numTeamComps + 1));
+        if (teamName) {
+            const teamCompSave: TeamCompositionCreateUpdateDto = {
+                name: teamName,
+                hero_1_key: teamComp.hero_1.hero_key,
+                hero_2_key: teamComp.hero_2.hero_key,
+                hero_3_key: teamComp.hero_3.hero_key,
+                hero_4_key: teamComp.hero_4.hero_key,
+                hero_5_key: teamComp.hero_5.hero_key,
+            }
+            fetchJsonWithAuthRefresh("/api/team-compositions/create/", {
+                method: "POST",
+                body: JSON.stringify(teamCompSave)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Team composition could not be saved");
+                    }
+                    return response.json();
+                })
+                .then(response => {
+                    if(incrementNumTeamComps) {
+                        incrementNumTeamComps(1, true);
+                    }
+                    updateTeamComp(response);
+                    console.log("created new team: ", response);
+                })
+                .catch(error => {
+                    console.log("could not save team comp: ", error);
+                    alert("Sorry but your team comp could not be saved. Please try again later.");
+                })
+        }
+    }
+
+    return (
+        <div className="team-button-wrapper">
+            <Tooltip
+                title={isLoggedIn ? "Click to save current Team Comp" : "Please login or register to use the save function for your current team composition."}>
+                <button className={isLoggedIn ? 'saveBtn-add' : 'saveBtn-add-disabled'}
+                        onClick={confirmTeamSave}></button>
+            </Tooltip>
+        </div>
     )
 }
 
 function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}: TeamSlotProp) {
-    const heroRole = selectedHero.hero_key != "" ? selectedHero.role.toLowerCase() : "";
     const normalizedDefaultRole = defaultRole.toLowerCase();
-
-    let roleImage;
-    let frameImage;
-
     const handleSlotSelected = () => {
         if (selectedHero.hero_key == "") {
             return;
         } else if (selectedHero.hero_key != ""
             && selectedHero.hero_key != hero.hero_key
-            && heroRole == normalizedDefaultRole) {
+            && selectedHero.role.toLowerCase() == normalizedDefaultRole) {
             console.log("placing hero " + hero.display_name + " into slot " + slot);
             confirmHeroSelection(slot);
         }
     }
 
+    let roleImage;
+    let frameImage;
     if (defaultRole === "tank") {
         roleImage = backgroundTank;
         frameImage = selectTank;
@@ -177,14 +202,15 @@ function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}:
 
     return (
         <div className='team-role-select'>
-            <img className={heroRole == normalizedDefaultRole && selectedHero.hero_key != "" ? 'role' : 'role-disabled'}
-                 src={hero.hero_key != "" ? hero.portrait_url : roleImage}
-                 style={hero.hero_key != "" ? {
-                     maskSize: "120%",
-                     transform: "scale(0.85)"
-                 } : {maskSize: "contain"}}
-                 alt={defaultRole}
-                 onClick={handleSlotSelected}></img>
+            <img
+                className={selectedHero.role.toLowerCase() == normalizedDefaultRole && selectedHero.hero_key != "" ? 'role' : 'role-disabled'}
+                src={hero.hero_key != "" ? hero.portrait_url : roleImage}
+                style={hero.hero_key != "" ? {
+                    maskSize: "120%",
+                    transform: "scale(0.85)"
+                } : {maskSize: "contain"}}
+                alt={defaultRole}
+                onClick={handleSlotSelected}></img>
             <img className='select-frame' src={frameImage} alt={defaultRole + " team slot frame"}></img>
         </div>
     )
@@ -197,7 +223,8 @@ function TeamComposition({
                              teamComp,
                              incrementNumTeamComps,
                              updateTeamComp,
-                             selectedHero
+                             selectedHero,
+                             numTeamComps
                          }: TeamCompProp) {
     return (
         <div className='team-comp'>
@@ -211,8 +238,10 @@ function TeamComposition({
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
             <TeamSlot defaultRole={"support"} hero={teamComp.hero_5} selectedHero={selectedHero} slot={4}
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
-            <Save isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps}
-                  updateTeamComp={updateTeamComp}></Save>
+            <SaveAdd isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps}
+                     updateTeamComp={updateTeamComp} numTeamComps={numTeamComps}></SaveAdd>
+            <SaveUpdate isLoggedIn={isLoggedIn} teamComp={teamComp} numTeamComps={numTeamComps}
+                        updateTeamComp={updateTeamComp}></SaveUpdate>
             <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
         </div>)
 }

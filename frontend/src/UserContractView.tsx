@@ -4,7 +4,7 @@ import {Button} from "@mui/material";
 import * as React from "react";
 import type {TokenResponseDto} from "./data/api-dtos.tsx";
 
-export interface UserContract{
+export interface UserContract {
     username: string
     token: TokenResponseDto
 }
@@ -22,6 +22,12 @@ type View = (typeof View)[keyof typeof View];
 interface UserLogin {
     username: string;
     password: string;
+}
+
+interface ViewProp {
+    isLoggedIn: boolean,
+    updateLoginState: (isLoggedIn: boolean) => void,
+    toggleView: () => void
 }
 
 const getUserLoginData = (form: HTMLFormElement): UserLogin => {
@@ -108,7 +114,7 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                        pattern="^[a-zA-Z0-9]+"
                        title='Please only use upper-/lowercase letters and numbers'
                        onChange={(e) => {
-                           if(validateUsername(e)) {
+                           if (validateUsername(e)) {
                                updateLoginValidity(true);
                            } else {
                                updateLoginValidity(false);
@@ -217,13 +223,8 @@ const RegisterSuccessView = (
     );
 }
 
-interface ViewProp {
-    updateLoginState: (isLoggedIn: boolean) => void,
-    toggleView: () => void
-}
-
-function UserContractView({updateLoginState, toggleView}: ViewProp) {
-    const [view, setView] = useState<View>(View.LOGIN);
+function UserContractView({updateLoginState, toggleView, isLoggedIn}: ViewProp) {
+    const [view, setView] = useState<View>(!isLoggedIn ? View.LOGIN : View.LOGINSUCCESS);
     const updateContractView = (view: View) => setView(view);
 
     const loginView = LoginView(updateLoginState, updateContractView);
@@ -256,7 +257,10 @@ function UserContractView({updateLoginState, toggleView}: ViewProp) {
     );
 }
 
-function UserContractViewToggle({updateLoginState}: { updateLoginState: (isLoggedIn: boolean) => void }) {
+function UserContractViewToggle({updateLoginState, isLoggedIn}: {
+    updateLoginState: (hasLoggedIn: boolean) => void,
+    isLoggedIn: boolean
+}) {
     const [showUserContract, setShowUserContract] = useState(false);
     const onClick = () => setShowUserContract(!showUserContract);
     return (
@@ -266,7 +270,8 @@ function UserContractViewToggle({updateLoginState}: { updateLoginState: (isLogge
             </div>
             <div className="login-view-container">
                 {showUserContract ? <UserContractView updateLoginState={updateLoginState}
-                                                      toggleView={() => setShowUserContract(!showUserContract)}/> : null}
+                                                      toggleView={() => setShowUserContract(!showUserContract)}
+                                                      isLoggedIn={isLoggedIn}/> : null}
             </div>
         </>
     );

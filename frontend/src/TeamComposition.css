@@ -1,7 +1,4 @@
-.loadBtn,
-.saveBtn,
-.loadBtn-disabled,
-.saveBtn-disabled {
+.team-button-wrapper button{
     display: block;
     width: 30%;
     margin: 10%;
@@ -9,30 +6,35 @@
     aspect-ratio: 1/1;
     border: none;
     cursor: pointer;
+    background-size: 100% 100%;
 }
 
-.loadBtn:hover,
-.saveBtn:hover,
+.team-button-wrapper button:hover,
 .loadBtn-disabled,
-.saveBtn-disabled {
+.saveBtn-add-disabled,
+.saveBtn-update-disabled {
     opacity: 0.5;
 }
 
 .loadBtn:active,
-.saveBtn:active {
+.saveBtn-add:active,
+.saveBtn-update:active{
     opacity: 1;
 }
 
 .loadBtn,
 .loadBtn-disabled {
     background-image: url("../src/assets/download.png");
-    background-size: 100% 100%;
 }
 
-.saveBtn,
-.saveBtn-disabled {
-    background-image: url("../src/assets/save.png");
-    background-size: 100% 100%;
+.saveBtn-add,
+.saveBtn-add-disabled {
+    background-image: url("../src/assets/save_add.png");
+}
+
+.saveBtn-update,
+.saveBtn-update-disabled {
+    background-image: url("../src/assets/save_update.png");
 }
 
 .role,
@@ -60,8 +62,8 @@
 
 .team-role-select {
     position: relative;
-    margin: 10px;
-    grid-row: 1 / span 2;
+    margin: 5px;
+    grid-row: 1 / span 3;
 }
 
 .select-frame {

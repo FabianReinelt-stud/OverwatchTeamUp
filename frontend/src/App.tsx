@@ -66,8 +66,12 @@ function App() {
         setShowTeamCompView(!showTeamCompView);
     }
 
-    const incrementNumTeamComps = () => {
-        setNumTeamComps(numTeamComps => numTeamComps + 1);
+    const updateNumTeamComps = (num: number, isModifier: boolean) => {
+        if(isModifier){
+            setNumTeamComps(numTeamComps => numTeamComps + num);
+        } else {
+        setNumTeamComps(num);
+        }
     }
 
     const updateTeamComp = (teamComp: TeamCompositionDto) => {
@@ -157,15 +161,18 @@ function App() {
                         selectedHero={selectedHero}
                         confirmHeroSelection={confirmHeroSelection}
                         teamComp={currentTeamComp}
-                        incrementNumTeamComps={incrementNumTeamComps}
+                        incrementNumTeamComps={updateNumTeamComps}
                         updateTeamComp={updateTeamComp}
+                        numTeamComps={numTeamComps}
                     ></TeamComposition>
                 </div>
                 <SideBar updateLoginState={updateLoginState}
                          updateTeamComp={updateTeamComp}
                          updateSelectedHero={updateSelectedHero}
                          showTeamCompView={showTeamCompView}
-                         numTeamComps={numTeamComps}></SideBar>
+                         updateNumTeamComps={updateNumTeamComps}
+                         numTeamComps={numTeamComps}
+                         isLoggedIn={isLoggedIn}></SideBar>
             </div>
         </>
     )
