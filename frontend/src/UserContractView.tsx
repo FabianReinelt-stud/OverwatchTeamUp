@@ -24,38 +24,68 @@ interface UserLogin {
     password: string;
 }
 
-const handleLogin = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin,
-                     setLoginValidity: (isValid: boolean) => void,
-                     updateLoginState: (user: UserContract) => void) => {
+const getUserLoginData = (form: HTMLFormElement): UserLogin => {
+    const formData = new FormData(form);
+    return {
+        username: String(formData.get("username") || ""),
+        password: String(formData.get("password") || ""),
+    };
+}
+
+const parseJsonResponse = async (response: Response) => {
+    const responseText = await response.text();
+    let responseBody;
+
+    try {
+        responseBody = responseText ? JSON.parse(responseText) : {};
+    } catch {
+        throw new Error(
+            `Expected JSON but got status ${response.status}: ${responseText.slice(0, 200)}`
+        );
+    }
+
+    if (!response.ok) {
+        throw new Error(JSON.stringify(responseBody));
+    }
+
+    return responseBody;
+}
+
+const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin,
+                           setLoginValidity: (isValid: boolean) => void,
+                           updateLoginState: (user: UserContract) => void) => {
     e.preventDefault();
 
-    fetch("/api/auth/token/", {
-        method: "POST",
-        body: JSON.stringify({userLoginData})
-    })
-        .then(response => response.json())
-        .then(response => {
-            console.log("login was successful (access/ refresh): ", response.access, response.refresh);
-            updateLoginState((userLoginData.username, response.access, response.refresh))
-        })
-        .catch(error => {
-            console.log("could not login: ", error);
-            setLoginValidity(false);
+    try {
+        const response = await fetch("/api/auth/token/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            body: JSON.stringify(userLoginData)
         });
+        const token = await parseJsonResponse(response);
+        console.log("login was successful (access/ refresh): ", token.access, token.refresh);
+        updateLoginState({
+            username: userLoginData.username,
+            token,
+        });
+    } catch (error) {
+        console.log("could not login: ", error);
+        setLoginValidity(false);
+    }
 }
 
 const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                    updateContractView: (view: View) => void) => {
-    const [userContract, setUserContract] = useState<UserContract>()
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
     const [isLoginValid, setIsLoginValid] = useState(true);
     const updateUserContract = (user: UserContract) => {
-        setUserContract(user);
+        localStorage.setItem("accessToken", user.token.access);
+        localStorage.setItem("refreshToken", user.token.refresh);
         updateLoginState(true);
-        if(userContract) {
-            console.log("user login updated with: ", userContract.username, userContract.token.access, userContract.token.refresh)
-        }
+        updateContractView(View.LOGINSUCCESS);
+        console.log("user login updated with: ", user.username);
     }
 
     const updateLoginValidity = (isValid: boolean) => {
@@ -70,15 +100,15 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
         <div className='register-wrapper'>
             <p className="view-name">Login</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
-                handleLogin(e, {username, password}, updateLoginValidity, updateUserContract)}>
+                handleLogin(e, getUserLoginData(e.currentTarget), updateLoginValidity, updateUserContract)}>
                 <label>Username</label>
                 <input type="text"
+                       name="username"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="^[a-zA-Z0-9]+"
                        title='Please only use upper-/lowercase letters and numbers'
                        onChange={(e) => {
                            if(validateUsername(e)) {
-                               setUsername(e.target.value)
                                updateLoginValidity(true);
                            } else {
                                updateLoginValidity(false);
@@ -87,10 +117,10 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                        required></input>
                 <label><p></p>Password</label>
                 <input type="password"
+                       name="password"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                        title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters"
-                       onChange={(e) => setPassword(e.target.value)}
                        required></input>
                 <div className='form-buttons'>
                     <button type="submit">Login</button>
@@ -115,47 +145,51 @@ const LoginSuccessView = (toggleView: () => void) => {
     )
 }
 
-const handleRegister = (e: React.SyntheticEvent<HTMLFormElement>, userLoginData: UserLogin) => {
+const handleRegister = async (
+    e: React.SyntheticEvent<HTMLFormElement>,
+    userLoginData: UserLogin,
+    updateContractView: (view: View) => void,
+) => {
     e.preventDefault();
 
-    fetch("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify({userLoginData})
-    })
-        .then(response => response.json())
-        .then(response => {
-            console.log("registration was successful (id/username): ", response.id, response.username);
-            //TODO view callback to switch to login view
-        })
-        .catch(error => {
-            console.log("could not register: ", error);
-            //TODO registration feedback
-        })
+    try {
+        const response = await fetch("/api/auth/register/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            body: JSON.stringify(userLoginData)
+        });
+        const user = await parseJsonResponse(response);
+        console.log("registration was successful (id/username): ", user.id, user.username);
+        updateContractView(View.REGISTERSUCCESS);
+    } catch (error) {
+        console.log("could not register: ", error);
+        //TODO registration feedback
+    }
 }
 
 const RegisterView = (//TODO add register callback here
     updateContractView: (view: View) => void) => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-
     return (
         <div className='register-wrapper'>
             <p className="view-name">Registration</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
-                handleRegister(e, {username, password})}>
+                handleRegister(e, getUserLoginData(e.currentTarget), updateContractView)}>
                 <label>Username</label>
                 <input type="text"
+                       name="username"
                        className='form-control'
                        pattern="^[a-zA-Z0-9]+"
                        title='Please only use upper-/lowercase letters and numbers'
-                       onChange={(e) => setUsername(e.target.value)}
                        required></input>
                 <label><p></p>Password</label>
                 <input type="password"
+                       name="password"
                        className='form-control'
                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                        title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters"
-                       onChange={(e) => setPassword(e.target.value)}
                        required></input>
                 <div className='form-buttons'>
                     <button type="submit">Register</button>

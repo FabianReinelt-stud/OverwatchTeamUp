@@ -4,6 +4,7 @@ import UserContractViewToggle from "./UserContractView";
 import SearchBar from "./SearchBar";
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import * as React from "react";
+import {getAuthHeaders} from "./auth.ts";
 
 const heroListAreaStyle = {
     gridRow: '1 / 1'
@@ -63,7 +64,8 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTea
     useEffect(() => {
         if (showTeamCompView) {
             fetch("/api/team-compositions/", {
-                method: "GET"
+                method: "GET",
+                headers: getAuthHeaders(),
             })
                 .then(response => {
                     if (!response.ok) {

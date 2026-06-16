@@ -6,6 +6,7 @@ import "./List.css"
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import * as React from "react";
 import {useState} from "react";
+import {getAuthHeaders} from "./auth.ts";
 
 interface HeroListProp {
     input: string;
@@ -45,9 +46,14 @@ const deleteTeam = (id: number) => {
         return;
     }
     fetch("/api/team-compositions/"+ id + "/delete/", {
-        method: "DELETE"
+        method: "DELETE",
+        headers: getAuthHeaders(),
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Team could not be deleted");
+            }
+        })
         .catch(error => {
             console.log("team could not be deleted:", error);
             alert("Sorry but your team comp could not be deleted");
@@ -169,10 +175,10 @@ function List({input, heroList, updateSelectedHero}: HeroListProp) {
     });
 
     const getHeroRoleImg = (role: string) => {
-        role.toLowerCase();
-        if (role == "tank") {
+        const normalizedRole = role.toLowerCase();
+        if (normalizedRole == "tank") {
             return tankIcon;
-        } else if (role == "damage") {
+        } else if (normalizedRole == "damage") {
             return damageIcon;
         }
         return supportIcon;

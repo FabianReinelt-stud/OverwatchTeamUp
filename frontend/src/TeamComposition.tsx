@@ -7,6 +7,7 @@ import backgroundTank from './assets/teamcomp_bg_tank.png'
 import {Tooltip} from '@mui/material'
 import type {HeroDto, TeamCompositionCreateUpdateDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import './TeamComposition.css'
+import {getJsonHeaders} from "./auth.ts";
 
 interface BaseTeamCompProp {
     selectedHero: HeroDto,
@@ -38,16 +39,27 @@ interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveTeamProp {
 }
 
 export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
+    const handleLoad = () => {
+        if (!isLoggedIn) {
+            return;
+        }
+        updateTeamCompViewState();
+    }
+
     return (
         <Tooltip
             title={isLoggedIn ? "Click to open Team Comp table" : "Please login or register to use the save function for your team composition."}>
-            <button onClick={updateTeamCompViewState} className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'}></button>
+            <button onClick={handleLoad} className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'}></button>
         </Tooltip>
     )
 }
 
 export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamComp}: SaveTeamProp) {
     const confirmTeamSave = () => {
+        if (!isLoggedIn) {
+            alert("Please login or register to save your team composition.");
+            return;
+        }
         if (!teamComp) {
             alert("Please create a team comp to save.");
             return;
@@ -64,9 +76,15 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
             }
             fetch("/api/team-compositions/create/", {
                 method: "POST",
+                headers: getJsonHeaders(),
                 body: JSON.stringify(teamCompSave)
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Team composition could not be saved");
+                    }
+                    return response.json();
+                })
                 .then(response => {
                     incrementNumTeamComps();
                     updateTeamComp(response);
@@ -81,6 +99,10 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
     }
 
     const updateExistingTeam = () => {
+        if (!isLoggedIn) {
+            alert("Please login or register to update your team composition.");
+            return;
+        }
         if (!teamComp) {
             alert("Something went wrong. Please reload the team you are trying to edit.")
             return;
@@ -97,9 +119,15 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
 
         fetch("/api/team-compositions/" + teamComp.id + "/update/", {
             method: "PUT",
+            headers: getJsonHeaders(),
             body: JSON.stringify(teamCompUpdate)
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Team composition could not be updated");
+                }
+                return response.json();
+            })
             .then(response => {
                 updateTeamComp(response);
                 console.log("updated existing team: ", response);
@@ -121,9 +149,8 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
 }
 
 function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}: TeamSlotProp) {
-    const heroRole = selectedHero.hero_key != "" ? selectedHero.role : "";
-    heroRole.toLowerCase();
-    defaultRole.toLowerCase();
+    const heroRole = selectedHero.hero_key != "" ? selectedHero.role.toLowerCase() : "";
+    const normalizedDefaultRole = defaultRole.toLowerCase();
 
     let roleImage;
     let frameImage;
@@ -133,7 +160,7 @@ function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}:
             return;
         } else if (selectedHero.hero_key != ""
             && selectedHero.hero_key != hero.hero_key
-            && selectedHero.role == defaultRole) {
+            && heroRole == normalizedDefaultRole) {
             console.log("placing hero " + hero.display_name + " into slot " + slot);
             confirmHeroSelection(slot);
         }
@@ -152,7 +179,7 @@ function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}:
 
     return (
         <div className='team-role-select'>
-            <img className={heroRole == defaultRole && selectedHero.hero_key != "" ? 'role' : 'role-disabled'}
+            <img className={heroRole == normalizedDefaultRole && selectedHero.hero_key != "" ? 'role' : 'role-disabled'}
                  src={hero.hero_key != "" ? hero.portrait_url : roleImage}
                  style={hero.hero_key != "" ? {
                      maskSize: "120%",

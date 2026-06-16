@@ -44,7 +44,7 @@ const isHeroInTeam = (heroKey: string, currentTeamComp: TeamCompositionDto) => {
 }
 
 function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(localStorage.getItem("accessToken")));
 
     const updateLoginState = (isLoggedIn: boolean) => {
         setIsLoggedIn(isLoggedIn);
