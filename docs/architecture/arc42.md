@@ -6,9 +6,9 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 **Essential features:**
 
--   Browse all Overwatch heroes with key stats (role, win rate, pick rate, health, abilities)
+-   Browse all Overwatch heroes  
 
--   View detailed hero profiles including abilities and portraits
+-   View detailed hero details including role, win rate, pick rate, health, abilities
 
 -   Register and authenticate as a user (JWT-based)
 
@@ -328,49 +328,47 @@ The current setup is development-only. A production deployment would require:
 
 # Architecture Decisions {#section-design-decisions}
 
-::: formalpara-title
-**Contents**
-:::
+## ADR-01: Python and Django as Backend Technology {#_adr_01}
 
-Important, expensive, large scale or risky architecture decisions
-including rationales. With \"decisions\" we mean selecting one
-alternative based on given criteria.
+| Field | Content |
+|-------|---------|
+| **Status** | Accepted |
+| **Context** | OverwatchTeamUp is a student project. The team chose it as an opportunity to learn Python as a new language. A backend was needed to expose a REST API, manage a PostgreSQL database, and sync hero data from an external API. |
+| **Decision** | Use Python as the backend language and Django with Django REST Framework (DRF) as the web framework. |
+| **Consequences** | (+) Learning goal fulfilled — the project gave the team hands-on experience with Python and Django. (+) Django ORM, DRF serializers, and the management command system reduced boilerplate. (+) Large ecosystem and strong documentation available. (−) Django is a full-stack framework; for an API-only service it brings unused features such as templates and the admin interface. (−) Python performance is lower than compiled languages, though irrelevant at this scale. |
 
-Please use your judgement to decide whether an architectural decision
-should be documented here in this central section or whether you better
-document it locally (e.g. within the white box template of one building
-block).
+---
 
-Avoid redundancy. Refer to section 4, where you already captured the
-most important decisions of your architecture.
+## ADR-02: React and TypeScript for the Frontend {#_adr_02}
 
-::: formalpara-title
-**Motivation**
-:::
+| Field | Content |
+|-------|---------|
+| **Status** | Accepted |
+| **Context** | A web frontend was needed to let users browse heroes and manage team compositions. The team wanted type safety and a component-based UI with a modern developer experience. |
+| **Decision** | Use React 19 with TypeScript and Vite as the build tool. MUI is used for UI components. TypeScript DTOs are auto-generated from DRF serializers via `dto_generation.py`. |
+| **Consequences** | (+) Component-based architecture keeps the UI maintainable and modular. (+) TypeScript catches frontend/backend contract mismatches at compile time. (+) Vite dev proxy eliminates CORS friction during development. (−) React ecosystem moves fast; major upgrades can be breaking. (−) Requires a DTO generation step to keep frontend types in sync with the backend serializers. |
 
-Stakeholders of your system should be able to comprehend and retrace
-your decisions.
+---
 
-::: formalpara-title
-**Form**
-:::
+## ADR-03: Hexagonal Architecture (Ports & Adapters) {#_adr_03}
 
-Various options:
+| Field | Content |
+|-------|---------|
+| **Status** | Accepted |
+| **Context** | The backend depends on two external systems — the OverFast API and PostgreSQL — that could change independently of the business logic. The team wanted the domain to be testable without live infrastructure and for external systems to be swappable without touching core logic. |
+| **Decision** | Apply the Hexagonal Architecture pattern. The domain layer (entities, services) has no framework or infrastructure dependencies. All external dependencies are accessed through abstract port interfaces (`HeroPort`, `TeamCompositionPort`, `ExternalHeroSourcePort`). Concrete adapters implement those ports and live outside the domain. |
+| **Consequences** | (+) The OverFast API can be replaced by changing exactly one file (`overfast_api_adapter.py`). (+) Domain logic is testable with stub adapters; no live database or external API needed in tests. (+) Business rules cannot leak into infrastructure code. (−) More files and indirection than a plain Django CRUD app. (−) New contributors must understand the pattern before making changes. |
 
--   ADR ([Documenting Architecture
-    Decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions))
-    for every important decision
+---
 
--   List or table, ordered by importance and consequences or:
+## ADR-04: PostgreSQL as the Database {#_adr_04}
 
--   more detailed in form of separate sections per decision
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Architecture Decisions](https://docs.arc42.org/section-9/) in the
-arc42 documentation. There you will find links and examples about ADR.
+| Field | Content |
+|-------|---------|
+| **Status** | Accepted |
+| **Context** | The application needs to persist hero data, user accounts, and team compositions. The data is relational by nature — heroes are referenced by team compositions, compositions belong to users. A reliable, well-supported database with strong Django ORM integration was needed. |
+| **Decision** | Use PostgreSQL 16 as the primary database, running as a Docker container in development. |
+| **Consequences** | (+) Well-suited to the relational data model; foreign key constraints enforce referential integrity between heroes, team compositions, and users. (+) Django's ORM has first-class PostgreSQL support. (+) Running in Docker keeps the local setup consistent across machines. (−) Switching database engines would require migration effort and potential ORM query changes. (−) Heavier than SQLite for local development, though Docker Compose handles this transparently. |
 
 # Quality Requirements {#section-quality-scenarios}
 
