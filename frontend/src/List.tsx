@@ -142,12 +142,12 @@ function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
                             alt={team.hero_3.display_name}
                             style={teamHeroPreviewStyle}></img>
                         <img
-                            src={team.hero_3.portrait_url}
-                            alt={team.hero_3.display_name}
+                            src={team.hero_4.portrait_url}
+                            alt={team.hero_4.display_name}
                             style={teamHeroPreviewStyle}></img>
                         <img
-                            src={team.hero_3.portrait_url}
-                            alt={team.hero_3.display_name}
+                            src={team.hero_5.portrait_url}
+                            alt={team.hero_5.display_name}
                             style={teamHeroPreviewStyle}></img>
                     </div>
                 </div>

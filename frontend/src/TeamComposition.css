@@ -25,13 +25,13 @@
 
 .loadBtn,
 .loadBtn-disabled {
-    background-image: url("..\src\assets\download.png");
+    background-image: url("../src/assets/download.png");
     background-size: 100% 100%;
 }
 
 .saveBtn,
 .saveBtn-disabled {
-    background-image: url("..\src\assets\save.png");
+    background-image: url("../src/assets/save.png");
     background-size: 100% 100%;
 }
 
@@ -41,7 +41,7 @@
     width: 100%;
     height: 100%;
     position: absolute;
-    mask-image: url("..\src\assets\teamcomp_bg.png");
+    mask-image: url("../src/assets/teamcomp_bg.png");
     mask-position: center;
     mask-repeat: no-repeat;
 }
