@@ -1,9 +1,7 @@
 import List, {TeamList} from './List.tsx'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import UserContractViewToggle from "./UserContractView";
 import SearchBar from "./SearchBar";
-import dummyData from "./data/HeroDummyData.json"
-import teamDummyData from "./data/TeamDummyData.json"
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import * as React from "react";
 
@@ -37,42 +35,52 @@ interface SideBarProp {
 }
 
 function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTeamComps, updateTeamComp}: SideBarProp) {
-    const [heroList, setHeroList] = useState<HeroSummaryDto[]>(dummyData); //TODO: replace dummyData with empty [] later
+    const [heroList, setHeroList] = useState<HeroSummaryDto[]>([]);
     const [heroText, setHeroText] = useState("");
 
-    if (heroList.length == 0) {
+    useEffect(() => {
         fetch("/api/heroes/", {
             method: "GET"
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Hero list request failed");
+                }
+                return response.json();
+            })
             .then(response => {
                 console.log("hero data successfully loaded: ", response);
-                setHeroList(response);
+                setHeroList(Array.isArray(response) ? response : []);
             })
             .catch(error => {
                 console.log("could not load hero data: ", error);
             });
-    }
+    }, []);
 
-    const [teamList, setTeamList] = useState<TeamCompositionDto[]>(teamDummyData);
+    const [teamList, setTeamList] = useState<TeamCompositionDto[]>([]);
     const [teamText, setTeamText] = useState("");
 
-    const refreshTeamTable = () => {
-        if (teamList.length == 0) {
+    useEffect(() => {
+        if (showTeamCompView) {
             fetch("/api/team-compositions/", {
                 method: "GET"
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Team composition request failed");
+                    }
+                    return response.json();
+                })
                 .then(response => {
                     console.log("team data successfully loaded: ", response);
-                    setTeamList(response);
+                    setTeamList(Array.isArray(response) ? response : []);
                 })
                 .catch(error => {
                     console.log("could not load team data: ", error);
+                    setTeamList([]);
                 });
         }
-    }
-    refreshTeamTable();
+    }, [showTeamCompView, numTeamComps]);
 
     return (
         <div className='side-bar' style={{

@@ -7,7 +7,6 @@ import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 import TeamComposition from "./TeamComposition";
 import type {HeroDto, TeamCompositionDto} from "./data/api-dtos.tsx";
-import dummyHero from './data/HeroViewDummyData.json'
 
 const emptyHero = {
     hero_key: "",
@@ -68,18 +67,21 @@ function App() {
         console.log("updated team composition: ", teamComp)
     }
 
-    const [selectedHeroKey, setSelectedHeroKey] = useState("");
-    const [selectedHero, setSelectedHero] = useState<HeroDto>(dummyHero);
+    const [selectedHero, setSelectedHero] = useState<HeroDto>(emptyHero);
     const [heroLoadingError, setHeroLoadingError] = useState(false);
 
     const updateSelectedHero = (heroKey: string) => {
         console.log("updated selected hero: ", heroKey)
-        if (selectedHeroKey != "" && !isHeroInTeam(heroKey, currentTeamComp)) {
-            fetch("/api/heroes/" + selectedHeroKey + "/", {method: "GET"})
-                .then(response => response.json())
+        if (heroKey != "" && !isHeroInTeam(heroKey, currentTeamComp)) {
+            fetch("/api/heroes/" + heroKey + "/", {method: "GET"})
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Hero detail request failed");
+                    }
+                    return response.json();
+                })
                 .then(response => {
                     console.log("hero data successfully loaded for view: ", response);
-                    setSelectedHeroKey(response.hero_key);
                     setSelectedHero(response);
                     setHeroLoadingError(false);
                 })
@@ -144,7 +146,7 @@ function App() {
                     <TeamComposition
                         isLoggedIn={isLoggedIn}
                         updateTeamCompViewState={updateTeamCompViewState}
-                        selectedHero={dummyHero}
+                        selectedHero={selectedHero}
                         confirmHeroSelection={confirmHeroSelection}
                         teamComp={currentTeamComp}
                         incrementNumTeamComps={incrementNumTeamComps}
