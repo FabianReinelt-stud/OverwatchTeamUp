@@ -6,7 +6,7 @@ import "./List.css"
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import * as React from "react";
 import {useState} from "react";
-import {getAuthHeaders} from "./auth.ts";
+import {fetchWithAuthRefresh} from "./auth.ts";
 
 interface HeroListProp {
     input: string;
@@ -45,9 +45,8 @@ const deleteTeam = (id: number) => {
         console.log("team id was not valid");
         return;
     }
-    fetch("/api/team-compositions/"+ id + "/delete/", {
+    fetchWithAuthRefresh("/api/team-compositions/"+ id + "/delete/", {
         method: "DELETE",
-        headers: getAuthHeaders(),
     })
         .then(response => {
             if (!response.ok) {

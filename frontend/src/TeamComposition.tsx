@@ -7,7 +7,7 @@ import backgroundTank from './assets/teamcomp_bg_tank.png'
 import {Tooltip} from '@mui/material'
 import type {HeroDto, TeamCompositionCreateUpdateDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import './TeamComposition.css'
-import {getJsonHeaders} from "./auth.ts";
+import {fetchJsonWithAuthRefresh} from "./auth.ts";
 
 interface BaseTeamCompProp {
     selectedHero: HeroDto,
@@ -74,9 +74,8 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
                 hero_4_key: teamComp.hero_4.hero_key,
                 hero_5_key: teamComp.hero_5.hero_key,
             }
-            fetch("/api/team-compositions/create/", {
+            fetchJsonWithAuthRefresh("/api/team-compositions/create/", {
                 method: "POST",
-                headers: getJsonHeaders(),
                 body: JSON.stringify(teamCompSave)
             })
                 .then(response => {
@@ -117,9 +116,8 @@ export function Save({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamCom
             hero_5_key: teamComp.hero_5.hero_key,
         }
 
-        fetch("/api/team-compositions/" + teamComp.id + "/update/", {
+        fetchJsonWithAuthRefresh("/api/team-compositions/" + teamComp.id + "/update/", {
             method: "PUT",
-            headers: getJsonHeaders(),
             body: JSON.stringify(teamCompUpdate)
         })
             .then(response => {

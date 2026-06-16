@@ -1,12 +1,13 @@
 import logo from './assets/logo.png'
 import HeroView from './HeroView'
 import SideBar from './SideBar'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import './App.css'
 import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
 import TeamComposition from "./TeamComposition";
 import type {HeroDto, TeamCompositionDto} from "./data/api-dtos.tsx";
+import {AUTH_CHANGED_EVENT} from "./auth.ts";
 
 const emptyHero = {
     hero_key: "",
@@ -45,6 +46,13 @@ const isHeroInTeam = (heroKey: string, currentTeamComp: TeamCompositionDto) => {
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(localStorage.getItem("accessToken")));
+
+    useEffect(() => {
+        const updateAuthState = () => setIsLoggedIn(Boolean(localStorage.getItem("accessToken")));
+
+        window.addEventListener(AUTH_CHANGED_EVENT, updateAuthState);
+        return () => window.removeEventListener(AUTH_CHANGED_EVENT, updateAuthState);
+    }, []);
 
     const updateLoginState = (isLoggedIn: boolean) => {
         setIsLoggedIn(isLoggedIn);
