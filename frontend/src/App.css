@@ -70,7 +70,7 @@
 .team-comp {
     display: grid;
     height: 20%;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr) 0.75fr;
     grid-template-rows: 1fr 1fr;
     border-radius: 10px;
 }

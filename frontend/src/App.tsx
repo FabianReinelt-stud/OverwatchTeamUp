@@ -70,6 +70,10 @@ function App() {
         setNumTeamComps(numTeamComps => numTeamComps + 1);
     }
 
+    const updateNumTeamComps = (num: number) => {
+        setNumTeamComps(num);
+    }
+
     const updateTeamComp = (teamComp: TeamCompositionDto) => {
         setCurrentTeamComp(teamComp);
         console.log("updated team composition: ", teamComp)
@@ -159,13 +163,16 @@ function App() {
                         teamComp={currentTeamComp}
                         incrementNumTeamComps={incrementNumTeamComps}
                         updateTeamComp={updateTeamComp}
+                        numTeamComps={numTeamComps}
                     ></TeamComposition>
                 </div>
                 <SideBar updateLoginState={updateLoginState}
                          updateTeamComp={updateTeamComp}
                          updateSelectedHero={updateSelectedHero}
                          showTeamCompView={showTeamCompView}
-                         numTeamComps={numTeamComps}></SideBar>
+                         updateNumTeamComps={updateNumTeamComps}
+                         numTeamComps={numTeamComps}
+                         isLoggedIn={isLoggedIn}></SideBar>
             </div>
         </>
     )

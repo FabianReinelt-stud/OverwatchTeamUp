@@ -55,16 +55,18 @@ const deleteTeam = (id: number) => {
         })
         .catch(error => {
             console.log("team could not be deleted:", error);
-            alert("Sorry but your team comp could not be deleted");
+            alert("Sorry but your team comp could not be deleted. Please try again later.");
         })
 }
 
 export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp) {
+    console.log("updating team list")
     const filteredTeamComps = teamCompList.filter((team) => {
-        if (input === '') {
+        const normalizedInput = input.toLowerCase();
+        if (normalizedInput === '') {
             return team;
         } else {
-            return team.name.toLowerCase().includes(input);
+            return team.name.toLowerCase().includes(normalizedInput);
         }
     });
 
@@ -92,6 +94,7 @@ export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp
 
 function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
     const [teamComp] = useState(team);
+    const [isBeingDeleted, setIsBeingDeleted] = useState(false);
     const handleTeamSelected = () => {
         if (!teamComp) {
             console.log("This button does not have an assigned team composition");
@@ -102,7 +105,7 @@ function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
     }
 
     return (
-        <li className="scrollable-item">
+        <li className="scrollable-item" style={isBeingDeleted? {opacity: 0.5, pointerEvents: "none"} : {}}>
             <div style={{
                 display: "grid",
                 gridTemplateColumns: "8fr 1fr"
@@ -156,20 +159,26 @@ function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
                  src={deleteIcon}
                  style={{
                      width: "90%",
-                     margin: "auto"
+                     margin: "auto",
+                     zIndex: 5,
                  }}
                  alt="team comp delete button"
-                 onClick={() => deleteTeam(team.id)}></img>
+                 onClick={() => {
+                     deleteTeam(team.id);
+                     setIsBeingDeleted(true);
+                 }}></img>
             </div>
         </li>)
 }
 
 function List({input, heroList, updateSelectedHero}: HeroListProp) {
     const filteredHeroes = heroList.filter((hero) => {
-        if (input === '') {
+        const normalizedInput = input.toLowerCase();
+        if (normalizedInput === '') {
             return hero;
         } else {
-            return hero.display_name.toLowerCase().includes(input);
+            return hero.display_name.toLowerCase().includes(normalizedInput)
+                || hero.role.toLowerCase().includes(normalizedInput);
         }
     });
 

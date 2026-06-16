@@ -28,16 +28,28 @@ const teamListFieldStyle = {
 }
 
 interface SideBarProp {
-    numTeamComps: number
+    updateNumTeamComps: (num: number) => void,
+    numTeamComps: number,
     updateLoginState: (isLoggedIn: boolean) => void,
+    isLoggedIn: boolean,
     updateSelectedHero: (heroKey: string) => void,
     updateTeamComp: (teamCompUp: TeamCompositionDto) => void
     showTeamCompView: boolean,
 }
 
-function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTeamComps, updateTeamComp}: SideBarProp) {
+function SideBar({
+                     updateLoginState,
+                     showTeamCompView,
+                     updateSelectedHero,
+                     numTeamComps,
+                     updateTeamComp,
+                     updateNumTeamComps,
+                     isLoggedIn
+                 }: SideBarProp) {
     const [heroList, setHeroList] = useState<HeroSummaryDto[]>([]);
     const [heroText, setHeroText] = useState("");
+    const [teamList, setTeamList] = useState<TeamCompositionDto[]>([]);
+    const [teamText, setTeamText] = useState("");
 
     useEffect(() => {
         fetch("/api/heroes/", {
@@ -58,9 +70,6 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTea
             });
     }, []);
 
-    const [teamList, setTeamList] = useState<TeamCompositionDto[]>([]);
-    const [teamText, setTeamText] = useState("");
-
     useEffect(() => {
         if (showTeamCompView) {
             fetchWithAuthRefresh("/api/team-compositions/", {
@@ -75,13 +84,14 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTea
                 .then(response => {
                     console.log("team data successfully loaded: ", response);
                     setTeamList(Array.isArray(response) ? response : []);
+                    updateNumTeamComps(Array.isArray(response) ? response.length : 0);
                 })
                 .catch(error => {
                     console.log("could not load team data: ", error);
                     setTeamList([]);
                 });
         }
-    }, [showTeamCompView, numTeamComps]);
+    }, [showTeamCompView, numTeamComps, updateNumTeamComps]);
 
     return (
         <div className='side-bar' style={{
@@ -98,7 +108,7 @@ function SideBar({updateLoginState, showTeamCompView, updateSelectedHero, numTea
                     setHeroText(lowerCase);
                 }} searchBarAreaStyle={heroListAreaStyle} searchFieldStyle={heroListFieldStyle}
                            label={"Search Heroes"}></SearchBar>
-                <UserContractViewToggle updateLoginState={updateLoginState}/>
+                <UserContractViewToggle updateLoginState={updateLoginState} isLoggedIn={isLoggedIn}/>
             </div>
             <List input={heroText} heroList={heroList} updateSelectedHero={updateSelectedHero}/>
             {showTeamCompView ?
