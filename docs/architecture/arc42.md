@@ -277,118 +277,52 @@ sequenceDiagram
 
 # Deployment View {#section-deployment-view}
 
-::: formalpara-title
-**Content**
-:::
+## Infrastructure Level 1 — Docker Compose (Development) {#_infrastructure_level_1}
 
-The deployment view describes:
+All three application processes run as Docker containers on a single host, connected by a Docker bridge network. The database persists data through a named Docker volume.
 
-1.  technical infrastructure used to execute your system, with
-    infrastructure elements like geographical locations, environments,
-    computers, processors, channels and net topologies as well as other
-    infrastructure elements and
+```mermaid
+graph TD
+    subgraph Host["Developer Machine"]
+        subgraph DockerNetwork["Docker Bridge Network"]
+            FE["frontend container\nReact / Vite dev server\nport 5173 (exposed)"]
+            BE["backend container\nDjango runserver\nport 8000 (exposed)"]
+            DB["db container\npostgres:16\nport 5432 (exposed to host)"]
+            VOL[("postgres_data\nDocker Volume")]
+        end
+    end
 
-2.  mapping of (software) building blocks to that infrastructure
-    elements.
+    Browser(["Browser"]) -- "HTTP :5173" --> FE
+    FE -- "HTTP /api to :8000\n(Vite proxy)" --> BE
+    BE -- "TCP :5432\nDjango ORM" --> DB
+    DB --- VOL
+```
 
-Often systems are executed in different environments, e.g. development
-environment, test environment, production environment. In such cases you
-should document all relevant environments.
+**Startup sequence** (enforced by `depends_on` and health checks):
 
-Especially document a deployment view if your software is executed as
-distributed system with more than one computer, processor, server or
-container or when you design and construct your own hardware processors
-and chips.
+1. `db` starts and passes `pg_isready` health check
+2. `backend` starts: runs `migrate`, then `sync_heroes`, then `runserver 0.0.0.0:8000`
+3. `frontend` starts: runs `npm run dev -- --host` (Vite proxies `/api` to `http://backend:8000`)
 
-From a software perspective it is sufficient to capture only those
-elements of an infrastructure that are needed to show a deployment of
-your building blocks. Hardware architects can go beyond that and
-describe an infrastructure to any level of detail they need to capture.
+## Building Block to Container Mapping {#_bb_mapping}
 
-::: formalpara-title
-**Motivation**
-:::
+| Building Block | Container | Entry Point |
+|----------------|-----------|-------------|
+| `frontend` (React SPA) | `frontend` | Vite dev server (`npm run dev`) |
+| `config` + `heroes` (Django backend) | `backend` | `manage.py runserver` |
+| PostgreSQL database | `db` | postgres:16 default entrypoint |
 
-Software does not run without hardware. This underlying infrastructure
-can and will influence a system and/or some cross-cutting concepts.
-Therefore, there is a need to know the infrastructure.
+## Production Note {#_production_note}
 
-::: formalpara-title
-**Form**
-:::
+The current setup is development-only. A production deployment would require:
 
-Maybe a highest level deployment diagram is already contained in section
-3.2. as technical context with your own infrastructure as ONE black box.
-In this section one can zoom into this black box using additional
-deployment diagrams:
-
--   UML offers deployment diagrams to express that view. Use it,
-    probably with nested diagrams, when your infrastructure is more
-    complex.
-
--   When your (hardware) stakeholders prefer other kinds of diagrams
-    rather than a deployment diagram, let them use any kind that is able
-    to show nodes and channels of the infrastructure.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Deployment View](https://docs.arc42.org/section-7/) in the arc42
-documentation.
-
-## Infrastructure Level 1 {#_infrastructure_level_1}
-
-Describe (usually in a combination of diagrams, tables, and text):
-
--   distribution of a system to multiple locations, environments,
-    computers, processors, .., as well as physical connections between
-    them
-
--   important justifications or motivations for this deployment
-    structure
-
--   quality and/or performance features of this infrastructure
-
--   mapping of software artifacts to elements of this infrastructure
-
-For multiple environments or alternative deployments please copy and
-adapt this section of arc42 for all relevant environments.
-
-***\<Overview Diagram\>***
-
-Motivation
-
-:   *\<explanation in text form\>*
-
-Quality and/or Performance Features
-
-:   *\<explanation in text form\>*
-
-Mapping of Building Blocks to Infrastructure
-
-:   *\<description of the mapping\>*
-
-## Infrastructure Level 2 {#_infrastructure_level_2}
-
-Here you can include the internal structure of (some) infrastructure
-elements from level 1.
-
-Please copy the structure from level 1 for each selected element.
-
-### *\<Infrastructure Element 1\>* {#_infrastructure_element_1}
-
-*\<diagram + explanation\>*
-
-### *\<Infrastructure Element 2\>* {#_infrastructure_element_2}
-
-*\<diagram + explanation\>*
-
-...​
-
-### *\<Infrastructure Element n\>* {#_infrastructure_element_n}
-
-*\<diagram + explanation\>*
+| Concern | Dev (current) | Production |
+|---------|--------------|------------|
+| Backend server | `manage.py runserver` | Gunicorn (WSGI) |
+| Frontend serving | Vite dev server (HMR) | Nginx serving `vite build` static output |
+| API routing | Vite proxy | Nginx reverse-proxying `/api` to Gunicorn |
+| Django settings | `DEBUG=True`, insecure secret key | `DEBUG=False`, `ALLOWED_HOSTS` set, secret key from env |
+| HTTPS | None | TLS termination at Nginx or load balancer |
 
 # Cross-cutting Concepts {#section-concepts}
 
