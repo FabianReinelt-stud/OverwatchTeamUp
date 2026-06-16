@@ -1,47 +1,61 @@
-    .scrollable-container {
-        display: flex;
-        overflow: auto;
-        height: 100%;
-        width: 85%;
-        min-width: 200px;
-        background-color: rgb(5, 5, 5);
-        border: 2px solid #ffffff;
-        border-radius: 10px;
-    }
+.scrollable-container {
+    display: flex;
+    overflow: auto;
+    height: 100%;
+    width: 85%;
+    min-width: 200px;
+    background-color: rgb(5, 5, 5);
+    border: 2px solid #ffffff;
+    border-radius: 10px;
+}
 
-    .scrollable-list {
-        padding: 0;
-        margin: 0;
-    }
+.scrollable-list {
+    padding: 0;
+    margin: 0;
+}
 
-    .scrollable-team{
-        align-items: center;
-        padding: 5px;
-        margin: 10px;
-        font-size: 1.5vw;
-        border-radius: 10px;
-        background-color: rgb(8, 27, 42);
-        border: 1px solid rgb(44, 45, 75);
-    }
+.scrollable-team {
+    align-items: center;
+    padding: 5px;
+    margin: 10px;
+    font-size: 1.5vw;
+    border-radius: 10px;
+    background-color: rgb(8, 27, 42);
+    border: 1px solid rgb(44, 45, 75);
+}
 
-    .scrollable-item {
-        align-items: center;
-        padding: 5px;
-        margin: 10px;
-        font-size: 1.5vw;
-        border-radius: 10px;
-        background-color: rgb(8, 27, 42);
-        border: 1px solid rgb(44, 45, 75);
-    }
+.scrollable-item {
+    align-items: center;
+    padding: 5px;
+    margin: 10px;
+    font-size: 1.5vw;
+    border-radius: 10px;
+    background-color: rgb(8, 27, 42);
+    border: 1px solid rgb(44, 45, 75);
+}
 
-    .hero-preview{
-        width: 75%;
-        margin: 1%;
-        padding-right: 10px;
-        border-radius: 5px;
-    }
+.hero-preview {
+    width: 75%;
+    margin: 1%;
+    padding-right: 10px;
+    border-radius: 5px;
+}
 
-    .hero-role{
-        display: block;
-        width: 100%;
-    }
+.hero-role {
+    display: block;
+    width: 100%;
+}
+
+.delete-button:hover {
+    background-color: red;
+    border-radius: 5px;
+}
+
+.team-comp-button{
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-template-rows: 0.5fr 1fr;
+    font-size: 0.7em;
+    background: transparent;
+    border: none;
+}

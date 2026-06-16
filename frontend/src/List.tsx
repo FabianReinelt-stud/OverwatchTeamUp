@@ -1,6 +1,7 @@
-import support from './assets/support.png'
-import damage from './assets/dmg.png'
-import tank from './assets/tank.png'
+import supportIcon from './assets/support.png'
+import damageIcon from './assets/dmg.png'
+import tankIcon from './assets/tank.png'
+import deleteIcon from './assets/delete.png'
 import "./List.css"
 import type {HeroSummaryDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import * as React from "react";
@@ -38,6 +39,21 @@ const teamHeroPreviewStyle: React.CSSProperties = {
     padding: "1%"
 }
 
+const deleteTeam = (id: number) => {
+    if(id == -1) {
+        console.log("team id was not valid");
+        return;
+    }
+    fetch("/api/team-compositions/"+ id + "/delete/", {
+        method: "DELETE"
+    })
+        .then(response => response.json())
+        .catch(error => {
+            console.log("team could not be deleted:", error);
+            alert("Sorry but your team comp could not be deleted");
+        })
+}
+
 export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp) {
     const filteredTeamComps = teamCompList.filter((team) => {
         if (input === '') {
@@ -72,7 +88,7 @@ export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp
 function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
     const [teamComp] = useState(team);
     const handleTeamSelected = () => {
-        if(!teamComp){
+        if (!teamComp) {
             console.log("This button does not have an assigned team composition");
             return;
         }
@@ -82,15 +98,12 @@ function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
 
     return (
         <li className="scrollable-item">
+            <div style={{
+                display: "grid",
+                gridTemplateColumns: "8fr 1fr"
+            }}>
             <button
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "3fr 2fr",
-                    gridTemplateRows: "0.5fr 1fr",
-                    fontSize: "0.7em",
-                    background: "transparent",
-                    border: "none",
-                }}
+                className="team-comp-button"
                 onClick={handleTeamSelected}>
                 <p style={{
                     gridRowStart: "1",
@@ -134,6 +147,15 @@ function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
                     </div>
                 </div>
             </button>
+            <img className="delete-button"
+                 src={deleteIcon}
+                 style={{
+                     width: "90%",
+                     margin: "auto"
+                 }}
+                 alt="team comp delete button"
+                 onClick={() => deleteTeam(team.id)}></img>
+            </div>
         </li>)
 }
 
@@ -149,11 +171,11 @@ function List({input, heroList, updateSelectedHero}: HeroListProp) {
     const getHeroRoleImg = (role: string) => {
         role.toLowerCase();
         if (role == "tank") {
-            return tank;
+            return tankIcon;
         } else if (role == "damage") {
-            return damage;
+            return damageIcon;
         }
-        return support;
+        return supportIcon;
     }
 
     let heroListItems;
