@@ -25,7 +25,7 @@ interface LoadTeamProp extends LoginStateProp {
 interface SaveTeamProp extends LoginStateProp {
     teamComp: TeamCompositionDto,
     updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
-    incrementNumTeamComps?: () => void,
+    incrementNumTeamComps?: (num: number, isModifier: boolean) => void,
     numTeamComps: number,
 }
 
@@ -151,7 +151,7 @@ export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeam
                 })
                 .then(response => {
                     if(incrementNumTeamComps) {
-                        incrementNumTeamComps();
+                        incrementNumTeamComps(1, true);
                     }
                     updateTeamComp(response);
                     console.log("created new team: ", response);

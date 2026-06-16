@@ -18,11 +18,13 @@ interface TeamCompListProp {
     input: string,
     teamCompList: TeamCompositionDto[],
     updateTeamComp: (teamCompUp: TeamCompositionDto) => void
+    updateNumTeamComps: (num: number, isModifier: boolean) => void
 }
 
 interface TeamListButtonProp {
     team: TeamCompositionDto,
-    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
+    updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
+    updateNumTeamComps: (num: number, isModifier: boolean) => void
 }
 
 const loadErrorStyle: React.CSSProperties = {
@@ -59,7 +61,7 @@ const deleteTeam = (id: number) => {
         })
 }
 
-export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp) {
+export function TeamList({input, teamCompList, updateTeamComp, updateNumTeamComps}: TeamCompListProp) {
     console.log("updating team list")
     const filteredTeamComps = teamCompList.filter((team) => {
         const normalizedInput = input.toLowerCase();
@@ -80,7 +82,7 @@ export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp
         teamListItems =
             <ul className="scrollable-list">
                 {filteredTeamComps.map((team) => (
-                    <TeamListButton team={team} updateTeamComp={updateTeamComp} key={team.id}></TeamListButton>
+                    <TeamListButton key={team.id} team={team} updateTeamComp={updateTeamComp} updateNumTeamComps={updateNumTeamComps}></TeamListButton>
                 ))}
             </ul>;
     }
@@ -92,7 +94,7 @@ export function TeamList({input, teamCompList, updateTeamComp}: TeamCompListProp
     )
 }
 
-function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
+function TeamListButton({team, updateTeamComp, updateNumTeamComps}: TeamListButtonProp) {
     const [teamComp] = useState(team);
     const [isBeingDeleted, setIsBeingDeleted] = useState(false);
     const handleTeamSelected = () => {
@@ -166,6 +168,7 @@ function TeamListButton({team, updateTeamComp}: TeamListButtonProp) {
                  onClick={() => {
                      deleteTeam(team.id);
                      setIsBeingDeleted(true);
+                     updateNumTeamComps(-1, true);
                  }}></img>
             </div>
         </li>)

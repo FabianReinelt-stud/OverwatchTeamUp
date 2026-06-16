@@ -28,7 +28,7 @@ const teamListFieldStyle = {
 }
 
 interface SideBarProp {
-    updateNumTeamComps: (num: number) => void,
+    updateNumTeamComps: (num: number, isModifier: boolean) => void,
     numTeamComps: number,
     updateLoginState: (isLoggedIn: boolean) => void,
     isLoggedIn: boolean,
@@ -84,7 +84,7 @@ function SideBar({
                 .then(response => {
                     console.log("team data successfully loaded: ", response);
                     setTeamList(Array.isArray(response) ? response : []);
-                    updateNumTeamComps(Array.isArray(response) ? response.length : 0);
+                    updateNumTeamComps(Array.isArray(response) ? response.length : 0, false);
                 })
                 .catch(error => {
                     console.log("could not load team data: ", error);
@@ -124,7 +124,7 @@ function SideBar({
                 </SearchBar> :
                 null}
             {showTeamCompView ?
-                <TeamList teamCompList={teamList} input={teamText} updateTeamComp={updateTeamComp}></TeamList> :
+                <TeamList teamCompList={teamList} input={teamText} updateTeamComp={updateTeamComp} updateNumTeamComps={updateNumTeamComps}></TeamList> :
                 null}
         </div>
     );
