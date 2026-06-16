@@ -38,6 +38,7 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 | Constraint | Explanation |
 |------------|-------------|
+| **React / TypeScript / Vite frontend** | The team chose React 19 with TypeScript and Vite as the frontend stack; switching framework would require a full rewrite of all components |
 | **Python / Django backend** | The team has Python expertise; the backend framework is fixed for the duration of the project |
 | **PostgreSQL as database** | Chosen due to team familiarity and existing infrastructure; switching engines would require significant migration effort |
 | **OverFast API as sole hero data source** | All hero data originates from this third-party public API. It has no SLA and no authentication, meaning it can change or go offline at any time. Hero data must therefore be cached locally rather than fetched live |
@@ -45,22 +46,23 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 # Context and Scope {#section-context-and-scope}
 
-OverwatchTeamUp interacts with two external parties: the end users who consume the REST API, and the OverFast API from which all hero data originates. Everything else (database, Django framework) is internal to the system.
+OverwatchTeamUp interacts with two external parties: the end users who use the web interface, and the OverFast API from which all hero data originates. Everything else — the React frontend, Django backend, and PostgreSQL database — is internal to the system.
 
 ## Business Context {#_business_context}
 
 | Communication Partner | Inputs to the system | Outputs from the system |
 |-----------------------|---------------------|------------------------|
-| **Overwatch Player (End User)** | Registration credentials, login credentials, team composition create/update/delete requests | JWT access and refresh tokens, hero list, hero detail, team composition data |
+| **Overwatch Player (End User)** | Hero search queries, hero slot selections, login/register credentials, team save/update/delete actions | Rendered hero stats and portraits, team composition UI, authentication forms, confirmation feedback |
 | **OverFast API** | Hero roster, hero detail (role, abilities, stats, portrait), hero win rate and pick rate per hero key | HTTP GET requests to `/heroes`, `/heroes/{key}`, `/heroes/stats` |
 
-The end user never contacts the OverFast API directly. All hero data enters the system through the `sync_heroes` management command and is served to users from the local database.
+The end user interacts exclusively through the React frontend — never directly with the REST API or the OverFast API. All hero data enters the system through the `sync_heroes` management command and is served to users from the local database.
 
 ## Technical Context {#_technical_context}
 
 | Partner | Channel | Protocol | Direction | Notes |
 |---------|---------|----------|-----------|-------|
-| End User / Frontend client | TCP port 8000 | HTTP, REST/JSON | Bidirectional | JWT passed as `Authorization: Bearer <token>` header on authenticated endpoints |
+| End User (browser) | TCP port 5173 (dev) | HTTP | Bidirectional | User navigates the React SPA; no direct contact with the backend |
+| Frontend → Backend | Vite proxy (`/api` → `http://backend:8000`) in dev; direct HTTP in prod | REST/JSON | Bidirectional | JWT passed as `Authorization: Bearer <token>` on authenticated requests; tokens stored in `localStorage` |
 | OverFast API (`overfast-api.tekrop.fr`) | HTTPS | REST/JSON | Pull (system initiates; hero data flows back as response) | Called exclusively by `OverfastAPIAdapter` during `sync_heroes`; three endpoints used: `/heroes`, `/heroes/{key}`, `/heroes/stats` |
 | PostgreSQL database | TCP port 5432 (internal Docker network) | PostgreSQL wire protocol | Bidirectional | Accessed via Django ORM; not reachable from outside the Docker network |
 
@@ -82,10 +84,37 @@ The backend is a single Django project containing one application module (`heroe
 
 | Building Block | Responsibility |
 |----------------|----------------|
+| **`frontend`** (React / TypeScript / Vite SPA) | Renders the user interface; browses heroes, builds team compositions, handles login/register; communicates with the backend via REST/JSON |
 | **`heroes`** (Django app) | All domain logic, REST API endpoints, data persistence, external API sync, and DTO generation |
 | **`config`** | Django project settings, root URL routing (`/api/` to `heroes`), WSGI/ASGI entry points |
 
-The `heroes` app is the sole runtime component. Everything described in Level 2 is internal to it.
+The `heroes` app contains all backend business logic. The frontend is a separate process that communicates with it over HTTP. Everything described in Level 2 is internal to the backend.
+
+```mermaid
+graph TD
+    User(["End User (Browser)"])
+    OverFast(["OverFast API"])
+    DB[("PostgreSQL")]
+
+    subgraph System["OverwatchTeamUp (Docker)"]
+        Frontend["frontend
+React / TypeScript / Vite
+port 5173"]
+        subgraph Backend["Backend"]
+            Config["config
+Settings / URL Routing"]
+            Heroes["heroes
+Domain / Adapters / Views / Services"]
+        end
+    end
+
+    User -- "HTTP port 5173" --> Frontend
+    Frontend -- "REST/JSON via /api proxy" --> Config
+    Config --> Heroes
+    Heroes -- "HTTPS - sync_heroes only" --> OverFast
+    Heroes -- "TCP 5432 / Django ORM" --> DB
+```
+
 
 
 
@@ -194,11 +223,11 @@ sequenceDiagram
 
 ## RT-02: Hero List Request {#_rt_02}
 
-A client requests all heroes. The OverFast API is not involved — data is served entirely from the local database.
+The frontend requests all heroes on load (via `SideBar.tsx`). The OverFast API is not involved — data is served entirely from the local database.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
+    participant Client as Frontend (React SPA)
     participant View as hero_list view
     participant HDBA as HeroDataBaseAdapter
     participant DB as PostgreSQL
@@ -216,11 +245,11 @@ sequenceDiagram
 
 ## RT-03: Create Team Composition {#_rt_03}
 
-An authenticated user creates a new team composition. The JWT middleware validates the token before the view is reached. Each hero key in the request body is resolved to a `HeroEntity` before the composition is persisted.
+An authenticated user saves a team composition via the frontend (via `TeamComposition.tsx`). The JWT middleware validates the token before the view is reached. Each hero key in the request body is resolved to a `HeroEntity` before the composition is persisted.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
+    participant Client as Frontend (React SPA)
     participant JWT as JWT Middleware
     participant View as team_composition_create view
     participant Ser as TeamCompositionCreateUpdateSerializer
@@ -248,200 +277,54 @@ sequenceDiagram
 
 # Deployment View {#section-deployment-view}
 
-::: formalpara-title
-**Content**
-:::
+## Infrastructure Level 1 — Docker Compose (Development) {#_infrastructure_level_1}
 
-The deployment view describes:
+All three application processes run as Docker containers on a single host, connected by a Docker bridge network. The database persists data through a named Docker volume.
 
-1.  technical infrastructure used to execute your system, with
-    infrastructure elements like geographical locations, environments,
-    computers, processors, channels and net topologies as well as other
-    infrastructure elements and
+```mermaid
+graph TD
+    subgraph Host["Developer Machine"]
+        subgraph DockerNetwork["Docker Bridge Network"]
+            FE["frontend container\nReact / Vite dev server\nport 5173 (exposed)"]
+            BE["backend container\nDjango runserver\nport 8000 (exposed)"]
+            DB["db container\npostgres:16\nport 5432 (exposed to host)"]
+            VOL[("postgres_data\nDocker Volume")]
+        end
+    end
 
-2.  mapping of (software) building blocks to that infrastructure
-    elements.
+    Browser(["Browser"]) -- "HTTP :5173" --> FE
+    FE -- "HTTP /api to :8000\n(Vite proxy)" --> BE
+    BE -- "TCP :5432\nDjango ORM" --> DB
+    DB --- VOL
+```
 
-Often systems are executed in different environments, e.g. development
-environment, test environment, production environment. In such cases you
-should document all relevant environments.
+**Startup sequence** (enforced by `depends_on` and health checks):
 
-Especially document a deployment view if your software is executed as
-distributed system with more than one computer, processor, server or
-container or when you design and construct your own hardware processors
-and chips.
+1. `db` starts and passes `pg_isready` health check
+2. `backend` starts: runs `migrate`, then `sync_heroes`, then `runserver 0.0.0.0:8000`
+3. `frontend` starts: runs `npm run dev -- --host` (Vite proxies `/api` to `http://backend:8000`)
 
-From a software perspective it is sufficient to capture only those
-elements of an infrastructure that are needed to show a deployment of
-your building blocks. Hardware architects can go beyond that and
-describe an infrastructure to any level of detail they need to capture.
+## Building Block to Container Mapping {#_bb_mapping}
 
-::: formalpara-title
-**Motivation**
-:::
+| Building Block | Container | Entry Point |
+|----------------|-----------|-------------|
+| `frontend` (React SPA) | `frontend` | Vite dev server (`npm run dev`) |
+| `config` + `heroes` (Django backend) | `backend` | `manage.py runserver` |
+| PostgreSQL database | `db` | postgres:16 default entrypoint |
 
-Software does not run without hardware. This underlying infrastructure
-can and will influence a system and/or some cross-cutting concepts.
-Therefore, there is a need to know the infrastructure.
+## Production Note {#_production_note}
 
-::: formalpara-title
-**Form**
-:::
+The current setup is development-only. A production deployment would require:
 
-Maybe a highest level deployment diagram is already contained in section
-3.2. as technical context with your own infrastructure as ONE black box.
-In this section one can zoom into this black box using additional
-deployment diagrams:
+| Concern | Dev (current) | Production |
+|---------|--------------|------------|
+| Backend server | `manage.py runserver` | Gunicorn (WSGI) |
+| Frontend serving | Vite dev server (HMR) | Nginx serving `vite build` static output |
+| API routing | Vite proxy | Nginx reverse-proxying `/api` to Gunicorn |
+| Django settings | `DEBUG=True`, insecure secret key | `DEBUG=False`, `ALLOWED_HOSTS` set, secret key from env |
+| HTTPS | None | TLS termination at Nginx or load balancer |
 
--   UML offers deployment diagrams to express that view. Use it,
-    probably with nested diagrams, when your infrastructure is more
-    complex.
 
--   When your (hardware) stakeholders prefer other kinds of diagrams
-    rather than a deployment diagram, let them use any kind that is able
-    to show nodes and channels of the infrastructure.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Deployment View](https://docs.arc42.org/section-7/) in the arc42
-documentation.
-
-## Infrastructure Level 1 {#_infrastructure_level_1}
-
-Describe (usually in a combination of diagrams, tables, and text):
-
--   distribution of a system to multiple locations, environments,
-    computers, processors, .., as well as physical connections between
-    them
-
--   important justifications or motivations for this deployment
-    structure
-
--   quality and/or performance features of this infrastructure
-
--   mapping of software artifacts to elements of this infrastructure
-
-For multiple environments or alternative deployments please copy and
-adapt this section of arc42 for all relevant environments.
-
-***\<Overview Diagram\>***
-
-Motivation
-
-:   *\<explanation in text form\>*
-
-Quality and/or Performance Features
-
-:   *\<explanation in text form\>*
-
-Mapping of Building Blocks to Infrastructure
-
-:   *\<description of the mapping\>*
-
-## Infrastructure Level 2 {#_infrastructure_level_2}
-
-Here you can include the internal structure of (some) infrastructure
-elements from level 1.
-
-Please copy the structure from level 1 for each selected element.
-
-### *\<Infrastructure Element 1\>* {#_infrastructure_element_1}
-
-*\<diagram + explanation\>*
-
-### *\<Infrastructure Element 2\>* {#_infrastructure_element_2}
-
-*\<diagram + explanation\>*
-
-...​
-
-### *\<Infrastructure Element n\>* {#_infrastructure_element_n}
-
-*\<diagram + explanation\>*
-
-# Cross-cutting Concepts {#section-concepts}
-
-::: formalpara-title
-**Content**
-:::
-
-This section describes crosscutting concepts (practices, patterns,
-regulations or solution ideas). Such concepts are often related to
-multiple building blocks. They may include many different topics, such
-as the topics shown in the following diagram:
-
-![Possible topics for crosscutting
-concepts](images/08-concepts-EN.drawio.png)
-
-::: formalpara-title
-**Motivation**
-:::
-
-Concepts form the basis for *conceptual integrity* (consistency,
-homogeneity) of the architecture. Thus, they are an important
-contribution to achieve inner qualities of your system.
-
-This is the place in the template that we provided for a cohesive
-specification of such concepts.
-
-Many of these concepts relate to or influence several of your building
-blocks.
-
-::: formalpara-title
-**Form**
-:::
-
-The form can be varied:
-
--   concept papers with any kind of structure
-
--   example implementations,especially for technical concepts
-
--   cross-cutting model excerpts or scenarios using notations of the
-    architecture views
-
-::: formalpara-title
-**Structure**
-:::
-
-Pick **only** the most-needed topics for your system and assign each a
-level-2 heading in this section (e.g. 8.1, 8.2 etc).
-
-DO NOT ATTEMPT to cover all of the topics of the aforementioned diagram.
-
-::: formalpara-title
-**Further Information**
-:::
-
-Some topics within systems often concern multiple building blocks,
-hardware elements or development processes. It might be easier to
-communicate or document such *cross-cutting* topics at a central
-location, instead of repeating them in the description of the concerned
-building blocks, hardware elements or development processes.
-
-Certain concepts might concern **all** elements of a system, others
-might only be relevant for a few. In the diagram above, logging concerns
-all three components, whereas security is relevant only for two
-components.
-
-See [Concepts](https://docs.arc42.org/section-8/) in the arc42
-documentation.
-
-## *\<Concept 1\>* {#_concept_1}
-
-*\<explanation\>*
-
-## *\<Concept 2\>* {#_concept_2}
-
-*\<explanation\>*
-
-...​
-
-## *\<Concept n\>* {#_concept_n}
-
-*\<explanation\>*
 
 # Architecture Decisions {#section-design-decisions}
 
