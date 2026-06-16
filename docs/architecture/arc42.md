@@ -38,6 +38,7 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 | Constraint | Explanation |
 |------------|-------------|
+| **React / TypeScript / Vite frontend** | The team chose React 19 with TypeScript and Vite as the frontend stack; switching framework would require a full rewrite of all components |
 | **Python / Django backend** | The team has Python expertise; the backend framework is fixed for the duration of the project |
 | **PostgreSQL as database** | Chosen due to team familiarity and existing infrastructure; switching engines would require significant migration effort |
 | **OverFast API as sole hero data source** | All hero data originates from this third-party public API. It has no SLA and no authentication, meaning it can change or go offline at any time. Hero data must therefore be cached locally rather than fetched live |
@@ -45,22 +46,23 @@ OverwatchTeamUp is a web application that allows Overwatch players to browse her
 
 # Context and Scope {#section-context-and-scope}
 
-OverwatchTeamUp interacts with two external parties: the end users who consume the REST API, and the OverFast API from which all hero data originates. Everything else (database, Django framework) is internal to the system.
+OverwatchTeamUp interacts with two external parties: the end users who use the web interface, and the OverFast API from which all hero data originates. Everything else — the React frontend, Django backend, and PostgreSQL database — is internal to the system.
 
 ## Business Context {#_business_context}
 
 | Communication Partner | Inputs to the system | Outputs from the system |
 |-----------------------|---------------------|------------------------|
-| **Overwatch Player (End User)** | Registration credentials, login credentials, team composition create/update/delete requests | JWT access and refresh tokens, hero list, hero detail, team composition data |
+| **Overwatch Player (End User)** | Hero search queries, hero slot selections, login/register credentials, team save/update/delete actions | Rendered hero stats and portraits, team composition UI, authentication forms, confirmation feedback |
 | **OverFast API** | Hero roster, hero detail (role, abilities, stats, portrait), hero win rate and pick rate per hero key | HTTP GET requests to `/heroes`, `/heroes/{key}`, `/heroes/stats` |
 
-The end user never contacts the OverFast API directly. All hero data enters the system through the `sync_heroes` management command and is served to users from the local database.
+The end user interacts exclusively through the React frontend — never directly with the REST API or the OverFast API. All hero data enters the system through the `sync_heroes` management command and is served to users from the local database.
 
 ## Technical Context {#_technical_context}
 
 | Partner | Channel | Protocol | Direction | Notes |
 |---------|---------|----------|-----------|-------|
-| End User / Frontend client | TCP port 8000 | HTTP, REST/JSON | Bidirectional | JWT passed as `Authorization: Bearer <token>` header on authenticated endpoints |
+| End User (browser) | TCP port 5173 (dev) | HTTP | Bidirectional | User navigates the React SPA; no direct contact with the backend |
+| Frontend → Backend | Vite proxy (`/api` → `http://backend:8000`) in dev; direct HTTP in prod | REST/JSON | Bidirectional | JWT passed as `Authorization: Bearer <token>` on authenticated requests; tokens stored in `localStorage` |
 | OverFast API (`overfast-api.tekrop.fr`) | HTTPS | REST/JSON | Pull (system initiates; hero data flows back as response) | Called exclusively by `OverfastAPIAdapter` during `sync_heroes`; three endpoints used: `/heroes`, `/heroes/{key}`, `/heroes/stats` |
 | PostgreSQL database | TCP port 5432 (internal Docker network) | PostgreSQL wire protocol | Bidirectional | Accessed via Django ORM; not reachable from outside the Docker network |
 
@@ -82,10 +84,37 @@ The backend is a single Django project containing one application module (`heroe
 
 | Building Block | Responsibility |
 |----------------|----------------|
+| **`frontend`** (React / TypeScript / Vite SPA) | Renders the user interface; browses heroes, builds team compositions, handles login/register; communicates with the backend via REST/JSON |
 | **`heroes`** (Django app) | All domain logic, REST API endpoints, data persistence, external API sync, and DTO generation |
 | **`config`** | Django project settings, root URL routing (`/api/` to `heroes`), WSGI/ASGI entry points |
 
-The `heroes` app is the sole runtime component. Everything described in Level 2 is internal to it.
+The `heroes` app contains all backend business logic. The frontend is a separate process that communicates with it over HTTP. Everything described in Level 2 is internal to the backend.
+
+```mermaid
+graph TD
+    User(["End User (Browser)"])
+    OverFast(["OverFast API"])
+    DB[("PostgreSQL")]
+
+    subgraph System["OverwatchTeamUp (Docker)"]
+        Frontend["frontend
+React / TypeScript / Vite
+port 5173"]
+        subgraph Backend["Backend"]
+            Config["config
+Settings / URL Routing"]
+            Heroes["heroes
+Domain / Adapters / Views / Services"]
+        end
+    end
+
+    User -- "HTTP port 5173" --> Frontend
+    Frontend -- "REST/JSON via /api proxy" --> Config
+    Config --> Heroes
+    Heroes -- "HTTPS - sync_heroes only" --> OverFast
+    Heroes -- "TCP 5432 / Django ORM" --> DB
+```
+
 
 
 
@@ -194,11 +223,11 @@ sequenceDiagram
 
 ## RT-02: Hero List Request {#_rt_02}
 
-A client requests all heroes. The OverFast API is not involved — data is served entirely from the local database.
+The frontend requests all heroes on load (via `SideBar.tsx`). The OverFast API is not involved — data is served entirely from the local database.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
+    participant Client as Frontend (React SPA)
     participant View as hero_list view
     participant HDBA as HeroDataBaseAdapter
     participant DB as PostgreSQL
@@ -216,11 +245,11 @@ sequenceDiagram
 
 ## RT-03: Create Team Composition {#_rt_03}
 
-An authenticated user creates a new team composition. The JWT middleware validates the token before the view is reached. Each hero key in the request body is resolved to a `HeroEntity` before the composition is persisted.
+An authenticated user saves a team composition via the frontend (via `TeamComposition.tsx`). The JWT middleware validates the token before the view is reached. Each hero key in the request body is resolved to a `HeroEntity` before the composition is persisted.
 
 ```mermaid
 sequenceDiagram
-    participant Client as Client
+    participant Client as Frontend (React SPA)
     participant JWT as JWT Middleware
     participant View as team_composition_create view
     participant Ser as TeamCompositionCreateUpdateSerializer
