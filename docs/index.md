@@ -1,17 +1,28 @@
-# Welcome to MkDocs
+# Overwatch TeamUp
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+A web application for Overwatch players to browse hero statistics and build team compositions.
 
-## Commands
+## What it does
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+- Browse all Overwatch heroes with stats (role, win rate, pick rate, health, abilities)
+- View detailed hero profiles including abilities and portraits
+- Register and log in with a personal account
+- Create, save, update, and delete named team compositions of 5 heroes
+- Hero data is automatically synced from the [OverFast API](https://overfast-api.tekrop.fr) on startup
 
-## Project layout
+## Stack
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, TypeScript, Vite, MUI |
+| Backend | Python, Django, Django REST Framework |
+| Database | PostgreSQL 16 |
+| Auth | JWT (djangorestframework-simplejwt) |
+| Infrastructure | Docker Compose |
+
+## Documentation
+
+- [Setup](setup.md) — how to run the project locally
+- [Architecture (arc42)](architecture/arc42.md) — full architecture documentation
+- [C4 Model](architecture/c4-model.md) — context and container diagrams
+- [API DTOs](api-dtos.md) — TypeScript types generated from backend serializers
