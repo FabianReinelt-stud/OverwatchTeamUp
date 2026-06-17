@@ -3,8 +3,15 @@ site_description: Projekt documentation for the SQS project
 repo_url: https://github.com/FabianReinelt-stud/OverwatchTeamUp
 
 theme:
-  name: readthedocs
+  name: material
   language: en
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
   - Home: index.md
@@ -15,10 +22,3 @@ nav:
       - C4-Modell: architecture/c4-model.md
   - ADRs:
       - Template: adr/template.md
-      - React frontend: adr/001-frontend-react.md
-      - Spring Boot backend: adr/002-backend-spring-boot.md
-      - PostgreSQL database: adr/003-database-postgres.md
-  - Tests:
-      - Testkonzept: testing/testkonzept.md
-  - Quality:
-      - Static code analysis: quality/static-analysis.md
