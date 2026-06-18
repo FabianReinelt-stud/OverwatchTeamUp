@@ -5,8 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    allowedHosts: ['host.docker.internal'],
     proxy: {
-      '/api': 'http://backend:8000',
+      '/api': process.env.VITE_API_PROXY_TARGET ?? 'http://backend:8000',
     },
   },
 })

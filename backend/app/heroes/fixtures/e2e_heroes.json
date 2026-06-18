@@ -1,0 +1,82 @@
+[
+  {
+    "model": "heroes.hero",
+    "pk": "e2e-tank",
+    "fields": {
+      "display_name": "E2E Tank",
+      "role": "tank",
+      "subrole": "protector",
+      "winrate": "50.0",
+      "pickrate": "5.0",
+      "health": 500,
+      "armor": 100,
+      "shields": 0,
+      "portrait_url": "https://example.com/e2e-tank.png",
+      "description": "Deterministic tank hero for end-to-end tests."
+    }
+  },
+  {
+    "model": "heroes.hero",
+    "pk": "e2e-damage-one",
+    "fields": {
+      "display_name": "E2E Damage One",
+      "role": "damage",
+      "subrole": "flanker",
+      "winrate": "51.0",
+      "pickrate": "6.0",
+      "health": 250,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://example.com/e2e-damage-one.png",
+      "description": "First deterministic damage hero for end-to-end tests."
+    }
+  },
+  {
+    "model": "heroes.hero",
+    "pk": "e2e-damage-two",
+    "fields": {
+      "display_name": "E2E Damage Two",
+      "role": "damage",
+      "subrole": "marksman",
+      "winrate": "52.0",
+      "pickrate": "4.0",
+      "health": 250,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://example.com/e2e-damage-two.png",
+      "description": "Second deterministic damage hero for end-to-end tests."
+    }
+  },
+  {
+    "model": "heroes.hero",
+    "pk": "e2e-support-one",
+    "fields": {
+      "display_name": "E2E Support One",
+      "role": "support",
+      "subrole": "healer",
+      "winrate": "49.0",
+      "pickrate": "7.0",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://example.com/e2e-support-one.png",
+      "description": "First deterministic support hero for end-to-end tests."
+    }
+  },
+  {
+    "model": "heroes.hero",
+    "pk": "e2e-support-two",
+    "fields": {
+      "display_name": "E2E Support Two",
+      "role": "support",
+      "subrole": "utility",
+      "winrate": "48.0",
+      "pickrate": "3.0",
+      "health": 225,
+      "armor": 0,
+      "shields": 0,
+      "portrait_url": "https://example.com/e2e-support-two.png",
+      "description": "Second deterministic support hero for end-to-end tests."
+    }
+  }
+]
