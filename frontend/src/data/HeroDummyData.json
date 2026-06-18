@@ -2,60 +2,20 @@
     "hero_key": "ana",
     "display_name": "Ana",
     "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
+    "role": "Support"
 }, {
     "hero_key": "winston",
     "display_name": "Winston",
     "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
+    "role": "Tank"
 },{
     "hero_key": "genji",
     "display_name": "Genji",
     "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
+    "role": "Damage"
 }, {
     "hero_key": "mizuki",
     "display_name": "Mizuki",
     "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}, {
-    "hero_key": "fabian",
-    "display_name": "Fabian",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}, {
-    "hero_key": "leo",
-    "display_name": "Leo",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "damage"
-},{
-    "hero_key": "julia",
-    "display_name": "Julia",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}, {
-    "hero_key": "ana2",
-    "display_name": "Ana",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}, {
-    "hero_key": "ana3",
-    "display_name": "Ana",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}, {
-    "hero_key": "ana4",
-    "display_name": "Ana",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-},{
-    "hero_key": "ana5",
-    "display_name": "Ana",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}, {
-    "hero_key": "ana6",
-    "display_name": "Ana",
-    "portrait_url": "https://d15f34w2p8l1cc.cloudfront.net/overwatch/3429c394716364bbef802180e9763d04812757c205e1b4568bc321772096ed86.png",
-    "role": "support"
-}] 
+    "role": "Support"
+}]
