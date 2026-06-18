@@ -1,3 +1,4 @@
 -r requirements.txt
 coverage==7.10.7
 pytestarch==4.0.1
+ruff==0.8.6

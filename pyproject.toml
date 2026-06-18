@@ -1,0 +1,19 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    "backend/venv",
+    "backend/app/**/migrations",
+    "backend/app/**/__pycache__",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "B"]
+ignore = [
+    "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"backend/app/**/tests.py" = ["B011"]
+"backend/app/**/test_*.py" = ["B011"]
+"backend/app/architecture_tests/*.py" = ["B011"]

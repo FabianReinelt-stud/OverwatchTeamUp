@@ -17,6 +17,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Setup: setup.md
+  - Test Concept: testconcept.md
   - API DTOs: api-dtos.md
   - Architecture:
       - arc42: architecture/arc42.md

@@ -1,7 +1,6 @@
 import {describe, expect} from "vitest";
-import {render, screen} from "@testing-library/react";
+import {render} from "@testing-library/react";
 import '@testing-library/jest-dom'
-import UserContractViewToggle from "./UserContractView.tsx";
 import UserContractView from "./UserContractView.tsx";
 
 describe('UserContractView', () => {

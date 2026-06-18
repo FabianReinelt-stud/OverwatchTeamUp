@@ -60,6 +60,13 @@ jobs:
         working-directory: frontend
         run: npm ci
 
+      - name: Lint backend
+        run: ruff check backend/app
+
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
+
       - name: Check Django migrations
         working-directory: backend/app
         run: python manage.py makemigrations --check --dry-run
@@ -77,6 +84,10 @@ jobs:
           coverage run --rcfile=backend/app/.coveragerc backend/app/manage.py test heroes
           coverage xml --rcfile=backend/app/.coveragerc -o backend/app/coverage.xml
           coverage report --rcfile=backend/app/.coveragerc
+
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: npm test
 
       - name: Build frontend
         working-directory: frontend
