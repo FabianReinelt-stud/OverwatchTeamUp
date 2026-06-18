@@ -1,10 +1,15 @@
 from decimal import Decimal
+from io import StringIO
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.test import TestCase
 from rest_framework.test import APIClient
+import requests
 
 from heroes.adapters.hero_database_adapter import HeroDataBaseAdapter
+from heroes.adapters.overfast_api_adapter import OverfastAPIAdapter
 from heroes.domain.entities import HeroEntity
 from heroes.dto_generation import generate_typescript_dtos
 from heroes.models import Hero, TeamComposition
@@ -472,6 +477,50 @@ class TestAuthEndpoints(TestCase):
         assert "access" in response.data
         assert "refresh" in response.data
 
+    def test_logout_requires_authentication(self):
+        response = self.client.post(
+            "/api/auth/logout/",
+            {"refresh": "not-a-token"},
+            format="json",
+        )
+
+        assert response.status_code == 401
+
+    def test_logout_requires_refresh_token(self):
+        user = User.objects.create_user(username="logout-user", password="strong-password")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post("/api/auth/logout/", {}, format="json")
+
+        assert response.status_code == 400
+        assert "refresh" in response.data
+
+    def test_logout_blacklists_refresh_token(self):
+        User.objects.create_user(username="logout-user", password="strong-password")
+        token_response = self.client.post(
+            "/api/auth/token/",
+            {"username": "logout-user", "password": "strong-password"},
+            format="json",
+        )
+        access_token = token_response.data["access"]
+        refresh_token = token_response.data["refresh"]
+
+        response = self.client.post(
+            "/api/auth/logout/",
+            {"refresh": refresh_token},
+            format="json",
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+
+        assert response.status_code == 204
+
+        refresh_response = self.client.post(
+            "/api/auth/token/refresh/",
+            {"refresh": refresh_token},
+            format="json",
+        )
+        assert refresh_response.status_code == 401
+
 
 class TestDtoGeneration(TestCase):
     def test_generates_team_composition_dtos_from_serializers(self):
@@ -482,3 +531,46 @@ class TestDtoGeneration(TestCase):
         assert "average_winrate: string;" in generated
         assert "export type TeamCompositionCreateUpdateDto" in generated
         assert "hero_1_key: string;" in generated
+
+
+class TestOverfastAPIAdapterResilience(TestCase):
+    def test_get_uses_session_with_timeout(self):
+        adapter = OverfastAPIAdapter()
+
+        with patch.object(adapter.session, "get") as get:
+            get.return_value.json.return_value = [{"key": "ana"}]
+
+            assert adapter._get("https://example.com/heroes") == [{"key": "ana"}]
+
+        get.assert_called_once_with("https://example.com/heroes", timeout=5)
+
+    def test_get_reraises_request_errors(self):
+        adapter = OverfastAPIAdapter()
+
+        with patch.object(adapter.session, "get", side_effect=requests.Timeout):
+            try:
+                adapter._get("https://example.com/heroes")
+                assert False, "Expected requests.Timeout"
+            except requests.Timeout:
+                pass
+
+
+class TestSyncHeroesCommandResilience(TestCase):
+    @patch("heroes.management.commands.sync_heroes.HeroSyncService")
+    def test_sync_failure_is_non_fatal_by_default(self, service_class):
+        service_class.return_value.sync.side_effect = requests.ConnectionError("OverFast down")
+        stderr = StringIO()
+
+        call_command("sync_heroes", stderr=stderr)
+
+        assert "Hero sync skipped" in stderr.getvalue()
+
+    @patch("heroes.management.commands.sync_heroes.HeroSyncService")
+    def test_sync_failure_can_be_made_fatal(self, service_class):
+        service_class.return_value.sync.side_effect = requests.ConnectionError("OverFast down")
+
+        try:
+            call_command("sync_heroes", "--fail-on-error")
+            assert False, "Expected requests.ConnectionError"
+        except requests.ConnectionError:
+            pass

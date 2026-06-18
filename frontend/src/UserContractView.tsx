@@ -3,6 +3,7 @@ import './UserContractView.css'
 import {Button} from "@mui/material";
 import * as React from "react";
 import type {TokenResponseDto} from "./data/api-dtos.tsx";
+import {logoutUser} from "./auth.ts";
 
 export interface UserContract {
     username: string
@@ -258,11 +259,26 @@ function UserContractViewToggle({updateLoginState, isLoggedIn}: {
     isLoggedIn: boolean
 }) {
     const [showUserContract, setShowUserContract] = useState(false);
-    const onClick = () => setShowUserContract(!showUserContract);
+    const onClick = async () => {
+        if (!isLoggedIn) {
+            setShowUserContract(!showUserContract);
+            return;
+        }
+
+        try {
+            await logoutUser();
+        } catch (error) {
+            console.log("could not logout on backend: ", error);
+        }
+
+        updateLoginState(false);
+        setShowUserContract(false);
+    }
+
     return (
         <>
             <div className="login-button">
-                <Button variant="contained" onClick={onClick}>Login</Button>
+                <Button variant="contained" onClick={onClick}>{isLoggedIn ? "Logout" : "Login"}</Button>
             </div>
             <div className="login-view-container">
                 {showUserContract ? <UserContractView updateLoginState={updateLoginState}
