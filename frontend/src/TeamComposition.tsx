@@ -98,7 +98,6 @@ export function SaveUpdate({isLoggedIn, teamComp, updateTeamComp}: SaveTeamProp)
             })
             .then(response => {
                 updateTeamComp(response);
-                console.log("updated existing team: ", response);
                 alert(teamComp.name + " was successfully updated");
             })
             .catch(error => {
@@ -154,7 +153,6 @@ export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeam
                         incrementNumTeamComps(1, true);
                     }
                     updateTeamComp(response);
-                    console.log("created new team: ", response);
                 })
                 .catch(error => {
                     console.log("could not save team comp: ", error);
@@ -174,7 +172,7 @@ export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeam
     )
 }
 
-function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}: TeamSlotProp) {
+export function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}: TeamSlotProp) {
     const normalizedDefaultRole = defaultRole.toLowerCase();
     const handleSlotSelected = () => {
         if (selectedHero.hero_key == "") {
@@ -182,7 +180,6 @@ function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}:
         } else if (selectedHero.hero_key != ""
             && selectedHero.hero_key != hero.hero_key
             && selectedHero.role.toLowerCase() == normalizedDefaultRole) {
-            console.log("placing hero " + hero.display_name + " into slot " + slot);
             confirmHeroSelection(slot);
         }
     }

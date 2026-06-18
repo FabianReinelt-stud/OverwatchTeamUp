@@ -62,7 +62,6 @@ function SideBar({
                 return response.json();
             })
             .then(response => {
-                console.log("hero data successfully loaded: ", response);
                 setHeroList(Array.isArray(response) ? response : []);
             })
             .catch(error => {
@@ -82,7 +81,6 @@ function SideBar({
                     return response.json();
                 })
                 .then(response => {
-                    console.log("team data successfully loaded: ", response);
                     setTeamList(Array.isArray(response) ? response : []);
                     updateNumTeamComps(Array.isArray(response) ? response.length : 0, false);
                 })

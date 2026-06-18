@@ -44,7 +44,6 @@ const teamHeroPreviewStyle: React.CSSProperties = {
 
 const deleteTeam = (id: number) => {
     if(id == -1) {
-        console.log("team id was not valid");
         return;
     }
     fetchWithAuthRefresh("/api/team-compositions/"+ id + "/delete/", {
@@ -62,7 +61,6 @@ const deleteTeam = (id: number) => {
 }
 
 export function TeamList({input, teamCompList, updateTeamComp, updateNumTeamComps}: TeamCompListProp) {
-    console.log("updating team list")
     const filteredTeamComps = teamCompList.filter((team) => {
         const normalizedInput = input.toLowerCase();
         if (normalizedInput === '') {
@@ -99,10 +97,8 @@ function TeamListButton({team, updateTeamComp, updateNumTeamComps}: TeamListButt
     const [isBeingDeleted, setIsBeingDeleted] = useState(false);
     const handleTeamSelected = () => {
         if (!teamComp) {
-            console.log("This button does not have an assigned team composition");
-            return;
+            throw new Error("This button does not have an assigned team composition");
         }
-        console.log("sending update: ", teamComp);
         updateTeamComp(teamComp);
     }
 
@@ -220,7 +216,7 @@ function List({input, heroList, updateSelectedHero}: HeroListProp) {
                             <img className="hero-preview"
                                  src={hero.portrait_url}
                                  alt="ana"></img>{hero.display_name}
-                            <img className="hero-role" src={getHeroRoleImg(hero.role)} alt='hero role'></img>
+                            <img className="hero-role" src={getHeroRoleImg(hero.role)} alt={hero.role}></img>
                         </button>
                     </li>
                 ))}

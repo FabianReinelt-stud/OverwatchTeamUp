@@ -81,7 +81,7 @@ function HeroView({currentHero, loadingError}: HeroViewProp) {
     )
 }
 
-function HeroStats({hero}: { hero: HeroDto }) {
+export function HeroStats({hero}: { hero: HeroDto }) {
     return (<div className='hero-view'>
         <img className='hero-portrait' src={hero.portrait_url} alt='hero'></img>
         <div className='stat-view'>
@@ -109,7 +109,7 @@ function HeroStats({hero}: { hero: HeroDto }) {
     </div>);
 }
 
-function HeroAbilityRow({abilities, abilityColor, rowStyle}: HeroAbilityProp) {
+export function HeroAbilityRow({abilities, abilityColor, rowStyle}: HeroAbilityProp) {
     return (
         <div className='hero-stat-row' style={statRowStyle}>
             <div className='stat-name'>

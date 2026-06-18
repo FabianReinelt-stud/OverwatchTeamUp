@@ -72,7 +72,6 @@ const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>, userLoginDa
             body: JSON.stringify(userLoginData)
         });
         const token = await parseJsonResponse(response);
-        console.log("login was successful (access/ refresh): ", token.access, token.refresh);
         updateLoginState({
             username: userLoginData.username,
             token,
@@ -91,7 +90,6 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
         localStorage.setItem("refreshToken", user.token.refresh);
         updateLoginState(true);
         updateContractView(View.LOGINSUCCESS);
-        console.log("user login updated with: ", user.username);
     }
 
     const updateLoginValidity = (isValid: boolean) => {
@@ -103,7 +101,7 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
     }
 
     return (
-        <div className='register-wrapper'>
+        <div className='login-wrapper'>
             <p className="view-name">Login</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
                 handleLogin(e, getUserLoginData(e.currentTarget), updateLoginValidity, updateUserContract)}>
@@ -142,9 +140,8 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
 }
 
 const LoginSuccessView = (toggleView: () => void) => {
-    //TODO: add tokens timer
     return (
-        <div>
+        <div className="login-success-wrapper">
             <p>You were successfully logged in.</p>
             <button type="button" onClick={toggleView}>Close</button>
         </div>
@@ -172,11 +169,10 @@ const handleRegister = async (
         updateContractView(View.REGISTERSUCCESS);
     } catch (error) {
         console.log("could not register: ", error);
-        //TODO registration feedback
     }
 }
 
-const RegisterView = (//TODO add register callback here
+const RegisterView = (
     updateContractView: (view: View) => void) => {
     return (
         <div className='register-wrapper'>

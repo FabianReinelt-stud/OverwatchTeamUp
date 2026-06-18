@@ -76,14 +76,12 @@ function App() {
 
     const updateTeamComp = (teamComp: TeamCompositionDto) => {
         setCurrentTeamComp(teamComp);
-        console.log("updated team composition: ", teamComp)
     }
 
     const [selectedHero, setSelectedHero] = useState<HeroDto>(emptyHero);
     const [heroLoadingError, setHeroLoadingError] = useState(false);
 
     const updateSelectedHero = (heroKey: string) => {
-        console.log("updated selected hero: ", heroKey)
         if (heroKey != "" && !isHeroInTeam(heroKey, currentTeamComp)) {
             fetch("/api/heroes/" + heroKey + "/", {method: "GET"})
                 .then(response => {
@@ -93,7 +91,6 @@ function App() {
                     return response.json();
                 })
                 .then(response => {
-                    console.log("hero data successfully loaded for view: ", response);
                     setSelectedHero(response);
                     setHeroLoadingError(false);
                 })
