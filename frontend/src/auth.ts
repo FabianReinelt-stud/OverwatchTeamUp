@@ -14,7 +14,7 @@ const notifyAuthChanged = () => {
     window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 }
 
-const clearTokens = () => {
+export const clearTokens = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     notifyAuthChanged();
@@ -86,3 +86,21 @@ export const fetchJsonWithAuthRefresh = async (
         ...(init.headers || {}),
     },
 });
+
+export const logoutUser = async (): Promise<void> => {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!refreshToken) {
+        clearTokens();
+        return;
+    }
+
+    try {
+        await fetchJsonWithAuthRefresh("/api/auth/logout/", {
+            method: "POST",
+            body: JSON.stringify({refresh: refreshToken}),
+        });
+    } finally {
+        clearTokens();
+    }
+}

@@ -1,7 +1,7 @@
 import logo from './assets/logo.png'
 import HeroView from './HeroView'
 import SideBar from './SideBar'
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import './App.css'
 import './fonts/big_noodle_titling.ttf'
 import './fonts/big_noodle_titling_oblique.ttf'
@@ -54,30 +54,38 @@ function App() {
         return () => window.removeEventListener(AUTH_CHANGED_EVENT, updateAuthState);
     }, []);
 
-    const updateLoginState = (isLoggedIn: boolean) => {
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setNumTeamComps(0);
+            setShowTeamCompView(false);
+            setCurrentTeamComp(JSON.parse(JSON.stringify(emptyTeamComp)));
+        }
+    }, [isLoggedIn]);
+
+    const updateLoginState = useCallback((isLoggedIn: boolean) => {
         setIsLoggedIn(isLoggedIn);
-    }
+    }, []);
 
     const [showTeamCompView, setShowTeamCompView] = useState(false);
     const [numTeamComps, setNumTeamComps] = useState(0);
     const [currentTeamComp, setCurrentTeamComp] = useState<TeamCompositionDto>(JSON.parse(JSON.stringify(emptyTeamComp)));
 
-    const updateTeamCompViewState = () => {
+    const updateTeamCompViewState = useCallback(() => {
         setShowTeamCompView(!showTeamCompView);
-    }
+    }, [showTeamCompView]);
 
-    const updateNumTeamComps = (num: number, isModifier: boolean) => {
+    const updateNumTeamComps = useCallback((num: number, isModifier: boolean) => {
         if(isModifier){
             setNumTeamComps(numTeamComps => numTeamComps + num);
         } else {
-        setNumTeamComps(num);
+            setNumTeamComps(num);
         }
-    }
+    }, []);
 
-    const updateTeamComp = (teamComp: TeamCompositionDto) => {
+    const updateTeamComp = useCallback((teamComp: TeamCompositionDto) => {
         setCurrentTeamComp(teamComp);
         console.log("updated team composition: ", teamComp)
-    }
+    }, []);
 
     const [selectedHero, setSelectedHero] = useState<HeroDto>(emptyHero);
     const [heroLoadingError, setHeroLoadingError] = useState(false);

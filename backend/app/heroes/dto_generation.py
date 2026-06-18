@@ -47,6 +47,9 @@ MANUAL_DTOS = {
     "TokenRefreshResponseDto": {
         "access": "string",
     },
+    "LogoutRequestDto": {
+        "refresh": "string",
+    },
 }
 
 

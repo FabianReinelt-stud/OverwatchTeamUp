@@ -472,6 +472,50 @@ class TestAuthEndpoints(TestCase):
         assert "access" in response.data
         assert "refresh" in response.data
 
+    def test_logout_requires_authentication(self):
+        response = self.client.post(
+            "/api/auth/logout/",
+            {"refresh": "not-a-token"},
+            format="json",
+        )
+
+        assert response.status_code == 401
+
+    def test_logout_requires_refresh_token(self):
+        user = User.objects.create_user(username="logout-user", password="strong-password")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post("/api/auth/logout/", {}, format="json")
+
+        assert response.status_code == 400
+        assert "refresh" in response.data
+
+    def test_logout_blacklists_refresh_token(self):
+        User.objects.create_user(username="logout-user", password="strong-password")
+        token_response = self.client.post(
+            "/api/auth/token/",
+            {"username": "logout-user", "password": "strong-password"},
+            format="json",
+        )
+        access_token = token_response.data["access"]
+        refresh_token = token_response.data["refresh"]
+
+        response = self.client.post(
+            "/api/auth/logout/",
+            {"refresh": refresh_token},
+            format="json",
+            HTTP_AUTHORIZATION=f"Bearer {access_token}",
+        )
+
+        assert response.status_code == 204
+
+        refresh_response = self.client.post(
+            "/api/auth/token/refresh/",
+            {"refresh": refresh_token},
+            format="json",
+        )
+        assert refresh_response.status_code == 401
+
 
 class TestDtoGeneration(TestCase):
     def test_generates_team_composition_dtos_from_serializers(self):

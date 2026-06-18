@@ -5,6 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from heroes.adapters.hero_database_adapter import HeroDataBaseAdapter
 from heroes.adapters.team_composition_adapter import TeamCompositionDatabaseAdapter
@@ -153,3 +155,24 @@ def register(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     user = serializer.save()
     return Response({"id": user.id, "username": user.username}, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    refresh_token = request.data.get("refresh")
+    if not refresh_token:
+        return Response(
+            {"refresh": ["This field is required."]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        RefreshToken(refresh_token).blacklist()
+    except TokenError:
+        return Response(
+            {"refresh": ["Invalid or expired token."]},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(status=status.HTTP_204_NO_CONTENT)

@@ -7,6 +7,7 @@
 | Register user | `POST` | `/api/auth/register/` | `RegisterRequestDto` | `RegisterResponseDto` |
 | Login | `POST` | `/api/auth/token/` | `TokenRequestDto` | `TokenResponseDto` |
 | Refresh access token | `POST` | `/api/auth/token/refresh/` | `TokenRefreshRequestDto` | `TokenRefreshResponseDto` |
+| Logout | `POST` | `/api/auth/logout/` | `LogoutRequestDto` | - |
 | List heroes | `GET` | `/api/heroes/` | - | `HeroSummaryDto[]` |
 | Get hero details | `GET` | `/api/heroes/<hero_key>/` | - | `HeroDto` |
 | List own team compositions | `GET` | `/api/team-compositions/` | - | `TeamCompositionDto[]` |

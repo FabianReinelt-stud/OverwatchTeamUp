@@ -78,3 +78,7 @@ export type TokenRefreshRequestDto = {
 export type TokenRefreshResponseDto = {
   access: string;
 };
+
+export type LogoutRequestDto = {
+  refresh: string;
+};

@@ -71,6 +71,15 @@ function SideBar({
     }, []);
 
     useEffect(() => {
+        let isCurrentRequest = true;
+
+        if (!isLoggedIn) {
+            setTeamList([]);
+            return () => {
+                isCurrentRequest = false;
+            };
+        }
+
         if (showTeamCompView) {
             fetchWithAuthRefresh("/api/team-compositions/", {
                 method: "GET",
@@ -82,16 +91,27 @@ function SideBar({
                     return response.json();
                 })
                 .then(response => {
+                    if (!isCurrentRequest) {
+                        return;
+                    }
                     console.log("team data successfully loaded: ", response);
                     setTeamList(Array.isArray(response) ? response : []);
                     updateNumTeamComps(Array.isArray(response) ? response.length : 0, false);
                 })
                 .catch(error => {
+                    if (!isCurrentRequest) {
+                        return;
+                    }
                     console.log("could not load team data: ", error);
                     setTeamList([]);
+                    updateNumTeamComps(0, false);
                 });
         }
-    }, [showTeamCompView, numTeamComps, updateNumTeamComps]);
+
+        return () => {
+            isCurrentRequest = false;
+        };
+    }, [isLoggedIn, showTeamCompView, numTeamComps, updateNumTeamComps]);
 
     return (
         <div className='side-bar' style={{
