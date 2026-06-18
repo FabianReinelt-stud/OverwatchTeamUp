@@ -1,14 +1,31 @@
 from decimal import Decimal
+import logging
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from heroes.domain.entities import AbilityEntity, HeroEntity
 from heroes.ports.external_hero_source_port import ExternalHeroSourcePort
 
 _BASE_URL = "https://overfast-api.tekrop.fr"
 _STATS_URL = f"{_BASE_URL}/heroes/stats?platform=pc&gamemode=competitive&region=europe&order_by=hero%3Aasc"
+_TIMEOUT_SECONDS = 5
+
+logger = logging.getLogger(__name__)
+
 
 class OverfastAPIAdapter(ExternalHeroSourcePort):
+    def __init__(self):
+        retry = Retry(
+            total=3,
+            backoff_factor=0.5,
+            status_forcelist=[502, 503, 504],
+            allowed_methods=["GET"],
+        )
+        self.session = requests.Session()
+        self.session.mount("https://", HTTPAdapter(max_retries=retry))
+
     def fetch_all(self) -> list[HeroEntity]:
         stats_by_key = {
             s["hero"]: s for s in self._get(_STATS_URL)
@@ -42,6 +59,10 @@ class OverfastAPIAdapter(ExternalHeroSourcePort):
         )
 
     def _get(self, url: str) -> dict | list:
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = self.session.get(url, timeout=_TIMEOUT_SECONDS)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException:
+            logger.exception("OverFast API request failed: %s", url)
+            raise
