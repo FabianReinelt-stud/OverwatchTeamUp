@@ -22,4 +22,8 @@ nav:
       - arc42: architecture/arc42.md
       - C4-Modell: architecture/c4-model.md
   - ADRs:
+      - ADR-01 Python & Django: adr/adr-01-python-django.md
+      - ADR-02 React & TypeScript: adr/adr-02-react-typescript.md
+      - ADR-03 Hexagonal Architecture: adr/adr-03-hexagonal-architecture.md
+      - ADR-04 PostgreSQL: adr/adr-04-postgresql.md
       - Template: adr/template.md
