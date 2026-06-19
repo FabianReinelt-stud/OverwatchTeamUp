@@ -84,3 +84,10 @@ class TeamComposition(models.Model):
 
     class Meta:
         db_table = "team_comps"
+
+
+class SyncState(models.Model):
+    last_synced_at = models.DateTimeField()
+
+    class Meta:
+        db_table = "sync_state"
