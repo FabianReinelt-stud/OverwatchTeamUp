@@ -1,5 +1,4 @@
 from decimal import Decimal
-import logging
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -11,8 +10,6 @@ from heroes.ports.external_hero_source_port import ExternalHeroSourcePort
 _BASE_URL = "https://overfast-api.tekrop.fr"
 _STATS_URL = f"{_BASE_URL}/heroes/stats?platform=pc&gamemode=competitive&region=europe&order_by=hero%3Aasc"
 _TIMEOUT_SECONDS = 5
-
-logger = logging.getLogger(__name__)
 
 
 class OverfastAPIAdapter(ExternalHeroSourcePort):
@@ -59,10 +56,6 @@ class OverfastAPIAdapter(ExternalHeroSourcePort):
         )
 
     def _get(self, url: str) -> dict | list:
-        try:
-            response = self.session.get(url, timeout=_TIMEOUT_SECONDS)
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException:
-            logger.exception("OverFast API request failed: %s", url)
-            raise
+        response = self.session.get(url, timeout=_TIMEOUT_SECONDS)
+        response.raise_for_status()
+        return response.json()
