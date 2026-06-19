@@ -34,7 +34,7 @@ test('loads a hero from the sidebar and shows hero details', async ({ page, requ
 
   await expect(page.locator('.hero-name')).toHaveText(hero.display_name);
   await expect(page.getByText('Role', { exact: true })).toBeVisible();
-  await expect(page.getByText(hero.role)).toBeVisible();
+  await expect(page.getByText(hero.role, { exact: true })).toBeVisible();
 });
 
 test('registers, logs in, saves, and loads a team composition', async ({ page, request }) => {
@@ -70,19 +70,19 @@ test('registers, logs in, saves, and loads a team composition', async ({ page, r
   await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
 
   await searchAndOpenHero(page, team[0]);
-  await page.getByAltText('tank', { exact: true }).click();
+  await page.locator('img.role[alt="tank"]').click();
 
   await searchAndOpenHero(page, team[1]);
-  await page.getByAltText('damage', { exact: true }).nth(0).click();
+  await page.locator('img.role[alt="damage"]').nth(0).click();
 
   await searchAndOpenHero(page, team[2]);
-  await page.getByAltText('damage', { exact: true }).nth(1).click();
+  await page.locator('img.role[alt="damage"]').nth(1).click();
 
   await searchAndOpenHero(page, team[3]);
-  await page.getByAltText('support', { exact: true }).nth(0).click();
+  await page.locator('img.role[alt="support"]').nth(0).click();
 
   await searchAndOpenHero(page, team[4]);
-  await page.getByAltText('support', { exact: true }).nth(1).click();
+  await page.locator('img.role[alt="support"]').nth(1).click();
 
   page.once('dialog', async (dialog) => {
     expect(dialog.type()).toBe('prompt');
