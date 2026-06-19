@@ -1,14 +1,18 @@
+from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.management import call_command
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from heroes.adapters.hero_database_adapter import HeroDataBaseAdapter
 from heroes.adapters.team_composition_adapter import TeamCompositionDatabaseAdapter
 from heroes.domain.entities import AbilityEntity, HeroEntity
-from heroes.models import Ability, Hero, TeamComposition
+from heroes.models import Ability, Hero, SyncState, TeamComposition
 
 
 class TestHeroDataBaseAdapterUpsert(TestCase):
@@ -257,3 +261,40 @@ class TestAuthIntegration(TestCase):
 
         assert response.status_code == 400
         assert User.objects.filter(username="existing").count() == 1
+
+
+class TestSyncStateIntegration(TestCase):
+    @patch("heroes.management.commands.sync_heroes.HeroSyncService")
+    def test_successful_sync_writes_sync_state_to_database(self, service_class):
+        service_class.return_value.sync.return_value = 5
+
+        call_command("sync_heroes")
+
+        assert SyncState.objects.count() == 1
+        assert SyncState.objects.first().last_synced_at is not None
+
+    @patch("heroes.management.commands.sync_heroes.HeroSyncService")
+    def test_sync_is_skipped_when_data_is_fresh(self, service_class):
+        SyncState.objects.create(last_synced_at=timezone.now())
+
+        call_command("sync_heroes")
+
+        service_class.return_value.sync.assert_not_called()
+
+    @patch("heroes.management.commands.sync_heroes.HeroSyncService")
+    def test_sync_runs_when_data_is_older_than_max_age(self, service_class):
+        service_class.return_value.sync.return_value = 5
+        SyncState.objects.create(last_synced_at=timezone.now() - timedelta(hours=25))
+
+        call_command("sync_heroes")
+
+        service_class.return_value.sync.assert_called_once()
+
+    @patch("heroes.management.commands.sync_heroes.HeroSyncService")
+    def test_max_age_hours_flag_overrides_default_threshold(self, service_class):
+        service_class.return_value.sync.return_value = 5
+        SyncState.objects.create(last_synced_at=timezone.now() - timedelta(hours=2))
+
+        call_command("sync_heroes", "--max-age-hours", "1")
+
+        service_class.return_value.sync.assert_called_once()

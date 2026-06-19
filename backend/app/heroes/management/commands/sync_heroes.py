@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from heroes.adapters.hero_database_adapter import HeroDataBaseAdapter
 from heroes.adapters.overfast_api_adapter import OverfastAPIAdapter
-from heroes.models import SyncState
+from heroes.adapters.sync_state_adapter import SyncStateAdapter
 from heroes.services.hero_sync_service import HeroSyncService
 
 _DEFAULT_MAX_AGE_HOURS = 24
@@ -27,9 +27,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        state = SyncState.objects.first()
-        if state:
-            age_seconds = (timezone.now() - state.last_synced_at).total_seconds()
+        sync_state = SyncStateAdapter()
+        last_synced_at = sync_state.get_last_synced_at()
+        if last_synced_at:
+            age_seconds = (timezone.now() - last_synced_at).total_seconds()
             if age_seconds < options["max_age_hours"] * 3600:
                 age_hours = int(age_seconds // 3600)
                 self.stdout.write(
@@ -54,5 +55,5 @@ class Command(BaseCommand):
                 raise
             return
 
-        SyncState.objects.update_or_create(id=1, defaults={"last_synced_at": timezone.now()})
+        sync_state.update_last_synced_at()
         self.stdout.write(self.style.SUCCESS(f"Synced {count} heroes."))
