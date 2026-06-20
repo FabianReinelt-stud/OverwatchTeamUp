@@ -1,5 +1,5 @@
-import {describe, expect} from "vitest";
-import {render} from "@testing-library/react";
+import {beforeEach, describe, expect, vi} from "vitest";
+import {fireEvent, render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom';
 import teamDummyData from './data/TeamDummyData.json'
 import heroDummyData from './data/HeroViewDummyData.json'
@@ -97,12 +97,23 @@ const MockEmptyHero = {
     abilities: []
 }
 
+beforeEach(() => {
+    vi.restoreAllMocks();
+});
+
 describe('Load', () => {
     it('should have load functionality disabled if not logged in', () => {
         const {container} = render(<Load updateTeamCompViewState={() => {
         }} isLoggedIn={false}></Load>)
         const disabledLoad = container.getElementsByClassName("loadBtn-disabled");
         expect(disabledLoad).not.toBeNull();
+    })
+
+    it('opens the team table when logged in', () => {
+        const updateTeamCompViewState = vi.fn();
+        render(<Load updateTeamCompViewState={updateTeamCompViewState} isLoggedIn={true}/>);
+        fireEvent.click(screen.getByRole("button", {name: "Load team composition"}));
+        expect(updateTeamCompViewState).toHaveBeenCalledOnce();
     })
 })
 
@@ -113,6 +124,26 @@ describe('SaveUpdate', () => {
         const disabledUpdate = container.getElementsByClassName("saveBtn-update-disabled");
         expect(disabledUpdate).not.toBeNull();
     })
+
+    it('updates a loaded team composition', async () => {
+        const updatedTeam = {...teamDummyData[0], name: "Updated"};
+        vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(updatedTeam), {status: 200}));
+        vi.spyOn(window, "alert").mockImplementation(() => undefined);
+        const updateTeamComp = vi.fn();
+        render(<SaveUpdate teamComp={teamDummyData[0]} updateTeamComp={updateTeamComp}
+                           numTeamComps={1} isLoggedIn={true}/>);
+        fireEvent.click(screen.getByRole("button", {name: "Update team composition"}));
+        await waitFor(() => expect(updateTeamComp).toHaveBeenCalledWith(updatedTeam));
+    })
+
+    it('reports an update failure', async () => {
+        vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, {status: 500}));
+        const alertMock = vi.spyOn(window, "alert").mockImplementation(() => undefined);
+        render(<SaveUpdate teamComp={teamDummyData[0]} updateTeamComp={vi.fn()}
+                           numTeamComps={1} isLoggedIn={true}/>);
+        fireEvent.click(screen.getByRole("button", {name: "Update team composition"}));
+        await waitFor(() => expect(alertMock).toHaveBeenCalled());
+    })
 })
 
 describe('SaveAdd', () => {
@@ -121,6 +152,27 @@ describe('SaveAdd', () => {
         }} numTeamComps={0} isLoggedIn={false}></SaveAdd>)
         const disabledAdd = container.getElementsByClassName("saveBtn-add-disabled");
         expect(disabledAdd).not.toBeNull();
+    })
+
+    it('rejects incomplete teams', () => {
+        const alertMock = vi.spyOn(window, "alert").mockImplementation(() => undefined);
+        render(<SaveAdd teamComp={MockEmptyTeam} updateTeamComp={vi.fn()}
+                        numTeamComps={0} isLoggedIn={true}/>);
+        fireEvent.click(screen.getByRole("button", {name: "Save new team composition"}));
+        expect(alertMock).toHaveBeenCalledWith("Please create a full team comp to save.");
+    })
+
+    it('creates a complete team composition', async () => {
+        const savedTeam = {...teamDummyData[0], id: 99, name: "My Team"};
+        vi.spyOn(window, "prompt").mockReturnValue("My Team");
+        vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify(savedTeam), {status: 201}));
+        const updateTeamComp = vi.fn();
+        const incrementNumTeamComps = vi.fn();
+        render(<SaveAdd teamComp={teamDummyData[0]} updateTeamComp={updateTeamComp}
+                        incrementNumTeamComps={incrementNumTeamComps} numTeamComps={2} isLoggedIn={true}/>);
+        fireEvent.click(screen.getByRole("button", {name: "Save new team composition"}));
+        await waitFor(() => expect(updateTeamComp).toHaveBeenCalledWith(savedTeam));
+        expect(incrementNumTeamComps).toHaveBeenCalledWith(1, true);
     })
 });
 
@@ -131,6 +183,14 @@ describe('TeamSlot', () => {
         }}></TeamSlot>)
         const teamSlot = container.getElementsByClassName("role");
         expect(teamSlot.length).toBe(1);
+    })
+
+    it('confirms selection on an enabled matching slot', () => {
+        const confirmHeroSelection = vi.fn();
+        render(<TeamSlot hero={MockEmptyHero} slot={4} defaultRole={"support"}
+                         selectedHero={heroDummyData} confirmHeroSelection={confirmHeroSelection}/>);
+        fireEvent.click(screen.getByRole("button", {name: "Select hero for support team slot"}));
+        expect(confirmHeroSelection).toHaveBeenCalledWith(4);
     })
 
     it('should deactivate a team slot if hero does not have the corresponding role', () => {

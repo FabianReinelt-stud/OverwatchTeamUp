@@ -123,8 +123,9 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
             <p className="view-name">Login</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
                 handleLogin(e, getUserLoginData(e.currentTarget), updateLoginValidity, updateUserContract)}>
-                <label>Username</label>
+                <label htmlFor="login-username">Username</label>
                 <input type="text"
+                       id="login-username"
                        name="username"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="^[a-zA-Z0-9]+"
@@ -137,8 +138,9 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                            }
                        }}
                        required></input>
-                <label><p></p>Password</label>
+                <label htmlFor="login-password"><p></p>Password</label>
                 <input type="password"
+                       id="login-password"
                        name="password"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
@@ -197,15 +199,17 @@ const RegisterView = (
             <p className="view-name">Registration</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
                 handleRegister(e, getUserLoginData(e.currentTarget), updateContractView)}>
-                <label>Username</label>
+                <label htmlFor="register-username">Username</label>
                 <input type="text"
+                       id="register-username"
                        name="username"
                        className='form-control'
                        pattern="^[a-zA-Z0-9]+"
                        title='Please only use upper-/lowercase letters and numbers'
                        required></input>
-                <label><p></p>Password</label>
+                <label htmlFor="register-password"><p></p>Password</label>
                 <input type="password"
+                       id="register-password"
                        name="password"
                        className='form-control'
                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
