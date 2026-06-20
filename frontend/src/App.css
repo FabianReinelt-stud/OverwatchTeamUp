@@ -71,6 +71,7 @@
     display: grid;
     height: 20%;
     grid-template-columns: repeat(5, 1fr) 0.75fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
     border-radius: 10px;
 }

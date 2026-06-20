@@ -3,7 +3,7 @@ import './UserContractView.css'
 import {Button} from "@mui/material";
 import * as React from "react";
 import type {TokenResponseDto} from "./data/api-dtos.tsx";
-import {logoutUser} from "./auth.ts";
+import {isValidJwt, logoutUser} from "./auth.ts";
 
 export interface UserContract {
     username: string
@@ -29,6 +29,19 @@ interface ViewProp {
     isLoggedIn: boolean,
     updateLoginState: (isLoggedIn: boolean) => void,
     toggleView: () => void
+}
+
+const parseTokenResponse = (value: unknown): TokenResponseDto => {
+    if (typeof value !== "object" || value === null) {
+        throw new Error("Invalid token response");
+    }
+
+    const token = value as Record<string, unknown>;
+    if (!isValidJwt(token.access) || !isValidJwt(token.refresh)) {
+        throw new Error("Invalid token response");
+    }
+
+    return {access: token.access, refresh: token.refresh};
 }
 
 const getUserLoginData = (form: HTMLFormElement): UserLogin => {
@@ -72,7 +85,7 @@ const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>, userLoginDa
             },
             body: JSON.stringify(userLoginData)
         });
-        const token = await parseJsonResponse(response);
+        const token = parseTokenResponse(await parseJsonResponse(response));
         updateLoginState({
             username: userLoginData.username,
             token,
@@ -87,6 +100,10 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                    updateContractView: (view: View) => void) => {
     const [isLoginValid, setIsLoginValid] = useState(true);
     const updateUserContract = (user: UserContract) => {
+        if (!isValidJwt(user.token.access) || !isValidJwt(user.token.refresh)) {
+            throw new Error("Invalid token response");
+        }
+
         localStorage.setItem("accessToken", user.token.access);
         localStorage.setItem("refreshToken", user.token.refresh);
         updateLoginState(true);

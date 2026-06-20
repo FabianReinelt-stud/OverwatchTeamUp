@@ -4,6 +4,9 @@ import selectSupport from './assets/teamcomp_select_support.png'
 import backgroundSupport from './assets/teamcomp_bg_support.png'
 import backgroundDamage from './assets/teamcomp_bg_damage.png'
 import backgroundTank from './assets/teamcomp_bg_tank.png'
+import loadIcon from './assets/download.png'
+import saveAddIcon from './assets/save_add.png'
+import saveUpdateIcon from './assets/save_update.png'
 import {Tooltip} from '@mui/material'
 import type {HeroDto, TeamCompositionCreateUpdateDto, TeamCompositionDto} from "./data/api-dtos.tsx";
 import './TeamComposition.css'
@@ -56,10 +59,13 @@ export function Load({isLoggedIn, updateTeamCompViewState}: LoadTeamProp) {
     }
 
     return (
-        <div className="team-button-wrapper">
+        <div className="team-button-wrapper load-wrapper">
             <Tooltip
                 title={isLoggedIn ? "Click to open Team Comp table" : "Please login to use the load function for your existing team compositions."}>
-                <button onClick={handleLoad} className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'}></button>
+                <button type="button" aria-label="Load team composition" onClick={handleLoad}
+                        className={isLoggedIn ? 'loadBtn' : 'loadBtn-disabled'}>
+                    <img src={loadIcon} alt="" />
+                </button>
             </Tooltip>
         </div>
     )
@@ -107,11 +113,14 @@ export function SaveUpdate({isLoggedIn, teamComp, updateTeamComp}: SaveTeamProp)
     }
 
     return (
-        <div className="team-button-wrapper">
+        <div className="team-button-wrapper save-update-wrapper">
             <Tooltip
                 title={isLoggedIn ? "Click to update current Team Comp" : "Please login to use the update function for your existing team compositions."}>
-                <button className={isLoggedIn ? 'saveBtn-update' : 'saveBtn-update-disabled'}
-                        onClick={updateExistingTeam}></button>
+                <button type="button" aria-label="Update team composition"
+                        className={isLoggedIn ? 'saveBtn-update' : 'saveBtn-update-disabled'}
+                        onClick={updateExistingTeam}>
+                    <img src={saveUpdateIcon} alt="" />
+                </button>
             </Tooltip>
         </div>
     )
@@ -162,11 +171,14 @@ export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeam
     }
 
     return (
-        <div className="team-button-wrapper">
+        <div className="team-button-wrapper save-add-wrapper">
             <Tooltip
                 title={isLoggedIn ? "Click to save current Team Comp" : "Please login or register to use the save function for your current team composition."}>
-                <button className={isLoggedIn ? 'saveBtn-add' : 'saveBtn-add-disabled'}
-                        onClick={confirmTeamSave}></button>
+                <button type="button" aria-label="Save new team composition"
+                        className={isLoggedIn ? 'saveBtn-add' : 'saveBtn-add-disabled'}
+                        onClick={confirmTeamSave}>
+                    <img src={saveAddIcon} alt="" />
+                </button>
             </Tooltip>
         </div>
     )
@@ -174,6 +186,7 @@ export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeam
 
 export function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSelection}: TeamSlotProp) {
     const normalizedDefaultRole = defaultRole.toLowerCase();
+    const isSelectable = selectedHero.role.toLowerCase() == normalizedDefaultRole && selectedHero.hero_key != "";
     const handleSlotSelected = () => {
         if (selectedHero.hero_key == "") {
             return;
@@ -199,15 +212,21 @@ export function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSele
 
     return (
         <div className='team-role-select'>
-            <img
-                className={selectedHero.role.toLowerCase() == normalizedDefaultRole && selectedHero.hero_key != "" ? 'role' : 'role-disabled'}
-                src={hero.hero_key != "" ? hero.portrait_url : roleImage}
-                style={hero.hero_key != "" ? {
-                    maskSize: "120%",
-                    transform: "scale(0.85)"
-                } : {maskSize: "contain"}}
-                alt={defaultRole}
-                onClick={handleSlotSelected}></img>
+            <button
+                type="button"
+                className={isSelectable ? 'role' : 'role-disabled'}
+                aria-label={`Select hero for ${defaultRole} team slot`}
+                disabled={!isSelectable}
+                onClick={handleSlotSelected}>
+                <img
+                    className="team-role-image"
+                    src={hero.hero_key != "" ? hero.portrait_url : roleImage}
+                    style={hero.hero_key != "" ? {
+                        maskSize: "120%",
+                        transform: "scale(0.85)"
+                    } : {maskSize: "contain"}}
+                    alt="" />
+            </button>
             <img className='select-frame' src={frameImage} alt={defaultRole + " team slot frame"}></img>
         </div>
     )
