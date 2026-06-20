@@ -92,7 +92,7 @@ function App() {
 
     const updateSelectedHero = (heroKey: string) => {
         console.log("updated selected hero: ", heroKey)
-        if (heroKey != "" && !isHeroInTeam(heroKey, currentTeamComp)) {
+        if (heroKey != "") {
             fetch("/api/heroes/" + heroKey + "/", {method: "GET"})
                 .then(response => {
                     if (!response.ok) {
