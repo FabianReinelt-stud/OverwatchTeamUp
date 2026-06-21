@@ -55,6 +55,13 @@ Run the backend architecture tests:
 docker compose run --rm backend python -m unittest discover -s architecture_tests -v
 ```
 
+Run the frontend architecture tests:
+
+```bash
+cd frontend
+npm run test:architecture
+```
+
 Run the frontend unit tests with coverage:
 
 ```bash

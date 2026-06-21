@@ -3,7 +3,7 @@ import './UserContractView.css'
 import {Button} from "@mui/material";
 import * as React from "react";
 import type {TokenResponseDto} from "./data/api-dtos.tsx";
-import {isValidJwt, logoutUser} from "./auth.ts";
+import {logoutUser, sanitizeJwt} from "./auth.ts";
 
 export interface UserContract {
     username: string
@@ -37,11 +37,13 @@ const parseTokenResponse = (value: unknown): TokenResponseDto => {
     }
 
     const token = value as Record<string, unknown>;
-    if (!isValidJwt(token.access) || !isValidJwt(token.refresh)) {
+    const access = sanitizeJwt(token.access);
+    const refresh = sanitizeJwt(token.refresh);
+    if (!access || !refresh) {
         throw new Error("Invalid token response");
     }
 
-    return {access: token.access, refresh: token.refresh};
+    return {access, refresh};
 }
 
 const getUserLoginData = (form: HTMLFormElement): UserLogin => {
@@ -100,12 +102,14 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                    updateContractView: (view: View) => void) => {
     const [isLoginValid, setIsLoginValid] = useState(true);
     const updateUserContract = (user: UserContract) => {
-        if (!isValidJwt(user.token.access) || !isValidJwt(user.token.refresh)) {
+        const accessToken = sanitizeJwt(user.token.access);
+        const refreshToken = sanitizeJwt(user.token.refresh);
+        if (!accessToken || !refreshToken) {
             throw new Error("Invalid token response");
         }
 
-        localStorage.setItem("accessToken", user.token.access);
-        localStorage.setItem("refreshToken", user.token.refresh);
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
         updateLoginState(true);
         updateContractView(View.LOGINSUCCESS);
     }

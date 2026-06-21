@@ -12,8 +12,16 @@ export const AUTH_CHANGED_EVENT = "auth-changed";
 
 const jwtPattern = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 
-export const isValidJwt = (value: unknown): value is string =>
-    typeof value === "string" && value.length <= 8192 && jwtPattern.test(value);
+export const sanitizeJwt = (value: unknown): string | null => {
+    if (typeof value !== "string" || value.length > 8192) {
+        return null;
+    }
+
+    const sanitizedValue = value.replace(/[^A-Za-z0-9_.-]/g, "");
+    return sanitizedValue === value && jwtPattern.test(sanitizedValue) ? sanitizedValue : null;
+}
+
+export const isValidJwt = (value: unknown): value is string => sanitizeJwt(value) !== null;
 
 const notifyAuthChanged = () => {
     window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
@@ -52,8 +60,8 @@ const refreshAccessToken = async (): Promise<string | null> => {
         return null;
     }
 
-    const accessToken = (token as Record<string, unknown>).access;
-    if (!isValidJwt(accessToken)) {
+    const accessToken = sanitizeJwt((token as Record<string, unknown>).access);
+    if (!accessToken) {
         clearTokens();
         return null;
     }
