@@ -44,6 +44,8 @@ const isHeroInTeam = (heroKey: string, currentTeamComp: TeamCompositionDto) => {
         || heroKey == currentTeamComp.hero_5.hero_key;
 }
 
+const isValidHeroKey = (heroKey: string) => /^[a-z0-9-]{1,30}$/.test(heroKey);
+
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(localStorage.getItem("accessToken")));
 
@@ -84,7 +86,6 @@ function App() {
 
     const updateTeamComp = useCallback((teamComp: TeamCompositionDto) => {
         setCurrentTeamComp(teamComp);
-        console.log("updated team composition: ", teamComp)
     }, []);
 
     const [selectedHero, setSelectedHero] = useState<HeroDto>(emptyHero);
@@ -92,8 +93,9 @@ function App() {
 
     const updateSelectedHero = (heroKey: string) => {
         console.log("updated selected hero: ", heroKey)
-        if (heroKey != "" && !isHeroInTeam(heroKey, currentTeamComp)) {
-            fetch("/api/heroes/" + heroKey + "/", {method: "GET"})
+        if (isValidHeroKey(heroKey)) {
+            const encodedHeroKey = encodeURIComponent(heroKey);
+            fetch(`/api/heroes/${encodedHeroKey}/`, {method: "GET"})
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("Hero detail request failed");
@@ -101,12 +103,11 @@ function App() {
                     return response.json();
                 })
                 .then(response => {
-                    console.log("hero data successfully loaded for view: ", response);
                     setSelectedHero(response);
                     setHeroLoadingError(false);
                 })
-                .catch(error => {
-                    console.log("could not load hero data for view: ", error);
+                .catch(() => {
+                    console.error("Could not load hero data for view");
                     setHeroLoadingError(true);
                 });
         }

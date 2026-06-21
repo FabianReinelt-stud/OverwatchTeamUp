@@ -333,7 +333,7 @@ The current setup is development-only. A production deployment would require:
 | Field | Content |
 |-------|---------|
 | **Status** | Accepted |
-| **Context** | OverwatchTeamUp is a student project. The team chose it as an opportunity to learn Python as a new language. A backend was needed to expose a REST API, manage a PostgreSQL database, and sync hero data from an external API. |
+| **Context** | OverwatchTeamUp is a student project. The backend team chose it as an opportunity to learn Python as a new language. A backend was needed to expose a REST API, manage a PostgreSQL database, and sync hero data from an external API. |
 | **Decision** | Use Python as the backend language and Django with Django REST Framework (DRF) as the web framework. |
 | **Consequences** | (+) Learning goal fulfilled — the project gave the team hands-on experience with Python and Django. (+) Django ORM, DRF serializers, and the management command system reduced boilerplate. (+) Large ecosystem and strong documentation available. (−) Django is a full-stack framework; for an API-only service it brings unused features such as templates and the admin interface. (−) Python performance is lower than compiled languages, though irrelevant at this scale. |
 
@@ -344,7 +344,7 @@ The current setup is development-only. A production deployment would require:
 | Field | Content |
 |-------|---------|
 | **Status** | Accepted |
-| **Context** | A web frontend was needed to let users browse heroes and manage team compositions. The team wanted type safety and a component-based UI with a modern developer experience. |
+| **Context** | OverwatchTeamUp is a student project. The frontend team chose React and Typescript to learn a new tool and programming language. A web frontend was needed to let users browse heroes and manage team compositions. The team wanted type safety and a component-based UI with a modern developer experience.|
 | **Decision** | Use React 19 with TypeScript and Vite as the build tool. MUI is used for UI components. TypeScript DTOs are auto-generated from DRF serializers via `dto_generation.py`. |
 | **Consequences** | (+) Component-based architecture keeps the UI maintainable and modular. (+) TypeScript catches frontend/backend contract mismatches at compile time. (+) Vite dev proxy eliminates CORS friction during development. (−) React ecosystem moves fast; major upgrades can be breaking. (−) Requires a DTO generation step to keep frontend types in sync with the backend serializers. |
 
@@ -496,45 +496,16 @@ The top five quality requirements are defined in section 1.2 with concrete metri
 
 # Glossary {#section-glossary}
 
-::: formalpara-title
-**Contents**
-:::
+| Abbreviation | Definition                |
+|--------------|---------------------------|
+| DTO          | Data Transfer Object      |
+| DRF          | Django REST Framework     |
+| JWT          | JSON Web Token            |
+| ORM          | Object-Relational Mapping |
+| SPA          | Single Page Application   |
 
-The most important domain and technical terms that your stakeholders use
-when discussing the system.
-
-You can also see the glossary as source for translations if you work in
-multi-language teams.
-
-::: formalpara-title
-**Motivation**
-:::
-
-You should clearly define your terms, so that all stakeholders
-
--   have an identical understanding of these terms
-
--   do not use synonyms and homonyms
-
-::: formalpara-title
-**Form**
-:::
-
-A table with columns \<Term\> and \<Definition\>.
-
-Potentially more columns in case you need translations.
-
-::: formalpara-title
-**Further Information**
-:::
-
-See [Glossary](https://docs.arc42.org/section-12/) in the arc42
-documentation.
-
-+----------------------+-----------------------------------------------+
-| Term                 | Definition                                    |
-+======================+===============================================+
-| *\<Term-1\>*         | *\<definition-1\>*                            |
-+----------------------+-----------------------------------------------+
-| *\<Term-2\>*         | *\<definition-2\>*                            |
-+----------------------+-----------------------------------------------+
+| Term             | Definition                                                                                                                                                        |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Hero             | A playable game character in Overwatch with different abilities that falls under one of three categories: Tank, Damage, Support.                                  |
+| Overwatch        | A live service multiplayer first-person shooter video game by Blizzard Entertainment, in which teams of five or six fight against one another in different modes. |
+| Team Composition | A team composition consists of five Heroes, fulfilling the following roles: Tank, Damage (2x), Support (2x)                                                       |

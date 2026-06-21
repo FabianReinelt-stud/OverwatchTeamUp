@@ -1,12 +1,40 @@
+.team-button-wrapper {
+    display: grid;
+    place-items: center;
+    grid-column: 6;
+    min-width: 0;
+    min-height: 0;
+}
+
+.save-add-wrapper {
+    grid-row: 1;
+}
+
+.save-update-wrapper {
+    grid-row: 2;
+}
+
+.load-wrapper {
+    grid-row: 3;
+}
+
 .team-button-wrapper button{
-    display: block;
-    width: 30%;
-    margin: 10%;
-    background-color: rgba(0, 0, 0, 0);
-    aspect-ratio: 1/1;
+    display: grid;
+    place-items: center;
+    width: min(55%, 56px);
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    aspect-ratio: 1 / 1;
     border: none;
     cursor: pointer;
-    background-size: 100% 100%;
+}
+
+.team-button-wrapper img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .team-button-wrapper button:hover,
@@ -22,27 +50,20 @@
     opacity: 1;
 }
 
-.loadBtn,
-.loadBtn-disabled {
-    background-image: url("../src/assets/download.png");
-}
-
-.saveBtn-add,
-.saveBtn-add-disabled {
-    background-image: url("../src/assets/save_add.png");
-}
-
-.saveBtn-update,
-.saveBtn-update-disabled {
-    background-image: url("../src/assets/save_update.png");
-}
-
 .role,
 .role-disabled{
     margin-bottom: 1%;
+    padding: 0;
     width: 100%;
     height: 100%;
     position: absolute;
+    inset: 0;
+    display: block;
+    background: transparent;
+    border: none;
+}
+
+.team-role-image {
     mask-image: url("../src/assets/teamcomp_bg.png");
     mask-position: center;
     mask-repeat: no-repeat;
@@ -54,20 +75,29 @@
 
 .role:hover {
     filter: brightness(250%);
+    cursor: pointer;
 }
 
 .role:active{
     filter: brightness(80%);
 }
 
+.role:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
 .team-role-select {
     position: relative;
     margin: 5px;
+    min-width: 0;
+    min-height: 0;
     grid-row: 1 / span 3;
 }
 
 .select-frame {
     position: absolute;
+    inset: 0;
     pointer-events: none;
 }
 

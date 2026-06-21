@@ -9,7 +9,7 @@ This document summarizes the automated test strategy for Overwatch TeamUp. The g
 | Unit tests | Verify isolated domain logic and React components | Django TestCase, unittest, Vitest, React Testing Library | `backend/app/heroes/test_team_composition_service.py`, `frontend/src/*.test.tsx` |
 | Integration tests | Verify API, serializers, authentication, ORM, and database behavior together | Django TestCase, DRF APIClient | `backend/app/heroes/tests.py`, `backend/app/heroes/test_integration.py` |
 | Security tests | Verify protected endpoints, JWT flows, and user isolation | Django TestCase, DRF APIClient | `backend/app/heroes/tests.py`, `backend/app/heroes/test_integration.py` |
-| Architecture tests | Verify backend dependency rules | pytestarch, PlantUML rules | `backend/app/architecture_tests/` |
+| Architecture tests | Verify backend and frontend dependency rules | unittest, pytestarch, TypeScript compiler API, Vitest | `backend/app/architecture_tests/`, `frontend/src/architecture.test.ts` |
 | End-to-end tests | Verify complete user flows in a real browser | Playwright | `frontend/e2e/` |
 | Static analysis | Detect code smells and rule violations | Ruff, ESLint, SonarQube | CI pipeline |
 
@@ -60,13 +60,20 @@ These automated tests cover the security logic of the application. They do not r
 
 ## Architecture Tests
 
-Architecture tests check that backend modules follow the documented dependency rules for domain, ports, adapters, services, and views.
+Architecture tests check that backend modules follow the documented dependency rules for domain, ports, adapters, services, and views. Frontend architecture tests prevent circular imports, keep data and authentication infrastructure independent from UI modules, and ensure protected API calls use the authenticated request module.
 
 Run locally:
 
 ```bash
 cd backend/app
 python -m unittest discover -s architecture_tests -v
+```
+
+Run the frontend architecture tests locally:
+
+```bash
+cd frontend
+npm run test:architecture
 ```
 
 ## End-to-End Tests

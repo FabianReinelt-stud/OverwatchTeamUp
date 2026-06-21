@@ -3,7 +3,7 @@ import './UserContractView.css'
 import {Button} from "@mui/material";
 import * as React from "react";
 import type {TokenResponseDto} from "./data/api-dtos.tsx";
-import {logoutUser} from "./auth.ts";
+import {logoutUser, sanitizeJwt} from "./auth.ts";
 
 export interface UserContract {
     username: string
@@ -29,6 +29,21 @@ interface ViewProp {
     isLoggedIn: boolean,
     updateLoginState: (isLoggedIn: boolean) => void,
     toggleView: () => void
+}
+
+const parseTokenResponse = (value: unknown): TokenResponseDto => {
+    if (typeof value !== "object" || value === null) {
+        throw new Error("Invalid token response");
+    }
+
+    const token = value as Record<string, unknown>;
+    const access = sanitizeJwt(token.access);
+    const refresh = sanitizeJwt(token.refresh);
+    if (!access || !refresh) {
+        throw new Error("Invalid token response");
+    }
+
+    return {access, refresh};
 }
 
 const getUserLoginData = (form: HTMLFormElement): UserLogin => {
@@ -72,7 +87,7 @@ const handleLogin = async (e: React.SyntheticEvent<HTMLFormElement>, userLoginDa
             },
             body: JSON.stringify(userLoginData)
         });
-        const token = await parseJsonResponse(response);
+        const token = parseTokenResponse(await parseJsonResponse(response));
         updateLoginState({
             username: userLoginData.username,
             token,
@@ -87,8 +102,14 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                    updateContractView: (view: View) => void) => {
     const [isLoginValid, setIsLoginValid] = useState(true);
     const updateUserContract = (user: UserContract) => {
-        localStorage.setItem("accessToken", user.token.access);
-        localStorage.setItem("refreshToken", user.token.refresh);
+        const accessToken = sanitizeJwt(user.token.access);
+        const refreshToken = sanitizeJwt(user.token.refresh);
+        if (!accessToken || !refreshToken) {
+            throw new Error("Invalid token response");
+        }
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
         updateLoginState(true);
         updateContractView(View.LOGINSUCCESS);
     }
@@ -106,8 +127,9 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
             <p className="view-name">Login</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
                 handleLogin(e, getUserLoginData(e.currentTarget), updateLoginValidity, updateUserContract)}>
-                <label>Username</label>
+                <label htmlFor="login-username">Username</label>
                 <input type="text"
+                       id="login-username"
                        name="username"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="^[a-zA-Z0-9]+"
@@ -120,8 +142,9 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
                            }
                        }}
                        required></input>
-                <label><p></p>Password</label>
+                <label htmlFor="login-password"><p></p>Password</label>
                 <input type="password"
+                       id="login-password"
                        name="password"
                        className={isLoginValid ? 'form-control' : 'error-control'}
                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
@@ -180,15 +203,17 @@ const RegisterView = (
             <p className="view-name">Registration</p>
             <form onSubmit={(e: React.SyntheticEvent<HTMLFormElement>) =>
                 handleRegister(e, getUserLoginData(e.currentTarget), updateContractView)}>
-                <label>Username</label>
+                <label htmlFor="register-username">Username</label>
                 <input type="text"
+                       id="register-username"
                        name="username"
                        className='form-control'
                        pattern="^[a-zA-Z0-9]+"
                        title='Please only use upper-/lowercase letters and numbers'
                        required></input>
-                <label><p></p>Password</label>
+                <label htmlFor="register-password"><p></p>Password</label>
                 <input type="password"
+                       id="register-password"
                        name="password"
                        className='form-control'
                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"

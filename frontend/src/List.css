@@ -46,9 +46,29 @@
     width: 100%;
 }
 
+.delete-button {
+    width: 90%;
+    margin: auto;
+    padding: 0;
+    z-index: 5;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-button img {
+    display: block;
+    width: 100%;
+}
+
 .delete-button:hover {
     background-color: red;
-    border-radius: 5px;
+}
+
+.delete-button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
 }
 
 .team-comp-button{

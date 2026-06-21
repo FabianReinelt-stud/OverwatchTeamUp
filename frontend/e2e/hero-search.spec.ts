@@ -70,25 +70,25 @@ test('registers, logs in, saves, and loads a team composition', async ({ page, r
   await expect(page.getByRole('button', { name: 'Logout' })).toBeVisible();
 
   await searchAndOpenHero(page, team[0]);
-  await page.locator('img.role[alt="tank"]').click();
+  await page.getByRole('button', { name: 'Select hero for tank team slot' }).click();
 
   await searchAndOpenHero(page, team[1]);
-  await page.locator('img.role[alt="damage"]').nth(0).click();
+  await page.getByRole('button', { name: 'Select hero for damage team slot' }).nth(0).click();
 
   await searchAndOpenHero(page, team[2]);
-  await page.locator('img.role[alt="damage"]').nth(1).click();
+  await page.getByRole('button', { name: 'Select hero for damage team slot' }).nth(1).click();
 
   await searchAndOpenHero(page, team[3]);
-  await page.locator('img.role[alt="support"]').nth(0).click();
+  await page.getByRole('button', { name: 'Select hero for support team slot' }).nth(0).click();
 
   await searchAndOpenHero(page, team[4]);
-  await page.locator('img.role[alt="support"]').nth(1).click();
+  await page.getByRole('button', { name: 'Select hero for support team slot' }).nth(1).click();
 
   page.once('dialog', async (dialog) => {
     expect(dialog.type()).toBe('prompt');
     await dialog.accept(teamName);
   });
-  await page.locator('button.saveBtn-add').click();
+  await page.getByRole('button', { name: 'Save new team composition' }).click();
 
   await expect.poll(async () => {
     const response = await request.get('/api/team-compositions/', {
@@ -103,6 +103,8 @@ test('registers, logs in, saves, and loads a team composition', async ({ page, r
     return compositions.some((composition) => composition.name === teamName);
   }).toBe(true);
 
-  await page.locator('button.loadBtn').click();
-  await expect(page.getByRole('button', { name: new RegExp(escapeRegExp(teamName), 'i') })).toBeVisible();
+  await page.getByRole('button', { name: 'Load team composition' }).click();
+  await expect(page.getByRole('button', {
+    name: new RegExp(`^${escapeRegExp(teamName)}\\s+Avg WR`, 'i'),
+  })).toBeVisible();
 });

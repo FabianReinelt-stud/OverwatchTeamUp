@@ -153,19 +153,17 @@ function TeamListButton({team, updateTeamComp, updateNumTeamComps}: TeamListButt
                     </div>
                 </div>
             </button>
-            <img className="delete-button"
-                 src={deleteIcon}
-                 style={{
-                     width: "90%",
-                     margin: "auto",
-                     zIndex: 5,
-                 }}
-                 alt="team comp delete button"
-                 onClick={() => {
-                     deleteTeam(team.id);
-                     setIsBeingDeleted(true);
-                     updateNumTeamComps(-1, true);
-                 }}></img>
+            <button
+                type="button"
+                className="delete-button"
+                aria-label={`Delete ${team.name}`}
+                onClick={() => {
+                    deleteTeam(team.id);
+                    setIsBeingDeleted(true);
+                    updateNumTeamComps(-1, true);
+                }}>
+                <img src={deleteIcon} alt="" />
+            </button>
             </div>
         </li>)
 }

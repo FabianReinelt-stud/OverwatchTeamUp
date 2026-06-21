@@ -10,6 +10,19 @@ export const getJsonHeaders = (): Record<string, string> => ({
 
 export const AUTH_CHANGED_EVENT = "auth-changed";
 
+const jwtPattern = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+export const sanitizeJwt = (value: unknown): string | null => {
+    if (typeof value !== "string" || value.length > 8192) {
+        return null;
+    }
+
+    const sanitizedValue = value.replace(/[^A-Za-z0-9_.-]/g, "");
+    return sanitizedValue === value && jwtPattern.test(sanitizedValue) ? sanitizedValue : null;
+}
+
+export const isValidJwt = (value: unknown): value is string => sanitizeJwt(value) !== null;
+
 const notifyAuthChanged = () => {
     window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 }
@@ -41,15 +54,39 @@ const refreshAccessToken = async (): Promise<string | null> => {
         return null;
     }
 
-    const token = await response.json();
-    localStorage.setItem("accessToken", token.access);
+    const token: unknown = await response.json();
+    if (typeof token !== "object" || token === null) {
+        clearTokens();
+        return null;
+    }
+
+    const accessToken = sanitizeJwt((token as Record<string, unknown>).access);
+    if (!accessToken) {
+        clearTokens();
+        return null;
+    }
+
+    localStorage.setItem("accessToken", accessToken);
     notifyAuthChanged();
-    return token.access;
+    return accessToken;
 }
 
 type AuthRequestInit = Omit<RequestInit, "headers"> & {
     headers?: Record<string, string>;
 };
+
+const getSafeApiUrl = (input: string): URL => {
+    const url = new URL(input, window.location.origin);
+    if (url.origin !== window.location.origin
+        || !url.pathname.startsWith("/api/")
+        || url.username
+        || url.password
+        || url.hash) {
+        throw new Error("Invalid API URL");
+    }
+
+    return url;
+}
 
 const withAuthHeader = (init: AuthRequestInit = {}, accessToken?: string): RequestInit => ({
     ...init,
@@ -60,10 +97,11 @@ const withAuthHeader = (init: AuthRequestInit = {}, accessToken?: string): Reque
 });
 
 export const fetchWithAuthRefresh = async (
-    input: RequestInfo | URL,
+    input: string,
     init: AuthRequestInit = {},
 ): Promise<Response> => {
-    const response = await fetch(input, withAuthHeader(init));
+    const apiUrl = getSafeApiUrl(input);
+    const response = await fetch(apiUrl, withAuthHeader(init));
     if (response.status !== 401) {
         return response;
     }
@@ -73,11 +111,11 @@ export const fetchWithAuthRefresh = async (
         return response;
     }
 
-    return fetch(input, withAuthHeader(init, refreshedAccessToken));
+    return fetch(apiUrl, withAuthHeader(init, refreshedAccessToken));
 }
 
 export const fetchJsonWithAuthRefresh = async (
-    input: RequestInfo | URL,
+    input: string,
     init: AuthRequestInit = {},
 ): Promise<Response> => fetchWithAuthRefresh(input, {
     ...init,
