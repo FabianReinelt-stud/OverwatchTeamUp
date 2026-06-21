@@ -27,7 +27,7 @@ const teamListFieldStyle = {
     margin: '15px auto 10px auto'
 }
 
-interface SideBarProp {
+type SideBarProp = Readonly<{
     updateNumTeamComps: (num: number, isModifier: boolean) => void,
     numTeamComps: number,
     updateLoginState: (isLoggedIn: boolean) => void,
@@ -35,7 +35,7 @@ interface SideBarProp {
     updateSelectedHero: (heroKey: string) => void,
     updateTeamComp: (teamCompUp: TeamCompositionDto) => void
     showTeamCompView: boolean,
-}
+}>
 
 function SideBar({
                      updateLoginState,
