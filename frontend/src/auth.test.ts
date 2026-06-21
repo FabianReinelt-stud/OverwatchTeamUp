@@ -32,11 +32,11 @@ describe("auth utilities", () => {
         localStorage.setItem("accessToken", jwt);
         localStorage.setItem("refreshToken", jwt);
         const listener = vi.fn();
-        window.addEventListener(AUTH_CHANGED_EVENT, listener);
+        globalThis.addEventListener(AUTH_CHANGED_EVENT, listener);
         clearTokens();
         expect(localStorage.getItem("accessToken")).toBeNull();
         expect(listener).toHaveBeenCalledOnce();
-        window.removeEventListener(AUTH_CHANGED_EVENT, listener);
+        globalThis.removeEventListener(AUTH_CHANGED_EVENT, listener);
     });
 
     it("performs same-origin API requests with JSON headers", async () => {

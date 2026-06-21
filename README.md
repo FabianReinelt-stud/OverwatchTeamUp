@@ -1,5 +1,7 @@
 # Overwatch TeamUp
 
+[![CI](https://github.com/FabianReinelt-stud/OverwatchTeamUp/actions/workflows/sonarqube.yml/badge.svg)](https://github.com/FabianReinelt-stud/OverwatchTeamUp/actions/workflows/sonarqube.yml)
+
 A web application for Overwatch players to browse hero statistics and build team compositions.
 
 ## What it does
@@ -10,6 +12,9 @@ A web application for Overwatch players to browse hero statistics and build team
 - Create, save, update, and delete named team compositions of 5 heroes
 - Hero data is automatically synced from the [OverFast API](https://overfast-api.tekrop.fr) on startup
 
+## Project Links
+- [Documentation](https://overwatchteamup.readthedocs.io/en/latest/)
+- [SonarCloud Analysis](https://sonarcloud.io/project/overview?id=FabianReinelt-stud_OverwatchTeamUp)
 ## Stack
 
 | Layer | Technology |

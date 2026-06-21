@@ -13,33 +13,36 @@ import './TeamComposition.css'
 import {fetchJsonWithAuthRefresh} from "./auth.ts";
 
 interface BaseTeamCompProp {
-    selectedHero: HeroDto,
-    confirmHeroSelection: (slot: number) => void
+    readonly selectedHero: HeroDto,
+    readonly confirmHeroSelection: (slot: number) => void
 }
 
 interface LoginStateProp {
-    isLoggedIn: boolean
+    readonly isLoggedIn: boolean
 }
 
 interface LoadTeamProp extends LoginStateProp {
-    updateTeamCompViewState: () => void
+    readonly updateTeamCompViewState: () => void
 }
 
 interface SaveTeamProp extends LoginStateProp {
-    teamComp: TeamCompositionDto,
-    updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
-    incrementNumTeamComps?: (num: number, isModifier: boolean) => void,
-    numTeamComps: number,
+    readonly teamComp: TeamCompositionDto,
+    readonly updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
+}
+
+interface SaveAddProp extends SaveTeamProp {
+    readonly incrementNumTeamComps?: (num: number, isModifier: boolean) => void,
+    readonly numTeamComps: number,
 }
 
 interface TeamSlotProp extends BaseTeamCompProp {
-    hero: HeroDto,
-    slot: number,
-    defaultRole: string,
+    readonly hero: HeroDto,
+    readonly slot: number,
+    readonly defaultRole: string,
 }
 
-interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveTeamProp {
-    updateTeamCompViewState: () => void,
+interface TeamCompProp extends BaseTeamCompProp, LoginStateProp, SaveAddProp {
+    readonly updateTeamCompViewState: () => void,
 }
 
 const isFullTeam = (team: TeamCompositionDto) => {
@@ -126,7 +129,7 @@ export function SaveUpdate({isLoggedIn, teamComp, updateTeamComp}: SaveTeamProp)
     )
 }
 
-export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamComp, numTeamComps}: SaveTeamProp) {
+export function SaveAdd({isLoggedIn, teamComp, incrementNumTeamComps, updateTeamComp, numTeamComps}: SaveAddProp) {
     const confirmTeamSave = () => {
         if (!isLoggedIn) {
             alert("Please login or register to save your team composition.");
@@ -188,9 +191,7 @@ export function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSele
     const normalizedDefaultRole = defaultRole.toLowerCase();
     const isSelectable = selectedHero.role.toLowerCase() == normalizedDefaultRole && selectedHero.hero_key != "";
     const handleSlotSelected = () => {
-        if (selectedHero.hero_key == "") {
-            return;
-        } else if (selectedHero.hero_key != ""
+        if (selectedHero.hero_key !== ""
             && selectedHero.hero_key != hero.hero_key
             && selectedHero.role.toLowerCase() == normalizedDefaultRole) {
             confirmHeroSelection(slot);
@@ -220,11 +221,11 @@ export function TeamSlot({defaultRole, selectedHero, hero, slot, confirmHeroSele
                 onClick={handleSlotSelected}>
                 <img
                     className="team-role-image"
-                    src={hero.hero_key != "" ? hero.portrait_url : roleImage}
-                    style={hero.hero_key != "" ? {
+                    src={hero.hero_key === "" ? roleImage : hero.portrait_url}
+                    style={hero.hero_key === "" ? {maskSize: "contain"} : {
                         maskSize: "120%",
                         transform: "scale(0.85)"
-                    } : {maskSize: "contain"}}
+                    }}
                     alt="" />
             </button>
             <img className='select-frame' src={frameImage} alt={defaultRole + " team slot frame"}></img>
@@ -256,7 +257,7 @@ function TeamComposition({
                       confirmHeroSelection={confirmHeroSelection}></TeamSlot>
             <SaveAdd isLoggedIn={isLoggedIn} teamComp={teamComp} incrementNumTeamComps={incrementNumTeamComps}
                      updateTeamComp={updateTeamComp} numTeamComps={numTeamComps}></SaveAdd>
-            <SaveUpdate isLoggedIn={isLoggedIn} teamComp={teamComp} numTeamComps={numTeamComps}
+            <SaveUpdate isLoggedIn={isLoggedIn} teamComp={teamComp}
                         updateTeamComp={updateTeamComp}></SaveUpdate>
             <Load isLoggedIn={isLoggedIn} updateTeamCompViewState={updateTeamCompViewState}></Load>
         </div>)

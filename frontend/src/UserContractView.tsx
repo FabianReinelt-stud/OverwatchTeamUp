@@ -26,10 +26,17 @@ interface UserLogin {
 }
 
 interface ViewProp {
-    isLoggedIn: boolean,
-    updateLoginState: (isLoggedIn: boolean) => void,
-    toggleView: () => void
+    readonly isLoggedIn: boolean,
+    readonly updateLoginState: (isLoggedIn: boolean) => void,
+    readonly toggleView: () => void
 }
+
+const usernamePattern = /^[a-z0-9_-]*$/i;
+
+const getFormString = (formData: FormData, field: string): string => {
+    const value = formData.get(field);
+    return typeof value === "string" ? value : "";
+};
 
 const parseTokenResponse = (value: unknown): TokenResponseDto => {
     if (typeof value !== "object" || value === null) {
@@ -49,8 +56,8 @@ const parseTokenResponse = (value: unknown): TokenResponseDto => {
 const getUserLoginData = (form: HTMLFormElement): UserLogin => {
     const formData = new FormData(form);
     return {
-        username: String(formData.get("username") || ""),
-        password: String(formData.get("password") || ""),
+        username: getFormString(formData, "username"),
+        password: getFormString(formData, "password"),
     };
 }
 
@@ -119,7 +126,7 @@ const LoginView = (updateLoginState: (isLoggedIn: boolean) => void,
     }
 
     const validateUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
-        return e.target?.value && e.target.value.match(/^[a-zA-Z0-9_-]*$/i);
+        return usernamePattern.exec(e.target.value) !== null;
     }
 
     return (
@@ -246,7 +253,7 @@ const RegisterSuccessView = (
 }
 
 function UserContractView({updateLoginState, toggleView, isLoggedIn}: ViewProp) {
-    const [view, setView] = useState<View>(!isLoggedIn ? View.LOGIN : View.LOGINSUCCESS);
+    const [view, setView] = useState<View>(isLoggedIn ? View.LOGINSUCCESS : View.LOGIN);
     const updateContractView = (view: View) => setView(view);
 
     const loginView = LoginView(updateLoginState, updateContractView);
@@ -280,8 +287,8 @@ function UserContractView({updateLoginState, toggleView, isLoggedIn}: ViewProp) 
 }
 
 function UserContractViewToggle({updateLoginState, isLoggedIn}: {
-    updateLoginState: (hasLoggedIn: boolean) => void,
-    isLoggedIn: boolean
+    readonly updateLoginState: (hasLoggedIn: boolean) => void,
+    readonly isLoggedIn: boolean
 }) {
     const [showUserContract, setShowUserContract] = useState(false);
     const onClick = async () => {

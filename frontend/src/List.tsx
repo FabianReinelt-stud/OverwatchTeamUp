@@ -9,22 +9,22 @@ import {useState} from "react";
 import {fetchWithAuthRefresh} from "./auth.ts";
 
 interface HeroListProp {
-    input: string;
-    heroList: HeroSummaryDto[];
-    updateSelectedHero: (selectedHero: string) => void;
+    readonly input: string;
+    readonly heroList: HeroSummaryDto[];
+    readonly updateSelectedHero: (selectedHero: string) => void;
 }
 
 interface TeamCompListProp {
-    input: string,
-    teamCompList: TeamCompositionDto[],
-    updateTeamComp: (teamCompUp: TeamCompositionDto) => void
-    updateNumTeamComps: (num: number, isModifier: boolean) => void
+    readonly input: string,
+    readonly teamCompList: TeamCompositionDto[],
+    readonly updateTeamComp: (teamCompUp: TeamCompositionDto) => void
+    readonly updateNumTeamComps: (num: number, isModifier: boolean) => void
 }
 
 interface TeamListButtonProp {
-    team: TeamCompositionDto,
-    updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
-    updateNumTeamComps: (num: number, isModifier: boolean) => void
+    readonly team: TeamCompositionDto,
+    readonly updateTeamComp: (teamCompUp: TeamCompositionDto) => void,
+    readonly updateNumTeamComps: (num: number, isModifier: boolean) => void
 }
 
 const loadErrorStyle: React.CSSProperties = {

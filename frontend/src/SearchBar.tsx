@@ -3,10 +3,10 @@ import "./SearchBar.css";
 import * as React from "react";
 
 interface SearchBarProp {
-    inputHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
-    searchBarAreaStyle: React.CSSProperties,
-    searchFieldStyle: React.CSSProperties,
-    label: string
+    readonly inputHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
+    readonly searchBarAreaStyle: React.CSSProperties,
+    readonly searchFieldStyle: React.CSSProperties,
+    readonly label: string
 }
 
 function SearchBar(

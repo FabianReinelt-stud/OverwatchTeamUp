@@ -46,21 +46,53 @@ const isHeroInTeam = (heroKey: string, currentTeamComp: TeamCompositionDto) => {
 
 const isValidHeroKey = (heroKey: string) => /^[a-z0-9-]{1,30}$/.test(heroKey);
 
+const selectHeroForTeamSlot = (
+    teamSlot: number,
+    selectedHero: HeroDto,
+    currentTeamComp: TeamCompositionDto,
+): TeamCompositionDto => {
+    const isInTeam = isHeroInTeam(selectedHero.hero_key, currentTeamComp);
+    const replacesHero = (otherSlotHero: HeroDto) => isInTeam && selectedHero.hero_key === otherSlotHero.hero_key;
+
+    switch (teamSlot) {
+        case 0:
+            return {...currentTeamComp, hero_1: selectedHero};
+        case 1:
+            return replacesHero(currentTeamComp.hero_3)
+                ? {...currentTeamComp, hero_2: selectedHero, hero_3: emptyHero}
+                : {...currentTeamComp, hero_2: selectedHero};
+        case 2:
+            return replacesHero(currentTeamComp.hero_2)
+                ? {...currentTeamComp, hero_2: emptyHero, hero_3: selectedHero}
+                : {...currentTeamComp, hero_3: selectedHero};
+        case 3:
+            return replacesHero(currentTeamComp.hero_5)
+                ? {...currentTeamComp, hero_4: selectedHero, hero_5: emptyHero}
+                : {...currentTeamComp, hero_4: selectedHero};
+        case 4:
+            return replacesHero(currentTeamComp.hero_4)
+                ? {...currentTeamComp, hero_4: emptyHero, hero_5: selectedHero}
+                : {...currentTeamComp, hero_5: selectedHero};
+        default:
+            return currentTeamComp;
+    }
+};
+
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(localStorage.getItem("accessToken")));
 
     useEffect(() => {
         const updateAuthState = () => setIsLoggedIn(Boolean(localStorage.getItem("accessToken")));
 
-        window.addEventListener(AUTH_CHANGED_EVENT, updateAuthState);
-        return () => window.removeEventListener(AUTH_CHANGED_EVENT, updateAuthState);
+        globalThis.addEventListener(AUTH_CHANGED_EVENT, updateAuthState);
+        return () => globalThis.removeEventListener(AUTH_CHANGED_EVENT, updateAuthState);
     }, []);
 
     useEffect(() => {
         if (!isLoggedIn) {
             setNumTeamComps(0);
             setShowTeamCompView(false);
-            setCurrentTeamComp(JSON.parse(JSON.stringify(emptyTeamComp)));
+            setCurrentTeamComp(structuredClone(emptyTeamComp));
         }
     }, [isLoggedIn]);
 
@@ -70,7 +102,7 @@ function App() {
 
     const [showTeamCompView, setShowTeamCompView] = useState(false);
     const [numTeamComps, setNumTeamComps] = useState(0);
-    const [currentTeamComp, setCurrentTeamComp] = useState<TeamCompositionDto>(JSON.parse(JSON.stringify(emptyTeamComp)));
+    const [currentTeamComp, setCurrentTeamComp] = useState<TeamCompositionDto>(structuredClone(emptyTeamComp));
 
     const updateTeamCompViewState = useCallback(() => {
         setShowTeamCompView(!showTeamCompView);
@@ -114,49 +146,11 @@ function App() {
     }
 
     const confirmHeroSelection = (teamSlot: number) => {
-        if (!selectedHero) {
-            return;
-        }
-        const isInTeam = isHeroInTeam(selectedHero.hero_key, currentTeamComp);
-
-        switch (teamSlot) {
-            case 0:
-                setCurrentTeamComp({...currentTeamComp, hero_1: selectedHero});
-                break;
-            case 1:
-                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_3.hero_key) {
-                    setCurrentTeamComp({...currentTeamComp, hero_2: selectedHero, hero_3: emptyHero})
-                } else {
-                    setCurrentTeamComp({...currentTeamComp, hero_2: selectedHero})
-                }
-                break;
-            case 2:
-                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_2.hero_key) {
-                    setCurrentTeamComp({...currentTeamComp, hero_2: emptyHero, hero_3: selectedHero})
-                } else {
-                    setCurrentTeamComp({...currentTeamComp, hero_3: selectedHero})
-                }
-                break;
-            case 3:
-                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_5.hero_key) {
-                    setCurrentTeamComp({...currentTeamComp, hero_4: selectedHero, hero_5: emptyHero})
-                } else {
-                    setCurrentTeamComp({...currentTeamComp, hero_4: selectedHero})
-                }
-                break;
-            case 4:
-                if (isInTeam && selectedHero.hero_key == currentTeamComp.hero_4.hero_key) {
-                    setCurrentTeamComp({...currentTeamComp, hero_4: emptyHero, hero_5: selectedHero})
-                } else {
-                    setCurrentTeamComp({...currentTeamComp, hero_5: selectedHero})
-                }
-                break;
-        }
+        setCurrentTeamComp(selectHeroForTeamSlot(teamSlot, selectedHero, currentTeamComp));
     }
 
     return (
-        <>
-            <div className='overwatch-team-comp'>
+        <div className='overwatch-team-comp'>
                 <p className="small-screen">We're sorry but this website is best viewed and used at a taller screen
                     ratio.</p>
                 <div className='main-view'>
@@ -182,8 +176,7 @@ function App() {
                          updateNumTeamComps={updateNumTeamComps}
                          numTeamComps={numTeamComps}
                          isLoggedIn={isLoggedIn}></SideBar>
-            </div>
-        </>
+        </div>
     )
 }
 

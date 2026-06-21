@@ -24,7 +24,7 @@ export const sanitizeJwt = (value: unknown): string | null => {
 export const isValidJwt = (value: unknown): value is string => sanitizeJwt(value) !== null;
 
 const notifyAuthChanged = () => {
-    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
+    globalThis.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
 }
 
 export const clearTokens = () => {
@@ -76,8 +76,8 @@ type AuthRequestInit = Omit<RequestInit, "headers"> & {
 };
 
 const getSafeApiUrl = (input: string): URL => {
-    const url = new URL(input, window.location.origin);
-    if (url.origin !== window.location.origin
+    const url = new URL(input, globalThis.location.origin);
+    if (url.origin !== globalThis.location.origin
         || !url.pathname.startsWith("/api/")
         || url.username
         || url.password
@@ -88,17 +88,17 @@ const getSafeApiUrl = (input: string): URL => {
     return url;
 }
 
-const withAuthHeader = (init: AuthRequestInit = {}, accessToken?: string): RequestInit => ({
+const withAuthHeader = (init?: AuthRequestInit, accessToken?: string): RequestInit => ({
     ...init,
     headers: {
-        ...(init.headers || {}),
+        ...init?.headers,
         ...(accessToken ? {Authorization: `Bearer ${accessToken}`} : getAuthHeaders()),
     },
 });
 
 export const fetchWithAuthRefresh = async (
     input: string,
-    init: AuthRequestInit = {},
+    init?: AuthRequestInit,
 ): Promise<Response> => {
     const apiUrl = getSafeApiUrl(input);
     const response = await fetch(apiUrl, withAuthHeader(init));
@@ -116,12 +116,12 @@ export const fetchWithAuthRefresh = async (
 
 export const fetchJsonWithAuthRefresh = async (
     input: string,
-    init: AuthRequestInit = {},
+    init?: AuthRequestInit,
 ): Promise<Response> => fetchWithAuthRefresh(input, {
     ...init,
     headers: {
         "Content-Type": "application/json",
-        ...(init.headers || {}),
+        ...init?.headers,
     },
 });
 

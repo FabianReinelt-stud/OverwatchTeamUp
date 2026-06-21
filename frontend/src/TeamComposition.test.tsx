@@ -120,7 +120,7 @@ describe('Load', () => {
 describe('SaveUpdate', () => {
     it('should have save update functionality disabled if not logged in', () => {
         const {container} = render(<SaveUpdate teamComp={MockEmptyTeam} updateTeamComp={() => {
-        }} numTeamComps={0} isLoggedIn={false}></SaveUpdate>)
+        }} isLoggedIn={false}></SaveUpdate>)
         const disabledUpdate = container.getElementsByClassName("saveBtn-update-disabled");
         expect(disabledUpdate).not.toBeNull();
     })
@@ -131,7 +131,7 @@ describe('SaveUpdate', () => {
         vi.spyOn(window, "alert").mockImplementation(() => undefined);
         const updateTeamComp = vi.fn();
         render(<SaveUpdate teamComp={teamDummyData[0]} updateTeamComp={updateTeamComp}
-                           numTeamComps={1} isLoggedIn={true}/>);
+                           isLoggedIn={true}/>);
         fireEvent.click(screen.getByRole("button", {name: "Update team composition"}));
         await waitFor(() => expect(updateTeamComp).toHaveBeenCalledWith(updatedTeam));
     })
@@ -140,7 +140,7 @@ describe('SaveUpdate', () => {
         vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, {status: 500}));
         const alertMock = vi.spyOn(window, "alert").mockImplementation(() => undefined);
         render(<SaveUpdate teamComp={teamDummyData[0]} updateTeamComp={vi.fn()}
-                           numTeamComps={1} isLoggedIn={true}/>);
+                           isLoggedIn={true}/>);
         fireEvent.click(screen.getByRole("button", {name: "Update team composition"}));
         await waitFor(() => expect(alertMock).toHaveBeenCalled());
     })

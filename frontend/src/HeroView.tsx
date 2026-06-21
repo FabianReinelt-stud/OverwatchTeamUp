@@ -3,21 +3,21 @@ import type {AbilityDto, HeroDto} from "./data/api-dtos.tsx";
 import * as React from "react";
 
 interface HeroStatProp {
-    statName: string;
-    statValue: string | number;
-    statColor: string;
-    rowStyle: React.CSSProperties;
+    readonly statName: string;
+    readonly statValue: string | number;
+    readonly statColor: string;
+    readonly rowStyle: React.CSSProperties;
 }
 
 interface HeroAbilityProp {
-    abilities: AbilityDto[];
-    abilityColor: string;
-    rowStyle: React.CSSProperties;
+    readonly abilities: AbilityDto[];
+    readonly abilityColor: string;
+    readonly rowStyle: React.CSSProperties;
 }
 
 interface HeroViewProp {
-    currentHero: HeroDto;
-    loadingError: boolean;
+    readonly currentHero: HeroDto;
+    readonly loadingError: boolean;
 }
 
 const messageStyle: React.CSSProperties = {
@@ -45,9 +45,7 @@ const abilityRowStyle: React.CSSProperties = {
 
 function HeroView({currentHero, loadingError}: HeroViewProp) {
     let heroView;
-    if (currentHero.hero_key != "") {
-        heroView = <HeroStats hero={currentHero}/>;
-    } else {
+    if (currentHero.hero_key === "") {
         heroView = <div className="introduction" style={messageStyle}>
             <h2 style={{
                 fontFamily: "BigNoodle, serif",
@@ -70,6 +68,8 @@ function HeroView({currentHero, loadingError}: HeroViewProp) {
                 </p>
             </div>
         </div>;
+    } else {
+        heroView = <HeroStats hero={currentHero}/>;
     }
 
     return (
@@ -81,7 +81,7 @@ function HeroView({currentHero, loadingError}: HeroViewProp) {
     )
 }
 
-export function HeroStats({hero}: { hero: HeroDto }) {
+export function HeroStats({hero}: Readonly<{ hero: HeroDto }>) {
     return (<div className='hero-view'>
         <img className='hero-portrait' src={hero.portrait_url} alt='hero'></img>
         <div className='stat-view'>
