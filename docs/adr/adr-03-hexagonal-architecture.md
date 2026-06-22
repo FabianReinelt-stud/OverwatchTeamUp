@@ -10,36 +10,35 @@ Accepted
 
 ## Context
 
-The backend depends on two external systems — the OverFast API and PostgreSQL — that could change independently of the business logic. The team wanted the domain to be testable without live infrastructure and for external systems to be swappable without touching core logic.
+The backend depends on two external systems, the OverFast API and PostgreSQL, that can change independently of the business logic. We wanted to test the domain without live infrastructure and replace external systems without modifying the core use cases.
 
 ## Decision
 
-Apply the Hexagonal Architecture pattern. The domain layer (entities, services) has no framework or infrastructure dependencies. All external dependencies are accessed through abstract port interfaces (`HeroPort`, `TeamCompositionPort`, `ExternalHeroSourcePort`). Concrete adapters implement those ports and live outside the domain.
+Apply the Hexagonal Architecture pattern to team composition management and hero synchronization. Domain entities have no framework dependencies. Application services access hero persistence, team composition persistence, and OverFast through the `HeroPort`, `TeamCompositionPort`, and `ExternalHeroSourcePort` interfaces. Concrete adapters implement these ports. Authentication and simple hero queries continue to use standard Django and DRF patterns.
 
 ## Alternatives Considered
 
 ### Option 1: Hexagonal Architecture (Ports & Adapters)
 
-- Pros: Domain logic is testable with stub adapters; external systems are swappable by changing one file; business rules cannot leak into infrastructure code.
+- Pros: Application services can be tested with in-memory port implementations; OverFast and database access remain outside those services.
 - Cons: More files and indirection than a plain Django CRUD app; new contributors must understand the pattern before making changes.
 
 ### Option 2: Plain Django MVT / CRUD
 
 - Pros: Less boilerplate; simpler mental model for Django developers.
-- Cons: Business logic becomes coupled to ORM models and the HTTP layer; replacing the external API or database would require changes throughout the codebase.
+- Cons: Business logic can become coupled to ORM models and HTTP concerns as the codebase grows.
 
 ## Consequences
 
-- (+) The OverFast API can be replaced by changing exactly one file (`overfast_api_adapter.py`).
-- (+) Domain logic is testable with stub adapters; no live database or external API needed in unit tests.
-- (+) Business rules cannot leak into infrastructure code.
-- (−) More files and indirection than a plain Django CRUD app.
-- (−) New contributors must understand the pattern before making changes.
+- (+) `HeroSyncService` and `TeamCompositionService` can be tested with in-memory port implementations.
+- (+) OverFast and database access remain outside these application services.
+- (−) The additional interfaces and mappings add indirection.
+- (−) Authentication, simple hero queries, and sync-state persistence do not yet follow the same structure.
 
 ## References
 
 - `heroes/ports/` — abstract port interfaces.
 - `heroes/adapters/` — concrete adapter implementations.
 - `heroes/domain/entities.py` — pure Python domain entities with no framework imports.
-- See [ADR-01](adr-01-python-django.md) — Django is confined to the adapter layer by this pattern.
-- See [ADR-04](adr-04-postgresql.md) — PostgreSQL is accessed exclusively through `HeroDataBaseAdapter` and `TeamCompositionDatabaseAdapter`.
+- See [ADR-01](adr-01-python-django.md) — the core use cases keep Django ORM access in adapters, while the HTTP and authentication layers still use Django and DRF directly.
+- See [ADR-04](adr-04-postgresql.md) — hero, team composition, and sync-state persistence use database adapters; Django authentication uses its own ORM integration.

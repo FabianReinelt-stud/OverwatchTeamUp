@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-A web frontend was needed to let users browse heroes and manage team compositions. The team wanted type safety and a component-based UI with a modern developer experience.
+OverwatchTeamUp is a student project. We chose React and TypeScript to gain practical experience with a new UI library and programming language. The frontend needed to let users browse heroes and manage team compositions. We also wanted type safety, reusable components, and fast local feedback during development.
 
 ## Decision
 
@@ -20,21 +20,20 @@ Use React 19 with TypeScript and Vite as the build tool. MUI is used for UI comp
 
 ### Option 1: React 19 + TypeScript + Vite
 
-- Pros: Component-based architecture; TypeScript catches frontend/backend contract mismatches at compile time; Vite dev proxy eliminates CORS friction during development.
-- Cons: React ecosystem moves fast; major upgrades can be breaking; requires a DTO generation step to keep frontend types in sync.
+- Pros: Reusable components; TypeScript catches many DTO mismatches during the build; Vite provides fast startup and hot module replacement.
+- Cons: Generated DTOs must be refreshed explicitly after backend serializer changes; major React upgrades may require migration work.
 
 ### Option 2: Plain JavaScript / HTML
 
 - Pros: No build tooling required; simpler setup.
-- Cons: No type safety; harder to maintain as the codebase grows; no component reuse.
+- Cons: No static type checks and no built-in component model for the growing UI.
 
 ## Consequences
 
-- (+) Component-based architecture keeps the UI maintainable and modular.
-- (+) TypeScript catches frontend/backend contract mismatches at compile time.
-- (+) Vite dev proxy eliminates CORS friction during development.
-- (−) React ecosystem moves fast; major upgrades can be breaking.
-- (−) Requires a DTO generation step (`generate_dtos` management command) to keep frontend types in sync with the backend serializers.
+- (+) React components separate the main UI concerns.
+- (+) TypeScript catches many DTO mismatches during the build.
+- (+) Vite provides fast local startup and hot module replacement.
+- (−) Generated DTOs must be refreshed explicitly with the `generate_dtos` management command after serializer changes.
 
 ## References
 

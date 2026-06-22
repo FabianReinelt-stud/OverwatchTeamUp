@@ -123,14 +123,3 @@ SonarQube imports:
 - Frontend coverage from `frontend/coverage/lcov.info`.
 
 Excluded from coverage calculation are test files, Django migrations, generated DTOs, e2e tests, and the frontend entry point `main.tsx`. Architecture and e2e tests are not counted as line coverage because they verify structure and user flows rather than providing a stable line coverage metric.
-
-## Test Levels
-
-| Level | Purpose | Tools |
-|-------|---------|-------|
-| Unit tests | Verify isolated domain logic and React components | Django TestCase, unittest, Vitest, React Testing Library |
-| Integration tests | Verify API, serializers, authentication, ORM, and database behavior together | Django TestCase, DRF APIClient |
-| Security tests | Verify protected endpoints, JWT flows, and user isolation | Django TestCase, DRF APIClient |
-| Architecture tests | Verify backend and frontend dependency rules | unittest, pytestarch, TypeScript compiler API, Vitest |
-| End-to-end tests | Verify complete user flows in a real browser | Playwright | 
-| Static analysis | Detect code smells and rule violations | Ruff, ESLint, SonarQube | CI pipeline |

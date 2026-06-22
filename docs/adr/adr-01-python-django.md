@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-OverwatchTeamUp is a student project. The team chose it as an opportunity to learn Python as a new language. A backend was needed to expose a REST API, manage a PostgreSQL database, and sync hero data from an external API.
+OverwatchTeamUp is a student project. We chose Python to gain practical experience with a new language. The backend needed to expose a REST API, manage a PostgreSQL database, and synchronize hero data from an external API.
 
 ## Decision
 
@@ -20,21 +20,19 @@ Use Python as the backend language and Django with Django REST Framework (DRF) a
 
 ### Option 1: Python / Django + DRF
 
-- Pros: Learning goal fulfilled; Django ORM, DRF serializers, and the management command system reduce boilerplate; large ecosystem and strong documentation.
+- Pros: Supports the learning goal; Django ORM, DRF serializers, and management commands cover most of the required backend infrastructure.
 - Cons: Django is a full-stack framework; for an API-only service it brings unused features such as templates and the admin interface.
 
 ### Option 2: Java / Spring Boot
 
 - Pros: Strongly typed; widely used in enterprise; good REST support.
-- Cons: Does not fulfill the team's learning goal of working with Python; more verbose boilerplate.
+- Cons: Does not support our goal of gaining experience with Python; requires more setup for this project.
 
 ## Consequences
 
-- (+) Learning goal fulfilled — the project gave the team hands-on experience with Python and Django.
-- (+) Django ORM, DRF serializers, and the management command system reduced boilerplate.
-- (+) Large ecosystem and strong documentation available.
-- (−) Django is a full-stack framework; for an API-only service it brings unused features such as templates and the admin interface.
-- (−) Python performance is lower than compiled languages, though irrelevant at this scale.
+- (+) We gained practical experience with Python and Django.
+- (+) Django ORM, DRF serializers, and management commands cover most backend infrastructure needs.
+- (−) The project uses only part of Django's full-stack feature set.
 
 ## References
 
