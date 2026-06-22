@@ -15,8 +15,8 @@ describe('SideBar', () => {
         const visibleSearchBars = container.getElementsByClassName("search-bar-area");
         const visibleSearchTables = container.getElementsByClassName("scrollable-container");
 
-        expect(visibleSearchBars.length).toBe(1);
-        expect(visibleSearchTables.length).toBe(1);
+        expect(visibleSearchBars).toHaveLength(1);
+        expect(visibleSearchTables).toHaveLength(1);
     })
 
     it('should only show Team Table and corresponding search bar if toggled on', () => {
@@ -32,7 +32,7 @@ describe('SideBar', () => {
         const visibleSearchBars = container.getElementsByClassName("search-bar-area");
         const visibleSearchTables = container.getElementsByClassName("scrollable-container");
 
-        expect(visibleSearchBars.length).toBe(2);
-        expect(visibleSearchTables.length).toBe(2);
+        expect(visibleSearchBars).toHaveLength(2);
+        expect(visibleSearchTables).toHaveLength(2);
     })
 })

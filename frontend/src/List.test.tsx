@@ -27,7 +27,7 @@ describe("TeamList", () => {
                                              updateNumTeamComps={MockFunction}></TeamList>);
 
         const listButtons = container.getElementsByClassName("scrollable-item");
-        expect(listButtons.length).toBe(3);
+        expect(listButtons).toHaveLength(3);
     })
 
     it("should render reduced list when filtering by input", () => {
@@ -35,7 +35,7 @@ describe("TeamList", () => {
                                              updateNumTeamComps={MockFunction}></TeamList>);
 
         const listButtons = container.getElementsByClassName("scrollable-item");
-        expect(listButtons.length).toBe(1);
+        expect(listButtons).toHaveLength(1);
     })
 })
 
@@ -51,7 +51,7 @@ describe("(Hero)List", () => {
         const {container} = render(<List input={""} heroList={heroDummyData} updateSelectedHero={MockFunction}></List>);
 
         const listButtons = container.getElementsByClassName("scrollable-item");
-        expect(listButtons.length).toBe(4);
+        expect(listButtons).toHaveLength(4);
     })
 
     it("should only render hero corresponding to name input", () => {
@@ -59,7 +59,7 @@ describe("(Hero)List", () => {
                                          updateSelectedHero={MockFunction}></List>);
 
         const listButtons = container.getElementsByClassName("scrollable-item");
-        expect(listButtons.length).toBe(1);
+        expect(listButtons).toHaveLength(1);
     })
 
     it("should only render heroes according to team role input", () => {
@@ -67,7 +67,7 @@ describe("(Hero)List", () => {
                                          updateSelectedHero={MockFunction}></List>);
 
         const listButtons = container.getElementsByClassName("scrollable-item");
-        expect(listButtons.length).toBe(2);
+        expect(listButtons).toHaveLength(2);
     })
 
     it("should render correct team role icon according to hero role", () => {

@@ -13,7 +13,7 @@ describe('HeroAbilityRow', () => {
         const {container} = render(<HeroAbilityRow abilities={heroViewDummyData.abilities} abilityColor="#ffc70e"
                                                    rowStyle={{}}></HeroAbilityRow>)
         const abilityRowComponents = container.getElementsByClassName("stat-value");
-        expect(abilityRowComponents.length).toBe(3);
+        expect(abilityRowComponents).toHaveLength(3);
     })
 })
 
@@ -21,7 +21,7 @@ describe('HeroStats', () => {
     it('should render all hero stats', () => {
         const {container} = render(<HeroStats hero={heroViewDummyData}></HeroStats>)
         const heroStats = container.getElementsByClassName("hero-stat-row");
-        expect(heroStats.length).toBe(11);
+        expect(heroStats).toHaveLength(11);
     })
 })
 
@@ -42,10 +42,10 @@ describe('HeroView', () => {
             abilities: []
         }} loadingError={false}></HeroView>)
         const introduction = container.getElementsByClassName("introduction");
-        expect(introduction).not.toBeNull();
+        expect(introduction).toHaveLength(1);
     })
 
-    it('should display an error message when there was a loading error', () => {
+    it('should display the selected hero stats', () => {
         render(<HeroView currentHero={{
             hero_key: "",
             display_name: "",
@@ -67,6 +67,6 @@ describe('HeroView', () => {
     it('should display an error message when there was a loading error', () => {
         const {container} = render(<HeroView currentHero={heroViewDummyData} loadingError={false}></HeroView>);
         const heroView = container.getElementsByClassName("hero-view");
-        expect(heroView).not.toBeNull();
+        expect(heroView).toHaveLength(1);
     })
 })

@@ -182,7 +182,7 @@ describe('TeamSlot', () => {
                                              selectedHero={heroDummyData} confirmHeroSelection={() => {
         }}></TeamSlot>)
         const teamSlot = container.getElementsByClassName("role");
-        expect(teamSlot.length).toBe(1);
+        expect(teamSlot).toHaveLength(1);
     })
 
     it('confirms selection on an enabled matching slot', () => {
@@ -204,7 +204,7 @@ describe('TeamSlot', () => {
                 }}></TeamSlot>
             </div>)
         const disabledSlots = container.getElementsByClassName("role-disabled");
-        expect(disabledSlots.length).toBe(2);
+        expect(disabledSlots).toHaveLength(2);
     })
 })
 
@@ -225,7 +225,7 @@ describe('TeamComposition', () => {
         const teamSlots = container.getElementsByClassName("team-role-select");
         const teamCompMenuButtons = container.getElementsByClassName("team-button-wrapper");
 
-        expect(teamSlots.length).toBe(5);
-        expect(teamCompMenuButtons.length).toBe(3);
+        expect(teamSlots).toHaveLength(5);
+        expect(teamCompMenuButtons).toHaveLength(3);
     })
 })
